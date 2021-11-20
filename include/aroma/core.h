@@ -61,7 +61,7 @@ typedef word (*color_handler)(const char *color_str);
  * Descriptions: libaroma runtime configuration
  */
 typedef struct{
-	char fb_shm_name[64];				//framebuffer shmem file name
+	char fb_shm_name[256];				//framebuffer shmem file name
 	byte snapshoot_fb;					//try to get screen contents before start
 	byte multicore_init_num;			//max cpu cores to init
 	color_handler custom_color_handler;	//color translator callback for text tags parser
