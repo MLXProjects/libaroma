@@ -516,13 +516,15 @@ byte _libaroma_ctl_scroll_thread(LIBAROMA_CONTROLP ctl) {
 					/* fling handler */
 					if ((me->velocity!=0)&&(!me->touched)){
 						/* onfling */
-						me->velocity=(me->velocity*246)>>8;
+						me->velocity=(me->velocity*246)>>8; /* this sets fling lowering rate a.k.a. slowing down */
 						if ((abs(me->velocity)<256)||(me->touched)) {
 							/* ended */
+							ALOGD("scroll velocity - released = %d", me->velocity);
 							me->velocity = 0;
 							need_drawing=1;
 						}
 						else{
+							ALOGD("scroll velocity - on fling = %d", me->velocity);
 							/* still on fling */
 							int scroll_y = (me->velocity>>8) + me->scroll_y;
 							if (scroll_y>=me->max_scroll_y){
@@ -591,6 +593,7 @@ byte _libaroma_ctl_scroll_thread(LIBAROMA_CONTROLP ctl) {
 					if (me->bounce_velocity!=0){
 						/* bounce */
 						me->bounce_velocity=(me->bounce_velocity*153)>>8;
+						ALOGD("scroll bounce velocity=%d", me->bounce_velocity);
 						if (abs(me->bounce_velocity)<256){
 							me->bounce_velocity=0;
 						}
@@ -1213,8 +1216,9 @@ dword _libaroma_ctl_scroll_touch_handler(
 				if (!me->handle_touched){
 					if (me->allow_scroll){
 						me->velocity=(libaroma_fling_up(&me->fling, y)*
-								libaroma_px(18))/libaroma_dp(4);
+										libaroma_px(18))/libaroma_dp(4); /* this sets start velocity a.k.a drop jumpyness */
 						if (me->velocity){
+							ALOGD("scroll start_velocity = %d", me->velocity);
 							me->touched=0;
 						}
 					}
