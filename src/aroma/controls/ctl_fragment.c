@@ -1017,6 +1017,77 @@ byte libaroma_ctl_fragment_set_active_window(
 	return ret;
 }
 
+/*
+ * Function		: libaroma_ctl_fragment_get_active_window
+ * Return Value: int
+ * Descriptions: get fragment active window
+ */
+LIBAROMA_WINDOWP libaroma_ctl_fragment_get_active_window(
+	LIBAROMA_CONTROLP ctl){
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, 0
+	);
+	if (me->win_n < 1) return NULL;
+	return me->wins[me->win_pos];
+}
+
+/*
+ * Function		: libaroma_ctl_fragment_get_active_window_id
+ * Return Value: int
+ * Descriptions: get active window id
+ */
+int libaroma_ctl_fragment_get_active_window_id(
+	LIBAROMA_CONTROLP ctl){
+	LIBAROMA_WINDOWP active_win = libaroma_ctl_fragment_get_active_window(ctl);
+	if (!active_win) return 0;
+	_LIBAROMA_CTL_FRAGMENT_WINP wind = (_LIBAROMA_CTL_FRAGMENT_WINP) active_win->client_data;
+	if (!wind) return 0;
+	return wind->id;
+}
+
+/*
+ * Function		: libaroma_ctl_is_fragment
+ * Return Value: byte
+ * Descriptions: check if control is fragment
+ */
+byte libaroma_ctl_is_fragment(
+	LIBAROMA_CONTROLP ctl){
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, 0
+	);
+	return 1;
+}
+
+/*
+ * Function		: libaroma_ctl_fragment_get_window_at
+ * Return Value: LIBAROMA_WINDOWP
+ * Descriptions: get window at index
+ */
+LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window_at(
+	LIBAROMA_CONTROLP ctl, int index){
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, NULL
+	);
+	if (index >= me->win_n || index < 0){
+		ALOGW("fragment_get_window_at index out of bounds (max=%d, requested=%d)", me->win_n, index);
+		return NULL;
+	}
+	return me->wins[index];
+	}
+	
+/*
+	* Function		: libaroma_ctl_fragment_get_window_count
+	* Return Value: int
+	* Descriptions: get fragment window count
+	*/
+byte libaroma_ctl_fragment_get_window_count(
+	LIBAROMA_CONTROLP ctl){
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, 0
+	);
+	return me->win_n;
+}
+
 #ifdef __cplusplus
 }
 #endif

@@ -63,6 +63,14 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window(
 	LIBAROMA_CONTROLP ctl, int id);
 
 /*
+ * Function		: libaroma_ctl_fragment_get_window_at
+ * Return Value: LIBAROMA_WINDOWP
+ * Descriptions: get window at index
+ */
+LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window_at(
+	LIBAROMA_CONTROLP ctl, int index);
+
+/*
  * Function		: libaroma_ctl_fragment_set_active_window
  * Return Value: byte
  * Descriptions: set active page
@@ -76,11 +84,36 @@ byte libaroma_ctl_fragment_set_active_window(
 	);
 
 /*
+ * Function		: libaroma_ctl_is_fragment
+ * Return Value: byte
+ * Descriptions: check if control is fragment
+ */
+byte libaroma_ctl_is_fragment(
+	LIBAROMA_CONTROLP ctl);
+
+
+/*
+ * Function		: libaroma_ctl_fragment_get_window_count
+ * Return Value: byte
+ * Descriptions: get fragment window count
+ */
+byte libaroma_ctl_fragment_get_window_count(
+	LIBAROMA_CONTROLP ctl);
+
+/*
  * Function		: libaroma_ctl_fragment_get_active_window
+ * Return Value: LIBAROMA_WINDOWP
+ * Descriptions: get active window
+ */
+LIBAROMA_WINDOWP libaroma_ctl_fragment_get_active_window(
+	LIBAROMA_CONTROLP ctl);
+
+/*
+ * Function		: libaroma_ctl_fragment_get_active_window_id
  * Return Value: int
  * Descriptions: get active window id
  */
- /*
-int libaroma_ctl_fragment_get_active_window(LIBAROMA_CONTROLP ctl);
-*/
+int libaroma_ctl_fragment_get_active_window_id(
+	LIBAROMA_CONTROLP ctl);
+
 #endif /* __libaroma_ctl_fragment_h__ */
