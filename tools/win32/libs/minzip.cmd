@@ -13,7 +13,7 @@ pushd "%LIBAROMA_BASE%\out\libs\%LIBAROMA_TARGET_NAME%\%~n0"
 echo Building MinZIP
 %LIBAROMA_GCC% -c ^
   -fdata-sections -ffunction-sections -Wl,--gc-sections ^
-  -fPIC -DPIC %LIBAROMA_STRIP_OBJECT% -D_GNU_SOURCE ^
+  -fPIC -DPIC %LIBAROMA_STRIP_OBJECT% -D_GNU_SOURCE -DLOG_NDEBUG ^
   ^
    %LIBAROMA_CFLAGS% ^
 	^
