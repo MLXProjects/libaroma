@@ -331,35 +331,6 @@ byte libaroma_window_layer_init(LIBAROMA_WINDOWP win);
  */
 byte libaroma_window_layer_release(LIBAROMA_WINDOWP win);
 
-/*********************PULLDOWN*********************/
-
-/*
- * Function		: libaroma_window_pulldown
- * Return Value: LIBAROMA_WINDOWP
- * Descriptions: new or get pulldown window
- */
-LIBAROMA_WINDOWP libaroma_window_pulldown(LIBAROMA_WINDOWP win, int height, byte showtype);
-
-/*
- * Function		: libaroma_window_pulldown_show
- * Return Value: byte
- * Descriptions: show/hide pulldown
- */
-byte libaroma_window_pulldown_show(LIBAROMA_WINDOWP win, byte show);
-
-/* slide pulldown callback */
-typedef void (*LIBAROMA_WINDOW_PULLDOWN_SLIDE_CB)(
-	LIBAROMA_WINDOWP,int,int);
-
-/*
- * Function		: libaroma_window_pulldown_onslide
- * Return Value: byte
- * Descriptions: set pulldown slide position callback
- */
-byte libaroma_window_pulldown_onslide(
-	LIBAROMA_WINDOWP win, LIBAROMA_WINDOW_PULLDOWN_SLIDE_CB cb);
-
-
 /************************SIDEBAR************************/
 /*
  * Function		: libaroma_window_sidebar
