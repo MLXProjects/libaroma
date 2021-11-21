@@ -18,15 +18,16 @@ Linux and Windows
 
 ### for running (target)
 
-Linux (both desktop and embedded), QNX
+Linux, Windows (thanks SDL), QNX
 
 ### target architectures
 
-Currently ARM, x86/x86_64 and (theoretically) MIPS are supported. Other platforms are not tested.
+Currently ARM (v6 onwards), x86 and x86_64 are supported. MIPS and other platforms are not tested.
 
 ### optimizations
 
 If you target ARM or x86/64, you have the following optional optimizations:
+
 ARM: you can use NEON (available from ARMv7 onwards) to improve drawing operations
 
 x86 and x86_64: you can se SSE to emulate NEON and make drawing operations faster
