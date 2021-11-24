@@ -107,6 +107,7 @@ echo "Building Libaroma${LIBAROMA_DEBUG_SUFFIX}"
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_pager.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_progress.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_scroll.c" \
+	"${LIBAROMA_BASE}/src/aroma/controls/ctl_slider.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_tabs.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_toast.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/listitem/listitem_caption.c" \
