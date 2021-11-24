@@ -263,6 +263,28 @@ byte libaroma_hid_get(
 					}
 				}
 				break;
+			case LIBAROMA_HID_EV_RET_MOUSE: {
+					/* filter move event to prevent flooding move messages */
+					if (e->state == LIBAROMA_HID_EV_STATE_MOVE) {
+						/* ignore the floods */
+						if ((_libaroma_hid->touch_last_x!=e->x)||
+							 (_libaroma_hid->touch_last_y!=e->y)){
+							libaroma_hid_set_keypress(e->key, e->state);
+							/* set last move info */
+							_libaroma_hid->touch_last_x = e->x;
+							_libaroma_hid->touch_last_y = e->y;
+							return ret;
+						}
+					}
+					else {
+						libaroma_hid_set_keypress(e->key, e->state);
+						/* set last move info */
+						_libaroma_hid->touch_last_x = e->x;
+						_libaroma_hid->touch_last_y = e->y;
+						return ret;
+					}
+				}
+				break;
 			default:
 				/* send value */
 				libaroma_hid_set_keypress(e->key, e->state);

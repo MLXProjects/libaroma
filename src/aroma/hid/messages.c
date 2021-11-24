@@ -85,6 +85,16 @@ static void * _libaroma_msgqueue_hid_thread(
 		if (_libaroma_msgqueue_isrun == 2) {
 			/* process input message */
 			switch (e.type) {
+				case LIBAROMA_HID_EV_TYPE_MOUSE:
+					/* post touch message */
+					libaroma_msg_post_hid(
+						LIBAROMA_MSG_MOUSE,
+						e.state,
+						e.key,
+						e.x,
+						e.y
+					);
+					break;
 				case LIBAROMA_HID_EV_TYPE_TOUCH:
 					/* post touch message */
 					libaroma_msg_post_hid(

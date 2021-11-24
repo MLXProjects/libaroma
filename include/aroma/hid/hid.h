@@ -31,11 +31,14 @@
 #define LIBAROMA_HID_KEYCODE_MAX      0x200
 #define LIBAROMA_HID_TOUCH_KEYCODE    (LIBAROMA_HID_KEYCODE_MAX-1)
 #define LIBAROMA_HID_WHEEL_KEYCODE    (LIBAROMA_HID_KEYCODE_MAX-2)
+#define LIBAROMA_HID_LMOUSE_KEYCODE   (LIBAROMA_HID_KEYCODE_MAX-3)
+#define LIBAROMA_HID_RMOUSE_KEYCODE   (LIBAROMA_HID_KEYCODE_MAX-4)
 
 /* Input Event Type */
 #define LIBAROMA_HID_EV_TYPE_NONE     0x00 /* Won't processed */
 #define LIBAROMA_HID_EV_TYPE_KEY      0x01 /* Keypad/Keyboards */
 #define LIBAROMA_HID_EV_TYPE_TOUCH    0x02 /* Touch Screen */
+#define LIBAROMA_HID_EV_TYPE_MOUSE    0x03 /* Touch Screen */
 
 /* Get Input Return Values */
 #define LIBAROMA_HID_EV_RET_NONE      0x00 /* ignore  */
@@ -48,7 +51,8 @@
 #define LIBAROMA_HID_EV_RET_RAWKEY    0x07 /* raw keycode */
 #define LIBAROMA_HID_EV_RET_POWER     0x08 /* power */
 #define LIBAROMA_HID_EV_RET_VOLDOWN   0x09 /* vol down */
-#define LIBAROMA_HID_EV_RET_VOLUP     0x10 /* vol up */
+#define LIBAROMA_HID_EV_RET_VOLUP     0x0a /* vol up */
+#define LIBAROMA_HID_EV_RET_MOUSE     0x0b /* mouse */
 #define LIBAROMA_HID_EV_RET_EXIT      0xcc /* halt */
 #define LIBAROMA_HID_EV_RET_ERROR     0xdd /* error */
 
