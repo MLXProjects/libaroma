@@ -149,23 +149,21 @@ void _libaroma_ctl_slider_draw(
 
 	libaroma_control_erasebg(ctl,c);
 	
-	double onedp=libaroma_dp(1); /* save dp value because dp calculation is quite costly */
-	
-	int ix = onedp*20;
+	int ix = libaroma_dp(20);
 	int iw = ctl->w-(ix*2);
-	int ih = onedp*4;
+	int ih = libaroma_dp(4);
 	int iy = ctl->h>>1;
 	float val_w = ((float)iw * me->curval) / me->max;
-	int h_sz = onedp*20;
+	int h_sz = libaroma_dp(20);
 	int h_x = ix+val_w;
-	int sh_sz= onedp*22;
+	int sh_sz= libaroma_dp(22);
 	/* draw full track */
 	libaroma_draw_line_width(c,
 		ix, iy, ix+iw, iy, ih, 
 		libaroma_colorget(ctl,NULL)->control_bg, 0xFF, 0, 0.5
 	);
 	if (val_w>0){
-		int val_h = onedp*6;
+		int val_h = libaroma_dp(6);
 		/* draw value track */
 		libaroma_draw_line_width(c,
 			ix, iy, h_x, iy, val_h,
@@ -178,9 +176,9 @@ void _libaroma_ctl_slider_draw(
 	LIBAROMA_CANVASP sh_mask = libaroma_canvas_ex(sh_sz, sh_sz,1);
 	libaroma_canvas_setcolor(sh_mask,0,0);
 	libaroma_gradient(sh_mask,0,0,sh_sz,sh_sz,0,0,sh_sz>>1,0x1111);
-	LIBAROMA_CANVASP sh_cv = libaroma_blur_ex(sh_mask,onedp,1,0);
+	LIBAROMA_CANVASP sh_cv = libaroma_blur_ex(sh_mask,libaroma_dp(1),1,0);
 	libaroma_canvas_free(sh_mask);
-	libaroma_draw_opacity(c, sh_cv, h_x-(sh_sz>>1)-onedp, iy-(sh_sz>>1), 3, 0x60);
+	libaroma_draw_opacity(c, sh_cv, h_x-(sh_sz>>1)-libaroma_dp(1), iy-(sh_sz>>1), 3, 0x60);
 	libaroma_canvas_free(sh_cv);
 	/* handle */
 	libaroma_draw_circle(c, libaroma_colorget(ctl,NULL)->primary, h_x, iy, h_sz, 0xFF);
@@ -212,9 +210,9 @@ dword _libaroma_ctl_slider_msg(
 			int y = msg->y;
 			libaroma_window_calculate_pos(NULL,ctl,&x,&y);
 			double onedp=libaroma_dp(1);
-			int ix = onedp*20;
+			int ix = libaroma_dp(20);
 			int iw = ctl->w-(ix*2);
-			int h_sz= onedp*20;
+			int h_sz= ix;
 			x-=ix;
 			if (x>ix+iw) x-=ix;
 			switch (msg->state){
@@ -224,17 +222,17 @@ dword _libaroma_ctl_slider_msg(
 					me->rtick = libaroma_tick();
 					/* if touched outside of handle bounds, update directly */
 					if (x < (me->curval-(h_sz>>1)) || x > (me->curval+(h_sz>>1))){
-						new_value=(x * 100.0f) / iw;
+						new_value=(x * me->max) / iw;
 					}
 				} break;
 				case LIBAROMA_HID_EV_STATE_MOVE:{
-					new_value=(x * 100.0f) / iw;
+					new_value=(x * me->max) / iw;
 					
 				} break;
 				case LIBAROMA_HID_EV_STATE_UP:{
 					me->rshow=0;
 					me->rtick = libaroma_tick();
-					new_value=(x * 100.0f) / iw;
+					new_value=(x * me->max) / iw;
 					
 				} break;
 			}
