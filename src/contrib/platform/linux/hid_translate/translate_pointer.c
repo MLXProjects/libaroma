@@ -121,19 +121,37 @@ byte LINUXHIDRV_translate_pointer(LIBAROMA_HIDP me, LINUXHIDRV_DEVICEP dev,
 			/* send fb config */
 			libaroma_fb_config("pointer",NULL,
 				MAKEDWORD(LINUXHIDRV_pointer_current_x,LINUXHIDRV_pointer_current_y));
-
-			/* send as mouse message */
-			dest_ev->type	 	= LIBAROMA_HID_EV_TYPE_MOUSE;
+			
 			dest_ev->key		= 0;
 			dest_ev->x			= LINUXHIDRV_pointer_current_x;
 			dest_ev->y			= LINUXHIDRV_pointer_current_y;
 			dest_ev->state	= LIBAROMA_HID_EV_STATE_MOVE;
-			return LIBAROMA_HID_EV_RET_MOUSE;
+			if (LINUXHIDRV_pointer_leftmouse_down){
+				/* send as touch message */
+				dest_ev->type	 = LIBAROMA_HID_EV_TYPE_TOUCH;
+				return LIBAROMA_HID_EV_RET_TOUCH;
+			}
+			else {
+				/* send as mouse message */
+				dest_ev->type	 	= LIBAROMA_HID_EV_TYPE_MOUSE;
+				return LIBAROMA_HID_EV_RET_MOUSE;
+			}
 		}
 	}
 	else if (ev->type==EV_KEY){
-		if (ev->code==BTN_LEFT || ev->code==BTN_RIGHT){
+		if (ev->code==BTN_LEFT){
 			LINUXHIDRV_pointer_leftmouse_down=(ev->value==1)?1:0;
+			/* send as touch */
+			LINUXHIDRV_pointer_init(me);
+			dest_ev->type	 = LIBAROMA_HID_EV_TYPE_TOUCH;
+			dest_ev->key		= 0;
+			dest_ev->x			= LINUXHIDRV_pointer_current_x;
+			dest_ev->y			= LINUXHIDRV_pointer_current_y;
+			dest_ev->state	= (LINUXHIDRV_pointer_leftmouse_down?
+			LIBAROMA_HID_EV_STATE_DOWN:LIBAROMA_HID_EV_STATE_UP);
+			return LIBAROMA_HID_EV_RET_TOUCH;
+		}
+		else if (ev->code==BTN_RIGHT){
 			/* send as mouse key */
 			LINUXHIDRV_pointer_init(me);
 			dest_ev->type	 	= LIBAROMA_HID_EV_TYPE_MOUSE;
@@ -141,7 +159,7 @@ byte LINUXHIDRV_translate_pointer(LIBAROMA_HIDP me, LINUXHIDRV_DEVICEP dev,
 				LIBAROMA_HID_LMOUSE_KEYCODE:LIBAROMA_HID_RMOUSE_KEYCODE;
 			dest_ev->x			= LINUXHIDRV_pointer_current_x;
 			dest_ev->y			= LINUXHIDRV_pointer_current_y;
-			dest_ev->state		= (LINUXHIDRV_pointer_leftmouse_down)?
+			dest_ev->state		= (ev->value==1)?
 				LIBAROMA_HID_EV_STATE_DOWN:LIBAROMA_HID_EV_STATE_UP;
 			return LIBAROMA_HID_EV_RET_MOUSE;
 		}
