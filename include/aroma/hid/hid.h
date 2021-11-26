@@ -169,18 +169,18 @@ byte libaroma_hid_config(char * name,char * svalue,dword dvalue);
 byte libaroma_hid_has_mice();
 
 /*
- * Function		: libaroma_hid_mice_x
+ * Function		: libaroma_hid_last_input_x
  * Return Value: int
- * Descriptions: get mice x coord
+ * Descriptions: get last touch/mice x coord
  */
-int libaroma_hid_mice_x();
+int libaroma_hid_last_input_x();
 
 /*
- * Function		: libaroma_hid_mice_y
+ * Function		: libaroma_hid_last_input_y
  * Return Value: int
- * Descriptions: get mice y coord
+ * Descriptions: get last touch/mice y coord
  */
-int libaroma_hid_mice_y();
+int libaroma_hid_last_input_y();
 
 
 #endif /* __libaroma_hid_h__ */

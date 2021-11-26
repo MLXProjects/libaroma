@@ -211,8 +211,8 @@ byte _libaroma_wm_cursor_draw(){
 	/* lock cursor mutex - prevent cursor change while rendering */
 	libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
 	/* get cursor x/y */
-	int x=libaroma_hid_mice_x(),
-	    y=libaroma_hid_mice_y();
+	int x=libaroma_hid_last_input_x(),
+		y=libaroma_hid_last_input_y();
 	/* save current fb data below mouse */
 	libaroma_draw_ex(_libaroma_wm_cursor->behind, libaroma_fb()->canvas,
 					0, 0,
@@ -388,7 +388,7 @@ byte libaroma_wm_init(){
 		LIBAROMA_WM_FLAG_RESET_COLOR|
 		LIBAROMA_WM_FLAG_RESET_THEME);
 	_libaroma_wm_workspace_canvas();
-	if (libaroma_hid_has_mice()){
+	if (libaroma_hid_has_mice() || libaroma_config()->wm_force_cursor){
 		/* initialize cursor support */
 		ALOGV("libaroma_wm_init init cursor render");
 		_libaroma_wm_cursor = calloc(sizeof(_LIBAROMA_WM_CURSOR),1);

@@ -146,7 +146,16 @@ byte libaroma_gfx_startup_dpi(int dpi){
  */
 void libaroma_config_cursor_path(char *uri){
 	libaroma_config()->wm_cursor_res = uri;
-}
+} /* End of libaroma_config_cursor_path */
+
+/*
+ * Function		: libaroma_config_force_cursor
+ * Return Value: void
+ * Descriptions: force window manager to init & render cursor
+ */
+void libaroma_config_force_cursor(){
+	libaroma_config()->wm_force_cursor=1;
+} /* End of libaroma_config_force_cursor */
 
 /*
  * Function		: libaroma_debug_output
