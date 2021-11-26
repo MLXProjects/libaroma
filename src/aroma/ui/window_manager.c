@@ -355,6 +355,15 @@ byte libaroma_wm_cursor_setvisible(byte visible){
 		return 0;
 	}
 	libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
+	if (!visible){
+		/* restore data below cursor to hide it */
+		libaroma_draw_ex(libaroma_fb()->canvas, _libaroma_wm_cursor->behind,
+						 _libaroma_wm_cursor->prev_x-(_libaroma_wm_cursor->size>>1), _libaroma_wm_cursor->prev_y-(_libaroma_wm_cursor->size>>1),
+						 0, 0,
+				   _libaroma_wm_cursor->behind->w, _libaroma_wm_cursor->behind->h,
+				   2, 0xFF
+		);
+	}
 	_libaroma_wm_cursor->norender=(visible)?0:1;
 	libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
 	return 1;
