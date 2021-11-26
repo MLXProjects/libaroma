@@ -73,6 +73,7 @@ typedef struct{
 	byte gfx_override_rgb;				//use gfx_default_rgb for framebuffer initialization
 	int gfx_override_dpi;				//override dpi at framebuffer initialization
 	byte gfx_default_rgb[3];			//display default RGB pixel order
+	char *wm_cursor_res;				//path to cursor image, used if mice connected
 } LIBAROMA_CONFIG, * LIBAROMA_CONFIGP;
 
 /*
@@ -97,11 +98,25 @@ void libaroma_sdl_startup_size(int width, int height);
 void libaroma_sdl_window_title(char *title);
 
 /*
- * Function		: libaroma_sdl_startup_size
+ * Function		: libaroma_gfx_override_rgb
  * Return Value: void
  * Descriptions: override rgb order when initializing framebuffer
  */
 void libaroma_gfx_override_rgb(byte override, byte r, byte g, byte b);
+
+/*
+ * Function		: libaroma_gfx_startup_dpi
+ * Return Value: void
+ * Descriptions: override dpi when initializing framebuffer
+ */
+byte libaroma_gfx_startup_dpi(int dpi);
+
+/*
+ * Function		: libaroma_config_cursor_path
+ * Return Value: void
+ * Descriptions: set wm cursor image path
+ */
+void libaroma_config_cursor_path(char *uri);
 
 /*
  * Function		: libaroma_info

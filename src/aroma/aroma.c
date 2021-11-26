@@ -140,6 +140,15 @@ byte libaroma_gfx_startup_dpi(int dpi){
 }
 
 /*
+ * Function		: libaroma_config_cursor_path
+ * Return Value: void
+ * Descriptions: set wm cursor image path
+ */
+void libaroma_config_cursor_path(char *uri){
+	libaroma_config()->wm_cursor_res = uri;
+}
+
+/*
  * Function		: libaroma_debug_output
  * Return Value: FILE *
  * Descriptions: get debug output fd

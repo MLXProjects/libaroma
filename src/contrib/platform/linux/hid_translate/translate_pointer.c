@@ -73,14 +73,6 @@ static inline void LINUXHIDRV_pointer_set_y(LIBAROMA_HIDP me,int y){
 	}
 }
 
-int LINUXHIDRV_get_mouse_x(){
-	return LINUXHIDRV_pointer_current_x;
-}
-
-int LINUXHIDRV_get_mouse_y(){
-	return LINUXHIDRV_pointer_current_y;
-}
-
 /*
  * function : translate raw pointer data
  */

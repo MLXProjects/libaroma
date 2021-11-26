@@ -106,6 +106,12 @@ byte libaroma_hid_init() {
 			goto return_error_clean;
 		}
 	}
+	
+	if (_libaroma_hid->has_mice){
+		/* set cursor to screen center at startup */
+		_libaroma_hid->touch_last_x=libaroma_fb()->w>>1;
+		_libaroma_hid->touch_last_y=libaroma_fb()->h>>1;
+	}
 
 	/* Check Callbacks */
 	if ((_libaroma_hid->release == NULL) ||
@@ -245,6 +251,7 @@ byte libaroma_hid_get(
 					/* filter move event to prevent flooding move messages */
 					if (e->state == LIBAROMA_HID_EV_STATE_MOVE) {
 						/* ignore the floods */
+						if (libaroma_wm()!=NULL) libaroma_wm()->cursor_draw=1;
 						if ((_libaroma_hid->touch_last_x!=e->x)||
 							 (_libaroma_hid->touch_last_y!=e->y)){
 							libaroma_hid_set_keypress(LIBAROMA_HID_TOUCH_KEYCODE, e->state);
@@ -266,6 +273,7 @@ byte libaroma_hid_get(
 			case LIBAROMA_HID_EV_RET_MOUSE: {
 					/* filter move event to prevent flooding move messages */
 					if (e->state == LIBAROMA_HID_EV_STATE_MOVE) {
+						if (libaroma_wm()!=NULL) libaroma_wm()->cursor_draw=1;
 						/* ignore the floods */
 						if ((_libaroma_hid->touch_last_x!=e->x)||
 							 (_libaroma_hid->touch_last_y!=e->y)){
@@ -278,9 +286,6 @@ byte libaroma_hid_get(
 					}
 					else {
 						libaroma_hid_set_keypress(e->key, e->state);
-						/* set last move info */
-						_libaroma_hid->touch_last_x = e->x;
-						_libaroma_hid->touch_last_y = e->y;
 						return ret;
 					}
 				}
@@ -319,6 +324,53 @@ byte libaroma_hid_config(
 	ALOGV("hid set config %s=%s,(%x)", name, svalue, dvalue);
 	return _libaroma_hid->config(_libaroma_hid, name, svalue, dvalue);
 } /* End of libaroma_hid_config */
+
+/*
+ * Function		: libaroma_hid_has_mice
+ * Return Value: byte
+ * Descriptions: is mice available?
+ */
+byte libaroma_hid_has_mice(){
+	if (_libaroma_hid == NULL) {
+		ALOGW("hid instance uninitialized");
+		return 0;
+	}
+	return _libaroma_hid->has_mice;
+} /* End of libaroma_hid_has_mice */
+
+/*
+ * Function		: libaroma_hid_mice_x
+ * Return Value: int
+ * Descriptions: get current mice x coord
+ */
+int libaroma_hid_mice_x(){
+	if (_libaroma_hid == NULL) {
+		ALOGW("hid instance uninitialized");
+		return 0;
+	}
+	if (!(_libaroma_hid->has_mice)){
+		ALOGW("hid instance has no mice");
+		return 0;
+	}
+	return _libaroma_hid->touch_last_x;
+} /* End of libaroma_hid_mice_x */
+
+/*
+ * Function		: libaroma_hid_mice_y
+ * Return Value: int
+ * Descriptions: get current mice y coord
+ */
+int libaroma_hid_mice_y(){
+	if (_libaroma_hid == NULL) {
+		ALOGW("hid instance uninitialized");
+		return 0;
+	}
+	if (!(_libaroma_hid->has_mice)){
+		ALOGW("hid instance has no mice");
+		return 0;
+	}
+	return _libaroma_hid->touch_last_y;
+} /* End of libaroma_hid_mice_y */
 
 #ifdef __cplusplus
 }

@@ -221,6 +221,10 @@ byte LINUXHIDRV_init(
 				/* set pooling data and monitor it */
 				mi->fds[mi->n].fd		 = fd;
 				mi->fds[mi->n].events = POLLIN;
+				/* if pointer connected, enable wm cursor drawing */
+				if ((mi->dev[mi->n].devclass & LINUXHIDRV_DEVCLASS_POINTER)){
+					me->has_mice=1;
+				}
 				/* increment the polling count */
 				mi->n++;
 			}

@@ -106,6 +106,7 @@ struct _LIBAROMA_HID {
   int   screen_width;
   int   screen_height;
   byte  key_pressed[LIBAROMA_HID_KEYCODE_MAX / 8];
+  byte  has_mice;
   
   /* touch move informations */
   int   touch_last_x;
@@ -159,6 +160,27 @@ byte libaroma_hid_get(LIBAROMA_HID_EVENTP e);
  * Descriptions: runtime config
  */
 byte libaroma_hid_config(char * name,char * svalue,dword dvalue);
+
+/*
+ * Function		: libaroma_hid_has_mice
+ * Return Value: byte
+ * Descriptions: is mice available?
+ */
+byte libaroma_hid_has_mice();
+
+/*
+ * Function		: libaroma_hid_mice_x
+ * Return Value: int
+ * Descriptions: get mice x coord
+ */
+int libaroma_hid_mice_x();
+
+/*
+ * Function		: libaroma_hid_mice_y
+ * Return Value: int
+ * Descriptions: get mice y coord
+ */
+int libaroma_hid_mice_y();
 
 
 #endif /* __libaroma_hid_h__ */

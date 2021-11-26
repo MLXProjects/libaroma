@@ -29,12 +29,30 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct{
+	LIBAROMA_MUTEX mutex;
+	
+	LIBAROMA_CANVASP cursor;
+	LIBAROMA_CANVASP shadow;
+	LIBAROMA_CANVASP behind;
+	word shadow_color;
+	int size;
+	
+	byte norender;
+	int prev_x;
+	int prev_y;
+} _LIBAROMA_WM_CURSOR, * _LIBAROMA_WM_CURSORP;
+
+#define _LIBAROMA_WM_CURSOR_DEFAULT_SIZE libaroma_dp(48);
+
 /*
  * Variable		: _libaroma_wm
  * Type				: LIBAROMA_WMP
  * Descriptions: window manager storage
  */
 static LIBAROMA_WMP _libaroma_wm=NULL;
+static _LIBAROMA_WM_CURSORP _libaroma_wm_cursor=NULL;
 static LIBAROMA_THREAD _libaroma_wm_message_thread_var;
 static LIBAROMA_THREAD _libaroma_wm_ui_thread_var;
 static LIBAROMA_COND_MUTEX	_libaroma_wm_mutex;
@@ -180,6 +198,167 @@ byte _libaroma_wm_workspace_canvas(){
 	_libaroma_wm_workspace_canvas_update();
 	return 1;
 } /* End of _libaroma_wm_workspace_canvas */
+/*
+ * Function		: _libaroma_wm_cursor_draw
+ * Return Value: byte
+ * Descriptions: draw cursor to screen
+ */
+byte _libaroma_wm_cursor_draw(){
+	if (_libaroma_wm_cursor->norender){
+		_libaroma_wm->cursor_draw=0;
+		return 0;
+	}
+	/* lock cursor mutex - prevent cursor change while rendering */
+	libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
+	/* get cursor x/y */
+	int x=libaroma_hid_mice_x(),
+	    y=libaroma_hid_mice_y();
+	/* save current fb data below mouse */
+	libaroma_draw_ex(_libaroma_wm_cursor->behind, libaroma_fb()->canvas,
+					0, 0,
+					x-(_libaroma_wm_cursor->size>>1), y-(_libaroma_wm_cursor->size>>1),
+					_libaroma_wm_cursor->behind->w, _libaroma_wm_cursor->behind->h,
+					2, 0xFF
+	);
+	/* draw cursor image at current x/y */
+	if (_libaroma_wm_cursor->shadow!=NULL){
+		/* draw cursor shadow */
+		libaroma_draw(libaroma_fb()->canvas, _libaroma_wm_cursor->shadow, x-(_libaroma_wm_cursor->size>>1), y-(_libaroma_wm_cursor->size>>1), 3);
+	}
+	libaroma_draw(libaroma_fb()->canvas, _libaroma_wm_cursor->cursor, x-(_libaroma_wm_cursor->size>>1), y-(_libaroma_wm_cursor->size>>1), 3);
+	_libaroma_wm_cursor->prev_x=x;
+	_libaroma_wm_cursor->prev_y=y;
+	libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
+	return 1;
+} /* _libaroma_wm_cursor_draw */
+
+/*
+ * Function		: libaroma_wm_cursor_getimg
+ * Return Value: LIBAROMA_CANVASP
+ * Descriptions: get cursor image
+ */
+LIBAROMA_CANVASP libaroma_wm_cursor_getimg(){
+	if (!_libaroma_wm_cursor){
+		ALOGW("wm_cursor_setimg cursor uninitialized");
+		return NULL;
+	}
+	return _libaroma_wm_cursor->cursor;
+} /* End of libaroma_wm_cursor_getimg */
+
+/*
+ * Function		: libaroma_wm_cursor_setimg
+ * Return Value: byte
+ * Descriptions: set cursor image
+ */
+byte libaroma_wm_cursor_setimg(LIBAROMA_CANVASP image){
+	if (!_libaroma_wm_cursor){
+		ALOGW("wm_cursor_setimg cursor uninitialized");
+		return 0;
+	}
+	libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
+	/* default cursor size */
+	_libaroma_wm_cursor->size = libaroma_dp(48);
+	byte isdefault=(image==NULL)?1:0;
+	if (isdefault){
+		/* fallback to default cursor */
+		image = libaroma_canvas_ex(_libaroma_wm_cursor->size, _libaroma_wm_cursor->size, 1);
+		LIBAROMA_PATHP path = libaroma_path(libaroma_dp(24), libaroma_dp(24));
+		libaroma_path_add(path, libaroma_dp(46), libaroma_dp(36));
+		libaroma_path_add(path, libaroma_dp(34), libaroma_dp(40));
+		libaroma_path_add(path, libaroma_dp(28), libaroma_dp(46));
+		libaroma_path_draw(image, path, RGB(FFFFFF), 0xFF, 1, 0.5);
+		libaroma_path_free(path);
+		libaroma_canvas_fillcolor(image, RGB(FFFFFF));
+	}
+	if (_libaroma_wm_cursor->cursor==NULL){
+		/* init cursor cv */
+		LIBAROMA_CANVASP cursor_cv = libaroma_canvas_ex(_libaroma_wm_cursor->size, _libaroma_wm_cursor->size, 1);
+		if (cursor_cv == NULL){
+			ALOGW("wm_cursor_setimg alloc cursor canvas failed");
+			return 0;
+		}
+		_libaroma_wm_cursor->cursor=cursor_cv;
+	}
+	/* clear cursor canvas */
+	libaroma_canvas_blank(_libaroma_wm_cursor->cursor);
+	/* scale image to cursor */
+	libaroma_draw_scale_smooth(_libaroma_wm_cursor->cursor, image, 0, 0, _libaroma_wm_cursor->size, _libaroma_wm_cursor->size, 0, 0, image->w, image->h);
+	if (isdefault || _libaroma_wm_cursor->shadow!=NULL){
+		/* isdefault check needed because default cursor is plain white */
+		libaroma_wm_cursor_setshadow_color(1, isdefault?0:_libaroma_wm_cursor->shadow_color);
+	}
+	libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
+	return 1;
+} /* End of libaroma_wm_cursor_setimg */
+
+/*
+ * Function		: libaroma_wm_cursor_setshadow_color
+ * Return Value: byte
+ * Descriptions: set cursor shadow and color
+ */
+byte libaroma_wm_cursor_setshadow_color(byte enable, word color){
+	if (_libaroma_wm_cursor==NULL){
+		ALOGW("wm_cursor_setshadow cursor uninitialized");
+		return 0;
+	}
+	libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
+	if (enable){
+		LIBAROMA_CANVASP shadow = libaroma_blur(_libaroma_wm_cursor->cursor, libaroma_dp(1));
+		if (!shadow){
+			ALOGW("wm_cursor_setshadow failed to alloc shadow canvas");
+			return 0;
+		}
+		/* set shadow color & save */
+		libaroma_canvas_fillcolor(shadow, color);
+		if (_libaroma_wm_cursor->shadow!=NULL){
+			/* free previous shadow */
+			libaroma_canvas_free(_libaroma_wm_cursor->shadow);
+		}
+		_libaroma_wm_cursor->shadow_color = color;
+		_libaroma_wm_cursor->shadow = shadow;
+	}
+	else {
+		if (_libaroma_wm_cursor->shadow!=NULL){
+			libaroma_canvas_free(_libaroma_wm_cursor->shadow);
+			_libaroma_wm_cursor->shadow=NULL;
+		}
+	}
+	libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
+	if (!(_libaroma_wm_cursor->norender)){
+		/* render updated cursor */
+		_libaroma_wm->cursor_draw=1;
+	}
+	return 1;
+} /* End of libaroma_wm_cursor_setshadow_color */
+
+/*
+ * Function		: libaroma_wm_cursor_visible
+ * Return Value: byte
+ * Descriptions: get cursor visible
+ */
+byte libaroma_wm_cursor_visible(){
+	if (_libaroma_wm_cursor==NULL){
+		ALOGW("wm_cursor_visible cursor uninitialized");
+		return 0;
+	}
+	return (_libaroma_wm_cursor->norender)?0:1;
+} /* End of libaroma_wm_cursor_visible */
+
+/*
+ * Function		: libaroma_wm_cursor_setvisible
+ * Return Value: byte
+ * Descriptions: set cursor visible
+ */
+byte libaroma_wm_cursor_setvisible(byte visible){
+	if (_libaroma_wm_cursor==NULL){
+		ALOGW("wm_cursor_setvisible cursor not initialized");
+		return 0;
+	}
+	libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
+	_libaroma_wm_cursor->norender=(visible)?0:1;
+	libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
+	return 1;
+} /* End of libaroma_wm_cursor_setvisible */
 
 /*
  * Function		: libaroma_wm_init
@@ -209,6 +388,40 @@ byte libaroma_wm_init(){
 		LIBAROMA_WM_FLAG_RESET_COLOR|
 		LIBAROMA_WM_FLAG_RESET_THEME);
 	_libaroma_wm_workspace_canvas();
+	if (libaroma_hid_has_mice()){
+		/* initialize cursor support */
+		ALOGV("libaroma_wm_init init cursor render");
+		_libaroma_wm_cursor = calloc(sizeof(_LIBAROMA_WM_CURSOR),1);
+		if (_libaroma_wm_cursor==NULL){
+			ALOGW("libaroma_wm_init alloc cursor memory failed");
+			return 0;
+		}
+		libaroma_mutex_init(_libaroma_wm_cursor->mutex);
+		if (libaroma_config()->wm_cursor_res!=NULL){
+			if (!libaroma_wm_cursor_setimg(libaroma_image_uri(libaroma_config()->wm_cursor_res))){
+				ALOGW("libaroma_wm_init cursor init failed");
+				libaroma_canvas_free(_libaroma_wm_cursor->behind);
+				libaroma_mutex_free(_libaroma_wm_cursor->mutex);
+				free(_libaroma_wm_cursor);
+				_libaroma_wm_cursor=NULL;
+				return 1;
+			}
+		}
+		LIBAROMA_CANVASP behind_cv = libaroma_canvas_ex(_libaroma_wm_cursor->size, _libaroma_wm_cursor->size, 0);
+		if (!behind_cv){
+			ALOGW("libaroma_wm_init alloc behind cursor canvas failed");
+			free(_libaroma_wm_cursor);
+			_libaroma_wm_cursor=NULL;
+			return 1;
+		}
+		_libaroma_wm_cursor->behind=behind_cv;
+		/* init cursor draw at screen center */
+		_libaroma_wm_cursor->prev_x=libaroma_fb()->w>>1;
+		_libaroma_wm_cursor->prev_y=libaroma_fb()->h>>1;
+		/* draw cursor at wm init */
+		_libaroma_wm->cursor_draw=1;
+	}
+	
 	return 1;
 } /* End of libaroma_wm_init */
 
@@ -223,11 +436,27 @@ byte libaroma_wm_release(){
 		return 0;
 	}
 	libaroma_mutex_lock(_libaroma_wm_ui_mutex);
+	_libaroma_wm->cursor_draw=0;
 	_libaroma_wm_onprocessing=1;
 	if (_libaroma_wm->client_started){
 		libaroma_mutex_unlock(_libaroma_wm_ui_mutex);
 		libaroma_wm_client_stop();
 		libaroma_mutex_lock(_libaroma_wm_ui_mutex);
+	}
+	if (_libaroma_wm_cursor!=NULL){
+		ALOGV("libaroma_wm_release release cursor");
+		libaroma_mutex_lock(_libaroma_wm_cursor->mutex);
+		_libaroma_wm_cursor->norender=1;
+		libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
+		if (_libaroma_wm_cursor->cursor!=NULL)
+			libaroma_canvas_free(_libaroma_wm_cursor->cursor);
+		if (_libaroma_wm_cursor->shadow!=NULL)
+			libaroma_canvas_free(_libaroma_wm_cursor->shadow);
+		if (_libaroma_wm_cursor->behind!=NULL)
+			libaroma_canvas_free(_libaroma_wm_cursor->behind);
+		libaroma_mutex_free(_libaroma_wm_cursor->mutex);
+		free(_libaroma_wm_cursor);
+		_libaroma_wm_cursor=NULL;
 	}
 	ALOGV("libaroma_wm_release release window manager");
 	libaroma_sarray_free(_libaroma_wm->color);
@@ -238,13 +467,13 @@ byte libaroma_wm_release(){
 	_libaroma_wm_onprocessing=0;
 	libaroma_mutex_unlock(_libaroma_wm_ui_mutex);
 	libaroma_mutex_free(_libaroma_wm_sync_mutex);
+	libaroma_mutex_free(_libaroma_wm_sync_mutex);
 	libaroma_mutex_free(_libaroma_wm_ui_mutex);
 	libaroma_cond_free(&_libaroma_wm_cond, &_libaroma_wm_mutex);
 	free(_libaroma_wm);
 	_libaroma_wm=NULL;
 	return 1;
 } /* End of libaroma_wm_release */
-
 
 /*
  * Function		: libaroma_wm_compose
@@ -644,6 +873,15 @@ static void * _libaroma_wm_ui_thread(void * cookie) {
 		if (_libaroma_wm->client_started){
 			libaroma_mutex_lock(_libaroma_wm_ui_mutex);
 			if (!_libaroma_wm_onprocessing){
+				if (_libaroma_wm_cursor!=NULL && !(_libaroma_wm_cursor->norender)){
+					/* restore data behind cursor before window content update */
+					libaroma_draw_ex(libaroma_fb()->canvas, _libaroma_wm_cursor->behind,
+									_libaroma_wm_cursor->prev_x-(_libaroma_wm_cursor->size>>1), _libaroma_wm_cursor->prev_y-(_libaroma_wm_cursor->size>>1),
+									0, 0,
+									_libaroma_wm_cursor->behind->w, _libaroma_wm_cursor->behind->h,
+									2, 0xFF
+					);
+				}
 				if (_libaroma_wm->active_window!=NULL){
 					if (_libaroma_wm->active_window->ui_thread!=NULL){
 						if (_libaroma_wm->active_window->ui_thread(
@@ -660,6 +898,13 @@ static void * _libaroma_wm_ui_thread(void * cookie) {
 				}
 			}
 			libaroma_mutex_unlock(_libaroma_wm_ui_mutex);
+			if (need_sync){
+				_libaroma_wm->cursor_draw=1;
+			}
+			if (_libaroma_wm_cursor!=NULL && _libaroma_wm->cursor_draw){
+				_libaroma_wm_cursor_draw();
+				_libaroma_wm->cursor_draw=0;
+			}
 			if (need_sync){
 				libaroma_wm_syncarea();
 				need_sync=0;
