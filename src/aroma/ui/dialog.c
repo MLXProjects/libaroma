@@ -136,11 +136,10 @@ LIBAROMA_WINDOWP libaroma_dialog_window(
 		ALOGW("libaroma_dialog_window: Cannot allocate window");
 		return NULL;
 	}
-	LIBAROMA_CANVASP old_prev=NULL;
-	if (win->prev_screen) old_prev=win->prev_screen;
-	win->prev_screen=libaroma_canvas(wmcv->w, wmcv->h);
-	libaroma_draw(win->prev_screen, wmcv, 0, 0, 0);
-	if (old_prev) libaroma_canvas_free(old_prev); 
+	if (!win->prev_screen){
+		win->prev_screen=libaroma_canvas(libaroma_fb()->w, libaroma_fb()->h);
+		libaroma_draw(win->prev_screen, wmcv, libaroma_wm()->x+win->x, libaroma_wm()->y+win->y, 0);
+	}
 	libaroma_canvas_free(wmcv);
 	win->colorset = colorset;
 	win->client_data = (voidp) cdata;
@@ -165,7 +164,7 @@ byte libaroma_dialog_free(
 			free(win->client_data);
 			win->client_data=NULL;
 		}
-		byte ret=libaroma_window_aniclose(win, LIBAROMA_WINDOW_SHOW_ANIMATION_FADE, 200);
+		byte ret=libaroma_window_aniclose(win, LIBAROMA_WINDOW_SHOW_ANIMATION_FADE, 250);
 		if (parent){
 			ret=libaroma_window_show(parent);
 		}
@@ -286,7 +285,7 @@ int libaroma_dialog_confirm(
 	if (parent)
 		cdata->parent=parent;
 	
-	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE,200);
+	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE,250);
 
 	byte onpool=1;
 	LIBAROMA_MSG msg;
@@ -440,7 +439,7 @@ LIBAROMA_CONTROLP libaroma_dialog_progress(
 		);
 	}
 
-	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE,200);
+	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE,250);
 /*
 	byte onpool=1;
 	LIBAROMA_MSG msg;
@@ -713,7 +712,7 @@ int libaroma_dialog_list(
 	}
 
 
-	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE, 200);
+	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE, 250);
 	//libaroma_window_anishow(win,0,0);
 
 	if (selitem){

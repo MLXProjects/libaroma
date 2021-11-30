@@ -913,7 +913,7 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 							libaroma_draw_ex(
 								wmc,
 								win->prev_screen,
-								0, 0, 0, 0, win->w, win->h-h, 0, 0xFF
+								0, 0, libaroma_wm()->x+win->x, libaroma_wm()->y+win->y, win->w, win->h-h, 0, 0xFF
 							);
 							libaroma_draw_ex(
 								wmc,
@@ -971,12 +971,12 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 							libaroma_draw_ex(
 								wmc,
 								win->prev_screen,
-								w, 0, w, 0, win->w-w, win->h, 0, 0xFF
+								w, 0, libaroma_wm()->x+win->x+w, libaroma_wm()->y+win->y, win->w-w, win->h, 0, 0xFF
 							);
 							libaroma_draw_ex(
 								wmc,
 								win->dc,
-								0, 0, x, 0, w, win->h,
+								0, 0, 0, 0, w, win->h,
 								0, 0xff
 							);
 								libaroma_wm_sync(win->x,win->y, win->w, win->h);
@@ -1031,7 +1031,7 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 							libaroma_draw_ex(
 								wmc,
 								win->prev_screen,
-								w, 0, 0, 0, win->w-w, win->h, 0, 0xFF
+								w, libaroma_wm()->x+win->x, 0, 0, win->w-w, win->h, 0, 0xFF
 							);
 							libaroma_draw_ex(
 								wmc,
@@ -1039,7 +1039,7 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 								x, 0, 0, 0, w, win->h,
 								0, 0xff
 							);
-								libaroma_wm_sync(win->x,win->y, win->w, win->h);
+							libaroma_wm_sync(win->x,win->y, win->w, win->h);
 						}
 					}
 					break;
@@ -1056,7 +1056,7 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 														wmc, win->prev_screen, win->dc,
 														//this is needed because snapshots are taken
 														//using fb size, not wm workspace size
-														libaroma_wm()->x, libaroma_wm()->y, 
+														libaroma_wm()->x+win->x, libaroma_wm()->y+win->y, 
 														win->prev_screen->w, win->prev_screen->h,
 														0, 0, win->w, win->h, state);
 					libaroma_wm_sync(win->x, win->y, win->w, win->h);
