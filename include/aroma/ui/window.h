@@ -358,4 +358,13 @@ typedef void (*LIBAROMA_WINDOW_SIDEBAR_SLIDE_CB)(
 byte libaroma_window_sidebar_onslide(
 	LIBAROMA_WINDOWP win, LIBAROMA_WINDOW_SIDEBAR_SLIDE_CB cb);
 
+/*
+ * Function		: libaroma_window_inside
+ * Return Value: byte
+ * Descriptions: check if coords inside window bounds
+ */
+byte libaroma_window_inside(
+	LIBAROMA_WINDOWP win, byte absolute, int x, int y
+);
+
 #endif /* __libaroma_window_h__ */

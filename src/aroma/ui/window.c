@@ -1364,6 +1364,22 @@ dword libaroma_window_pool(
 	return 0;
 } /* End of libaroma_window_pool */
 
+/*
+ * Function		: libaroma_window_inside
+ * Return Value: byte
+ * Descriptions: check if coords are inside of window bounds
+ */
+byte libaroma_window_inside(
+	LIBAROMA_WINDOWP win, byte absolute, int x, int y
+){
+	if (!win) return 0;
+	if (x < ((absolute)?libaroma_wm()->x:0 + win->x)) return 0;
+	if (x > ((absolute)?libaroma_wm()->x:0 + win->x + win->w)) return 0;
+	if (y < ((absolute)?libaroma_wm()->y:0 + win->y)) return 0;
+	if (y > ((absolute)?libaroma_wm()->y:0 + win->y + win->h)) return 0;
+	return 1;
+} /* End of libaroma_window_inside */
+
 
 #undef __CHECK_WM
 
