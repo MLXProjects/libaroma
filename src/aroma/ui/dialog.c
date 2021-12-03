@@ -292,13 +292,18 @@ int libaroma_dialog_confirm(
 	dword command;
 	byte cmd;
 	word id;
-	int retval=-1;
+	byte retval=0;
 
 	do{
 		command=libaroma_window_pool(win,&msg);
 		cmd = LIBAROMA_CMD(command);
 		id = LIBAROMA_CMD_ID(command);
-		if (msg.msg==LIBAROMA_MSG_KEY_BACK){
+		if (msg.msg==LIBAROMA_MSG_EXIT){ /* must exit */
+			ALOGV("libaroma_dialog_confirm: Exit Message - Close");
+			libaroma_dialog_free(win);
+			return retval;
+		}
+		else if (msg.msg==LIBAROMA_MSG_KEY_BACK){
 			if (flags&LIBAROMA_DIALOG_CANCELABLE){
 				ALOGV("libaroma_dialog_confirm: Back Button - Cancel");
 				win->onpool=0;
@@ -728,13 +733,18 @@ int libaroma_dialog_list(
 	dword command;
 	byte cmd;
 	word id;
-	int retval=-1;
+	byte retval=0;
 
 	do{
 		command=libaroma_window_pool(win,&msg);
 		cmd = LIBAROMA_CMD(command);
 		id = LIBAROMA_CMD_ID(command);
-		if (msg.msg==LIBAROMA_MSG_KEY_BACK){
+		if (msg.msg==LIBAROMA_MSG_EXIT){ /* must exit */
+			ALOGV("libaroma_dialog_confirm: Exit Message - Close");
+			libaroma_dialog_free(win);
+			return retval;
+		}
+		else if (msg.msg==LIBAROMA_MSG_KEY_BACK){
 			if (flags&LIBAROMA_DIALOG_CANCELABLE){
 				ALOGV("libaroma_dialog_confirm: Back Button - Cancel");
 				win->onpool=0;
