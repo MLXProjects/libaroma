@@ -287,7 +287,7 @@ int libaroma_dialog_confirm(
 	
 	libaroma_window_anishow(win,LIBAROMA_WINDOW_SHOW_ANIMATION_FADE,250);
 
-	byte onpool=1;
+	win->onpool=1;
 	LIBAROMA_MSG msg;
 	dword command;
 	byte cmd;
@@ -301,36 +301,36 @@ int libaroma_dialog_confirm(
 		if (msg.msg==LIBAROMA_MSG_KEY_BACK){
 			if (flags&LIBAROMA_DIALOG_CANCELABLE){
 				ALOGV("libaroma_dialog_confirm: Back Button - Cancel");
-				onpool=0;
+				win->onpool=0;
 			}
 		}
 		else if (cmd==LIBAROMA_CMD_CLICK){
 			if (id==1){
 				ALOGV("libaroma_dialog_confirm: Button 1 Selected");
 				retval=1;
-				onpool=0;
+				win->onpool=0;
 				libaroma_sleep(300);
 			}
 			else if (id==2){
 				ALOGV("libaroma_dialog_confirm: Button 2 Selected");
 				retval=2;
-				onpool=0;
+				win->onpool=0;
 				libaroma_sleep(300);
 			}
 		}
 		else if (msg.msg==LIBAROMA_MSG_TOUCH){
 			if (flags&LIBAROMA_DIALOG_CANCELABLE){
 				if (msg.state==1){
-					if ((msg.x<cdata->x)||(msg.y<cdata->y)||(msg.y>cdata->y+cdata->h)||
-						(msg.x>cdata->x+cdata->w)){
+					if (libaroma_window_inside(win, 0, msg.x, msg.y) && ((msg.x<cdata->x)||(msg.y<cdata->y)||(msg.y>cdata->y+cdata->h)||
+						(msg.x>cdata->x+cdata->w))){
 						ALOGV("libaroma_dialog_confirm: Touch Outside Dialog - Cancel");
-						onpool=0;
+						win->onpool=0;
 					}
 				}
 			}
 		}
 	}
-	while(onpool);
+	while(win->onpool);
 
 	libaroma_dialog_free(win);
 	return retval;
@@ -723,7 +723,7 @@ int libaroma_dialog_list(
 		);
 	}
 
-	byte onpool=1;
+	win->onpool=1;
 	LIBAROMA_MSG msg;
 	dword command;
 	byte cmd;
@@ -737,14 +737,14 @@ int libaroma_dialog_list(
 		if (msg.msg==LIBAROMA_MSG_KEY_BACK){
 			if (flags&LIBAROMA_DIALOG_CANCELABLE){
 				ALOGV("libaroma_dialog_confirm: Back Button - Cancel");
-				onpool=0;
+				win->onpool=0;
 			}
 		}
 		else if (cmd==LIBAROMA_CMD_CLICK){
 			if (button2 && id==last_id) {
 				ALOGV("libaroma_dialog_confirm: Button 2 Selected");
 				retval=-1;
-				onpool=0;
+				win->onpool=0;
 			}
 			else if (button2 && id==(last_id-1)){
 				ALOGV("libaroma_dialog_confirm: Button 1 Selected");
@@ -754,7 +754,7 @@ int libaroma_dialog_list(
 				else {
 					retval=id;
 				}
-				onpool=0;
+				win->onpool=0;
 				//libaroma_sleep(300);
 			}
 			else if (id==last_id) {
@@ -765,32 +765,32 @@ int libaroma_dialog_list(
 				else {
 					retval=id;
 				}
-				onpool=0;
+				win->onpool=0;
 			}
 			else {
 				retval = msg.key;
 				printf("Dialog returning value: %d\n", retval);
-				if (returnOnSelect) { onpool = 0; };
+				if (returnOnSelect) { win->onpool = 0; };
 			}
 		}
 		else if (msg.msg==LIBAROMA_MSG_TOUCH){
 			if (flags&LIBAROMA_DIALOG_CANCELABLE){
 				if (msg.state==1){
-					if ((msg.x<cdata->x)||(msg.y<cdata->y)||(msg.y>cdata->y+cdata->h)||
-						(msg.x>cdata->x+cdata->w)){
+					if (libaroma_window_inside(win, 0, msg.x, msg.y) && ((msg.x<cdata->x)||(msg.y<cdata->y)||(msg.y>cdata->y+cdata->h)||
+						(msg.x>cdata->x+cdata->w))){
 						ALOGV("libaroma_dialog_confirm: Touch Outside Dialog - Cancel");
-						onpool=0;
+						win->onpool=0;
 					}
 				}
 			}
 		}
-			/*printf("Dialog Command = (CMD: %i, ID: %i, Msg.Key: %i), i: %d\n",
-				LIBAROMA_CMD(command),
-				LIBAROMA_CMD_ID(command),
-				msg.key,
-				  i);*/
+		/*printf("Dialog Command = (CMD: %i, ID: %i, Msg.Key: %i), i: %d\n",
+			LIBAROMA_CMD(command),
+			LIBAROMA_CMD_ID(command),
+			msg.key,
+			i);*/
 	}
-	while(onpool);
+	while(win->onpool);
 
 	libaroma_dialog_free(win);
 	return retval;
