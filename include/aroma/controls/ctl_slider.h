@@ -81,11 +81,11 @@ byte libaroma_ctl_slider_max(
 );
 
 /*
- * Function		: libaroma_ctl_slider_set_update_callback
+ * Function		: libaroma_ctl_slider_set_onchange
  * Return Value: byte
  * Descriptions: set slider update callback
  */
-byte libaroma_ctl_slider_set_update_callback(
+byte libaroma_ctl_slider_set_onchange(
 		LIBAROMA_CONTROLP ctl, 
 		void *onchange
 );
