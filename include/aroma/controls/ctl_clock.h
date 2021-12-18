@@ -11,25 +11,28 @@
 	#error "Include <aroma.h> instead."
 #endif
 
-#ifndef INCLUDE_AROMA_CONTROLS_CTL_CLOCK_H_
-#define INCLUDE_AROMA_CONTROLS_CTL_CLOCK_H_
-#define LIBAROMA_CTL_CLOCK_NO_BORDER	0x1
+#ifndef __libaroma_ctl_clock_h__
+#define __libaroma_ctl_clock_h__
+#define LIBAROMA_CTL_CLOCK_NOBORDER		0x2		/* disable border drawing */
+#define LIBAROMA_CTL_CLOCK_ALPHA		0x4		/* enable alpha blended indicators */
+#define LIBAROMA_CTL_CLOCK_RIPPLE		0x8		/* ripple on touch */
 
-#define LIBAROMA_CTL_CLOCK_COLOR_HOUR	0
-#define LIBAROMA_CTL_CLOCK_COLOR_MINUTE	1
-#define LIBAROMA_CTL_CLOCK_COLOR_SECOND	2
-#define LIBAROMA_CTL_CLOCK_COLOR_BORDER	3
-#define LIBAROMA_CTL_CLOCK_COLOR_CENTER	4
+#define LIBAROMA_CTL_CLOCK_COLOR_HOUR	0x0
+#define LIBAROMA_CTL_CLOCK_COLOR_MINUTE	0x1
+#define LIBAROMA_CTL_CLOCK_COLOR_SECOND	0x2
+#define LIBAROMA_CTL_CLOCK_COLOR_BORDER	0x3
+#define LIBAROMA_CTL_CLOCK_COLOR_CENTER	0x4
 
 LIBAROMA_CONTROLP libaroma_ctl_clock(LIBAROMA_WINDOWP win, word id, int x,
-		int y, int w, int h, byte clock_style);
+		int y, int w, int h, LIBAROMA_CANVASP bg, byte flags);
 
-void libaroma_ctl_clock_set_color(LIBAROMA_CONTROLP ctl, byte type, word color);
+byte libaroma_ctl_clock_setcolor(LIBAROMA_CONTROLP ctl, byte type, word color);
 
-void libaroma_ctl_clock_set_bg(LIBAROMA_CONTROLP ctl, LIBAROMA_CANVASP bg);
+byte libaroma_ctl_clock_setalpha(LIBAROMA_CONTROLP ctl, byte alpha);
 
-#define libaroma_ctl_clock_disable_border(ctl) libaroma_ctl_clock_set_border(ctl, 0)
-#define libaroma_ctl_clock_enable_border(ctl) libaroma_ctl_clock_set_border(ctl, 1)
-void libaroma_ctl_clock_set_border(LIBAROMA_CONTROLP ctl, byte enabled);
+byte libaroma_ctl_clock_setbg(LIBAROMA_CONTROLP ctl, LIBAROMA_CANVASP bg);
 
-#endif /* INCLUDE_AROMA_CONTROLS_CTL_CLOCK_H_ */
+#define libaroma_ctl_clock_setnoborder(ctl) libaroma_ctl_clock_setborder(ctl, 0)
+byte libaroma_ctl_clock_setborder(LIBAROMA_CONTROLP ctl, byte enabled);
+
+#endif /* __libaroma_ctl_clock_h__ */
