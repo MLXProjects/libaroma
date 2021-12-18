@@ -49,6 +49,7 @@ typedef struct{
 	LIBAROMA_CANVASP ready_image;
 	int paralax_last_y;
 	int paralax_y;
+	byte redraw;
 	
 	LIBAROMA_MUTEX mutex;
 } _LIBAROMA_LISTITEM_IMAGE, * _LIBAROMA_LISTITEM_IMAGEP;
@@ -68,9 +69,11 @@ byte _libaroma_listitem_image_message(
 	if (item->handler!=&_libaroma_listitem_image_handler){
 		return 0;
 	}
+	byte ret=0;
 	_LIBAROMA_LISTITEM_IMAGEP mi =
 		(_LIBAROMA_LISTITEM_IMAGEP) item->internal;
-
+	
+	libaroma_mutex_lock(mi->mutex);
 	switch (msg){
 		case LIBAROMA_CTL_LIST_ITEM_MSG_THREAD:
 			{
@@ -82,7 +85,7 @@ byte _libaroma_listitem_image_message(
 						if ((ysch>=item->y)&&(ysc<item->y+item->h)){
 							ysch-=item->y;
 							mi->paralax_y=((item->h * ysch) / ctl->h);
-							return LIBAROMA_CTL_LIST_ITEM_MSGRET_NEED_DRAW;
+							ret=LIBAROMA_CTL_LIST_ITEM_MSGRET_NEED_DRAW;
 						}
 					}
 				}
@@ -118,7 +121,12 @@ byte _libaroma_listitem_image_message(
 			}
 			break;
 	}
-	return 0;
+	if (mi->redraw){
+		mi->redraw=0;
+		ret=LIBAROMA_CTL_LIST_ITEM_MSGRET_NEED_DRAW;
+	}
+	libaroma_mutex_unlock(mi->mutex);
+	return ret;
 } /* End of _libaroma_listitem_image_message */
 
 /*
@@ -409,8 +417,8 @@ byte libaroma_listitem_image_set(
 		libaroma_canvas_free(mi->ready_image);
 	mi->image = cv;
 	mi->ready_image = NULL;//libaroma_canvas_dup(cv);
+	mi->redraw=1;
 	libaroma_mutex_unlock(mi->mutex);
-	/* TODO: make this trigger an item redraw */
 	return 1;
 }
 
