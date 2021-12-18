@@ -532,7 +532,6 @@ byte libaroma_window_add(
 		ALOGW("window_add ctl already have window");
 		return 0;
 	}
-	libaroma_window_measure(win, ctl);
 	if (win->childn==0){
 		win->childs = (LIBAROMA_CONTROLP *) malloc(sizeof(LIBAROMA_CONTROLP));
 		if (!win->childs){
@@ -554,6 +553,7 @@ byte libaroma_window_add(
 	}
 	ctl->window = win;
 	win->childn++;
+	libaroma_window_measure(win, ctl);
 	_libaroma_window_recalculate(win);
 	return 1;
 } /* End of libaroma_window_add */
