@@ -100,6 +100,7 @@ echo "Building Libaroma${LIBAROMA_DEBUG_SUFFIX}"
 	"${LIBAROMA_BASE}/src/aroma/version.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_bar.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_button.c" \
+	"${LIBAROMA_BASE}/src/aroma/controls/ctl_clock.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_fragment.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_image.c" \
 	"${LIBAROMA_BASE}/src/aroma/controls/ctl_label.c" \
