@@ -543,7 +543,7 @@ LIBAROMA_CONTROLP libaroma_ctl_button(
 		libaroma_control_new(
 			id,
 			x, y, w, h,
-			libaroma_dp(48),libaroma_dp(48), /* min size */
+			libaroma_dp(38),libaroma_dp(38), /* min size */
 			(voidp) me,
 			&_libaroma_ctl_button_handler,
 			win
