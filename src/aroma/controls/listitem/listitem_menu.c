@@ -170,7 +170,7 @@ void _libaroma_listitem_menu_draw(
 		}
 
 		int icoh=libaroma_dp(vpad*2+seph);
-		int tw = cv->w - libaroma_dp(52);
+		int tw = cv->w - libaroma_dp(32);
 		int tx = libaroma_dp(16);
 		int dpsz=libaroma_dp(small_icon?24:40);
 		if (mi->icon){
