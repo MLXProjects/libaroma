@@ -2,11 +2,11 @@
 
 # Libaroma
 
-an embedded ui toolkit - originally by Ahmad Amarullah (Indonesia), improved by Michael Jauregui
+an embedded ui toolkit - originally by Ahmad Amarullah (Indonesia), improved by Michael Jauregui (Argentina)
 
 ## What's this?
 
-Written almost entirely in C, libaroma is a library/toolkit which aims to make it easy to build graphical applications for minimal environments (like Linux rootfs with just a shell) without the need to run an entire window server/manager like Xorg, while having the nice graphics an user would expect.
+Written almost entirely in C, libaroma is a library/toolkit which aims to make it easy to build graphical applications for minimal environments (like Linux busybox rootfs) without the need to run an entire window server/manager like Xorg, while having the nice graphics an user would expect.
 
 It also has a SDL compatibility layer, so you can test your apps (if you build on Linux) directly on your desktop or, if you want, even build entire desktop applications using it as UI :)
 
@@ -18,7 +18,7 @@ Linux and Windows
 
 ### for running (target)
 
-Linux, Windows (thanks SDL), QNX
+Linux, Windows (thanks SDL) and QNX
 
 ### target architectures
 
