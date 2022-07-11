@@ -320,7 +320,7 @@ byte libaroma_fb_sync() {
 	if (libaroma_fb_start_post()){
 		if (_libaroma_fb->post(_libaroma_fb, _libaroma_fb->canvas->data,
 				0, 0, _libaroma_fb->w, _libaroma_fb->h,
-				0, 0, _libaroma_fb->w, _libaroma_fb->h)){
+				0, 0, _libaroma_fb->canvas->l, _libaroma_fb->h)){
 			ret = 1;
 		}
 		libaroma_fb_end_post();
@@ -370,7 +370,7 @@ byte libaroma_fb_sync_area(
 	if (libaroma_fb_start_post()){
 		if (_libaroma_fb->post(_libaroma_fb, _libaroma_fb->canvas->data,
 				x, y, w, h,
-				x, y, w, h)){
+				x, y, _libaroma_fb->canvas->l, h)){
 			ret = 1;
 		}
 		libaroma_fb_end_post();
