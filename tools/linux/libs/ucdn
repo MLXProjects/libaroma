@@ -15,6 +15,7 @@ echo "Building UCDN"
 "${LIBAROMA_GCC}" -c \
   -fdata-sections -ffunction-sections -Wl,--gc-sections \
   -fPIC -DPIC ${LIBAROMA_STRIP_OBJECT} \
+  ${LIBAROMA_CFLAGS} \
   \
 	"${LIBAROMA_BASE}/libs/ucdn/ucdn.c" \
 	\
