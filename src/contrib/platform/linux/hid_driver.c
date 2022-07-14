@@ -389,7 +389,9 @@ byte LINUXHIDRV_getdevclass(
 
 	/* mouse or gamepad */
 	if (LINUXHIDRV_TEST_BIT(REL_X, relBitmask) &&
-			LINUXHIDRV_TEST_BIT(REL_Y, relBitmask)) {
+			LINUXHIDRV_TEST_BIT(REL_Y, relBitmask) &&
+			/* TODO: mouse doesn't have Z axis, what about joystick? */
+			!(LINUXHIDRV_TEST_BIT(REL_Z, relBitmask))) {
 		ret |= LINUXHIDRV_DEVCLASS_POINTER;
 	}
 
