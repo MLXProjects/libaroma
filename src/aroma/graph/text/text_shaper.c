@@ -87,7 +87,7 @@ _LIBAROMA_TEXTSHAPEDP libaroma_text_shaper(
 		_LIBAROMA_FONT_SLOT_CACHEP glp=(_LIBAROMA_FONT_SLOT_CACHEP)
 			libaroma_font_glyph(u,span->fontid,fontsize);
 		if (glp==NULL) {
-			ALOGW("libaroma_text_shaper could not find glyph for char %s", span->text[i]);
+			ALOGW("libaroma_text_shaper could not find glyph for char %c", span->text[i]);
 			return NULL;
 		}
 		int xa = glp->metrics.horiAdvance;
