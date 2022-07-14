@@ -239,7 +239,7 @@ byte _libaroma_wm_cursor_draw(){
  */
 LIBAROMA_CANVASP libaroma_wm_cursor_getimg(){
 	if (!_libaroma_wm_cursor){
-		ALOGW("wm_cursor_setimg cursor uninitialized");
+		ALOGW("wm_cursor_getimg cursor uninitialized");
 		return NULL;
 	}
 	return _libaroma_wm_cursor->cursor;
@@ -290,6 +290,32 @@ byte libaroma_wm_cursor_setimg(LIBAROMA_CANVASP image){
 	libaroma_mutex_unlock(_libaroma_wm_cursor->mutex);
 	return 1;
 } /* End of libaroma_wm_cursor_setimg */
+
+/*
+ * Function		: libaroma_wm_cursor_getshadow
+ * Return Value: byte
+ * Descriptions: get cursor shadow enabled
+ */
+byte libaroma_wm_cursor_getshadow(){
+	if (!_libaroma_wm_cursor){
+		ALOGW("libaroma_wm_cursor_getshadow cursor uninitialized");
+		return 0;
+	}
+	return (_libaroma_wm_cursor->shadow==NULL)?0:1;
+} /* End of libaroma_wm_cursor_getshadow */
+
+/*
+ * Function		: libaroma_wm_cursor_getshadow
+ * Return Value: word
+ * Descriptions: get cursor shadow color
+ */
+word libaroma_wm_cursor_getshadow_color(){
+	if (!_libaroma_wm_cursor){
+		ALOGW("libaroma_wm_cursor_getshadow cursor uninitialized");
+		return 0;
+	}
+	return _libaroma_wm_cursor->shadow_color;
+} /* End of libaroma_wm_cursor_getshadow_color */
 
 /*
  * Function		: libaroma_wm_cursor_setshadow_color

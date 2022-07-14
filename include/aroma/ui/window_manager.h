@@ -341,13 +341,27 @@ LIBAROMA_CANVASP libaroma_wm_cursor_getimg();
 byte libaroma_wm_cursor_setimg(LIBAROMA_CANVASP image);
 
 /*
+ * Function		: libaroma_wm_cursor_getshadow
+ * Return Value: byte
+ * Descriptions: get cursor shadow enabled
+ */
+byte libaroma_wm_cursor_getshadow();
+
+/*
+ * Function		: libaroma_wm_cursor_getshadow
+ * Return Value: word
+ * Descriptions: get cursor shadow color
+ */
+word libaroma_wm_cursor_getshadow_color();
+
+/*
  * Function		: libaroma_wm_cursor_setshadow_color
  * Return Value: byte
  * Descriptions: set cursor shadow and color
  */
 byte libaroma_wm_cursor_setshadow_color(byte enable, word color);
-/* enable shadow alias - using black shadow */
-#define libaroma_wm_cursor_setshadow(on) libaroma_wm_cursor_setshadow_color(on, _libaroma_wm_cursor->shadow_color)
+/* enable shadow alias - using current-color shadow */
+#define libaroma_wm_cursor_setshadow(on) libaroma_wm_cursor_setshadow_color(on, libaroma_wm_cursor_getshadow_color())
 
 /*
  * Function		: libaroma_wm_cursor_visible
