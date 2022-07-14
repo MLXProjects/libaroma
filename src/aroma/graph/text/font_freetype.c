@@ -243,7 +243,7 @@ LIBAROMA_GLYPH libaroma_font_glyph(
 	libaroma_font_set_size(fontid, libaroma_font_size_px(size), 0);
 
 	/* load glyph from freetype face */
-	if (FT_Load_Glyph(face, c, _LIBAROMA_FONT_LOAD_GLYPH_FLAG) == 0) {
+	if (FT_Load_Glyph(face, c, _LIBAROMA_FONT_LOAD_GLYPH_FLAG|FT_LOAD_COLOR) == 0) {
 		_LIBAROMA_FONT_SLOT_CACHE slot={0};
 		FT_Get_Glyph(face->glyph, &slot.glyph);
 		memcpy(&slot.metrics, &face->glyph->metrics, sizeof(FT_Glyph_Metrics));
@@ -323,11 +323,27 @@ byte libaroma_font_ex(
 		/* set default face size */
 		if (!size) def_size=libaroma_font_size_px(2);
 
-		if (FT_Set_Pixel_Sizes(tmp_face, 0, def_size) == 0) {
+		int szset_err = FT_Set_Pixel_Sizes(tmp_face, 0, def_size);
+		if (szset_err == 0 || szset_err == 23) {
 			/* save it */
 			if (libaroma_font_exists(fontid)){
 				ALOGV("previous font with same id exists, freeing");
 				libaroma_font_free(fontid);
+			}
+			if (szset_err == 23){
+				int best_match = 0;
+				int diff = abs(def_size - tmp_face->available_sizes[0].width);
+				for (int i = 1; i < tmp_face->num_fixed_sizes; i++) {
+					int ndiff = abs(def_size - tmp_face->available_sizes[i].width);
+					if (ndiff < diff) {
+						best_match = i;
+						diff = ndiff;
+					}
+				}
+
+				ALOGI("libaroma_font using fixed size %d", tmp_face->available_sizes[best_match].width);
+				szset_err = FT_Select_Size(tmp_face, best_match);
+				def_size=tmp_face->available_sizes[best_match].width;
 			}
 			_libaroma_font_faces[fontid].size	 = def_size;
 			_libaroma_font_faces[fontid].id		 = fontid;
