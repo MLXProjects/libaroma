@@ -16,6 +16,7 @@
 #define LIBAROMA_CTL_CLOCK_NOBORDER		0x2		/* disable border drawing */
 #define LIBAROMA_CTL_CLOCK_ALPHA		0x4		/* enable alpha blended indicators */
 #define LIBAROMA_CTL_CLOCK_RIPPLE		0x8		/* ripple on touch */
+#define LIBAROMA_CTL_CLOCK_FREEBG		0x16	/* free previous bg */
 
 #define LIBAROMA_CTL_CLOCK_COLOR_HOUR	0x0
 #define LIBAROMA_CTL_CLOCK_COLOR_MINUTE	0x1
@@ -30,7 +31,8 @@ byte libaroma_ctl_clock_setcolor(LIBAROMA_CONTROLP ctl, byte type, word color);
 
 byte libaroma_ctl_clock_setalpha(LIBAROMA_CONTROLP ctl, byte alpha);
 
-byte libaroma_ctl_clock_setbg(LIBAROMA_CONTROLP ctl, LIBAROMA_CANVASP bg);
+#define libaroma_ctl_clock_setbg(ctl, bg) libaroma_ctl_clock_setbg_ex(ctl, bg, 0)
+byte libaroma_ctl_clock_setbg_ex(LIBAROMA_CONTROLP ctl, LIBAROMA_CANVASP bg, byte use_orig);
 
 #define libaroma_ctl_clock_setnoborder(ctl) libaroma_ctl_clock_setborder(ctl, 0)
 byte libaroma_ctl_clock_setborder(LIBAROMA_CONTROLP ctl, byte enabled);

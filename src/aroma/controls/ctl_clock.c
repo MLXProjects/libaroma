@@ -48,7 +48,6 @@ typedef struct{
 	byte alpha;
 	byte redraw;
 	LIBAROMA_CANVASP bg;
-	LIBAROMA_CANVASP bg_noscale;
 	LIBAROMA_RIPPLEP ripple;
 
 	LIBAROMA_MUTEX mutex;
@@ -196,25 +195,22 @@ byte libaroma_ctl_clock_setborder(LIBAROMA_CONTROLP ctl, byte enable){
 	return 1;
 }
 
-byte libaroma_ctl_clock_setbg(
+byte libaroma_ctl_clock_setbg_ex(
 	LIBAROMA_CONTROLP ctl,
-	LIBAROMA_CANVASP bg
+	LIBAROMA_CANVASP bg, byte use_orig
 ){
 	_LIBAROMA_CTL_CHECK(_libaroma_ctl_clock_handler, _LIBAROMA_CTL_CLOCKP, 0);
 	libaroma_mutex_lock(me->mutex);
-	if (me->bg_noscale!=NULL)
-		libaroma_canvas_free(me->bg_noscale);
-	if (me->bg!=NULL)
+	if (me->bg!=NULL && (me->flags&LIBAROMA_CTL_CLOCK_FREEBG))
 		libaroma_canvas_free(me->bg);
-	me->bg_noscale=(bg==NULL)?NULL:libaroma_canvas_dup(bg);
-	if (me->bg_noscale){
-		if (me->bg_noscale->w == ctl->w && me->bg_noscale->h == ctl->h)
-			me->bg=libaroma_canvas_dup(bg);
-		else {
-			me->bg=libaroma_canvas(ctl->w, ctl->h);
-			libaroma_draw_scale_smooth(me->bg, me->bg_noscale, 0, 0, ctl->w, ctl->h, 0, 0, me->bg_noscale->w, me->bg_noscale->h);
-		}
+	if (bg->w <= ctl->w && bg->h <= ctl->h)
+		me->bg=use_orig?bg:libaroma_canvas_dup(bg);
+	else {
+		me->bg=libaroma_canvas(ctl->w, ctl->h);
+		libaroma_draw_scale_smooth(me->bg, bg, 0, 0, ctl->w, ctl->h, 0, 0, bg->w, bg->h);
 	}
+	if (!use_orig && (me->flags&LIBAROMA_CTL_CLOCK_FREEBG))
+		me->flags &= ~LIBAROMA_CTL_CLOCK_FREEBG;
 	me->redraw=1;
 	libaroma_mutex_unlock(me->mutex);
 	return 1;
@@ -252,7 +248,7 @@ void _libaroma_ctl_clock_draw(LIBAROMA_CONTROLP ctl, LIBAROMA_CANVASP c){
 	_LIBAROMA_CTL_CHECK(_libaroma_ctl_clock_handler, _LIBAROMA_CTL_CLOCKP, 0);
 	libaroma_control_erasebg(ctl, c);
 	
-	libaroma_draw(c, me->bg, 0, 0, 1);
+	libaroma_draw(c, me->bg, (c->w-me->bg->w)/2, (c->h-me->bg->h)/2, 1);
 		
 	int sz = MIN(c->w >> 1, c->h >> 1);
 	int outx, outy;
@@ -298,10 +294,8 @@ void _libaroma_ctl_clock_draw(LIBAROMA_CONTROLP ctl, LIBAROMA_CANVASP c){
 byte _libaroma_ctl_clock_destroy(LIBAROMA_CONTROLP ctl){
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(_libaroma_ctl_clock_handler, _LIBAROMA_CTL_CLOCKP, 0);
-	/*if (me->bg!=NULL)
-		libaroma_canvas_free(me->bg);*/
-	if (me->bg_noscale!=NULL)
-		libaroma_canvas_free(me->bg_noscale);
+	if (me->bg!=NULL && (me->flags&LIBAROMA_CTL_CLOCK_FREEBG))
+		libaroma_canvas_free(me->bg);
 	libaroma_mutex_unlock(me->mutex);
 	libaroma_mutex_free(me->mutex);
 	free(me);
