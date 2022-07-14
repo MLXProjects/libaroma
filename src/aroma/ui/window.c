@@ -871,6 +871,11 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 		}
 		else return libaroma_wm_set_active_window(win);
 	}
+	if (!win->prev_screen){
+		LIBAROMA_CANVASP cv = libaroma_canvas(win->w, win->h);
+		libaroma_draw_ex(cv, libaroma_fb()->canvas, 0, 0, libaroma_wm()->x+win->x, libaroma_wm()->y+win->y, win->w, win->h, 0, 0xFF);
+		win->prev_screen=cv;
+	}
 
 	/* lock sync */
 	win->lock_sync = 1;
@@ -879,9 +884,6 @@ byte libaroma_window_hideshow_animated(LIBAROMA_WINDOWP win, byte anim, int dura
 	else is_active=libaroma_wm_set_active_window(win);
 	if (is_active){
 		if (!close) win->active=2;
-		if (win->prev_screen==NULL) win->prev_screen=libaroma_canvas(win->w, win->h); //TODO: MOVE THIS TO WM CODE
-		//if (!win->prev_screen->alpha && anim==LIBAROMA_WINDOW_SHOW_ANIMATION_CIRCLE)
-			//libaroma_canvas_fillalpha(win->prev_screen, 0, 0, win->w, win->h, 0xFF); //init alpha for prev screen if needed
 		/* draw window into temp canvas */
 		LIBAROMA_CANVASP wmc = win->dc; //window had a canvas area of wm, let's grab it
 		LIBAROMA_CANVASP tdc = libaroma_canvas(wmc->w,wmc->h);
