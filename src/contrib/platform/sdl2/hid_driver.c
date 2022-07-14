@@ -127,7 +127,7 @@ byte LINUXHIDRV_getinput(
 					return LIBAROMA_HID_EV_RET_TOUCH;
 
 				case SDL_MOUSEMOTION:
-					if (__sdl_mouse_down==LIBAROMA_HID_EV_STATE_DOWN){
+					if (__sdl_mouse_down==LIBAROMA_HID_EV_STATE_DOWN || libaroma_config()->sdl_mousemove){
 						dest_ev->type	 = LIBAROMA_HID_EV_TYPE_TOUCH;
 						dest_ev->key		= 0;
 						dest_ev->x			= event.motion.x;

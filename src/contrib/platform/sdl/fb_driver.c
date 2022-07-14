@@ -128,6 +128,10 @@ byte SDLFBDR_init(LIBAROMA_FBP me) {
 		ALOGE("SDLFBDR could not create SDL surface");
 		goto error;
 	}
+	if (libaroma_config()->sdl_nocursor==1){
+		ALOGD("SDLFBDR disable SDL cursor");
+		SDL_ShowCursor(SDL_DISABLE);
+	}
 
 	/* set libaroma framebuffer instance values */
 	me->w = mi->window->w;		/* width */

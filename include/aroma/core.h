@@ -75,6 +75,9 @@ typedef struct{
 	byte gfx_default_rgb[3];			//display default RGB pixel order
 	char *wm_cursor_res;				//path to cursor image, used if mice connected
 	byte wm_force_cursor;				//force cursor init at window manager
+	byte sdl_mousemove;				//send mouse move events while buttons released
+	byte sdl_nocursor;				//toggle SDL window cursor at startup
+
 } LIBAROMA_CONFIG, * LIBAROMA_CONFIGP;
 
 /*
