@@ -94,10 +94,10 @@ char * libaroma_debug_prefix();
 #define LIBAROMA_STRINGZE(x) LIBAROMA_STRINGZE2(x)
 #define __LINE_STRING__ LIBAROMA_STRINGZE(__LINE__)
 #define LIBAROMA_DEBUG_SOURCE \
-  " ==> on " __FILE__ " line " __LINE_STRING__ "\n    "
+  " ==> on " __FILE__ " line " __LINE_STRING__
 #else
 #define LIBAROMA_DEBUG_SOURCE \
-  " ==> on " __FILE__ "\n    "
+  " ==> on " __FILE__
 #endif
 #else
 #define LIBAROMA_DEBUG_SOURCE ""
