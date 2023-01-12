@@ -1,3 +1,5 @@
-/out
-/apps
+# Ignore out folder
+out
 
+# Ignore my markdown editor's folder
+.obsidian

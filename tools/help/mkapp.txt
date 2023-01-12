@@ -1,5 +1,0 @@
-mkapp - build libaroma apps
-The app source must be at ${LIBAROMA_BASE}/apps/<app name>
-
-Behavior changes:
-To build an app with source separated in folders, you can put a text file called sourcelist.txt in the app source folder and fill it with relative paths to other source files (wildcards like * are not supported).

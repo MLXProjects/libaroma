@@ -1,4 +1,0 @@
-mkaroma - build main aroma library, with dependencies if they're not built
-
-Available parameters:
-nd || nodetect          Skip the dependency build detection

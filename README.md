@@ -1,41 +1,73 @@
-![libaroma-logo](/logo.png?raw=true "Libaroma logo")
-
 # Libaroma
+an embedded UI toolkit
+## What is this?
+It's a C library which provides graphics output, input management, utilities for drawing and a window system with controls that allows to create an entire user interface with few code lines.
+## Features
+- input management
+- graphics output
+- basic window manager (one window rendered at a time)
+- hardware acceleration whenever possible (ARM NEON, x86 SSE)
+- simple to use and understand
+- most parts have automatic allocation/free (you only need to release the library)
+## Compatibility
+For now it was tested on the following platforms:
+- Linux (either direct framebuffer/input or SDL window)
+- Windows (using SDL window)
+## How to use it?
+First build and install the library, [refer to the BUILDING.md file](BUILDING.md). 
+There are some examples already written, but the following code should be enough to initialize the library, create an empty window and handle the input:
 
-an embedded ui toolkit - originally by Ahmad Amarullah (Indonesia), improved by Michael Jauregui (Argentina)
-
-## What's this?
-
-Written almost entirely in C, libaroma is a library/toolkit which aims to make it easy to build graphical applications for minimal environments (like Linux busybox rootfs) without the need to run an entire window server/manager like Xorg, while having the nice graphics an user would expect.
-
-It also has a SDL compatibility layer, so you can test your apps (if you build on Linux) directly on your desktop or, if you want, even build entire desktop applications using it as UI :)
-
-## Supported platforms
-
-### for building (host)
-
-Linux and Windows
-
-### for running (target)
-
-Linux, Windows (thanks SDL) and QNX
-
-### target architectures
-
-Currently ARM (v6 onwards), x86 and x86_64 are supported. MIPS and other platforms are not tested.
-
-### optimizations
-
-If you target ARM or x86/64, you have the following optional optimizations:
-
-ARM: you can use NEON (available from ARMv7 onwards) to improve drawing operations
-
-x86 and x86_64: you can se SSE to emulate NEON and make drawing operations faster
-
-## Building
-
-read the file BUILDING.md in this page
-
-## Issues/help
-
-If you want to report any issues (or just want some help), please either use the issues tab from Github or email me directly to maicolinux4@gmail.com - feedback is highly appreciated!
+```
+#include <aroma.h>
+int main(int argc, char **argv){
+  if (!libaroma_start()){
+      printf("libaroma start failed\n");
+      return 0;
+  }
+  LIBAROMA_WINDOWP win = libaroma_window(NULL, 0, 0, 
+						  LIBAROMA_SIZE_FULL, LIBAROMA_SIZE_FULL);
+  if (win==NULL){
+      printf("libaroma window failed\n");
+      libaroma_end();
+      return 0;
+  }
+  libaroma_window_show(win);
+  LIBAROMA_MSG msg;
+  do {
+      libaroma_window_pool(win, &msg);
+      if (msg.msg==LIBAROMA_MSG_EXIT){
+          win->onpool=0;
+      }
+      else if (msg.msg==LIBAROMA_MSG_TOUCH &&
+		      msg.state==LIBAROMA_HID_EV_STATE_UP){
+          libaroma_msg_post(LIBAROMA_MSG_EXIT, 0, 0, 0, 0, NULL);
+      }
+      else printf("msg=% state=%d, key=%d, x=%d, y=%d, data=%p\n", 
+                  msg.msg, msg.state, msg.key, msg.x, msg.y, msg.d);
+  } while(win->onpool);
+  libaroma_window_free(win);
+  libaroma_end();
+}
+```
+After this, just compile the program as you would with any project, for example:
+`gcc main.c -o test -laroma`
+Run it and should show an empty screen/window that closes after releasing the mouse left click.
+## TODO
+- fix scroll control relying on screen size for fling velocity 
+- pager inside a fragment may give black control at creation
+- re-implement DRM on Linux
+- multiple windows & z order
+- LUA scripting engine?
+## Disclaimer
+This library is under heavy work in progress, while there are no planned API changes that break compatibility it may happen if needed (e.g. in case of redundant features removed or safety issues found).
+The following libraries were embedded to easily implement features:
+- cJSON ([thanks Dave Gamble](https://github.com/DaveGamble/cJSON))
+- ezXML ([thanks Aaron Voisine](https://ezxml.sourceforge.net) and [misc contributors](https://sourceforge.net/p/ezxml/patches/))
+- nanoSVG ([thanks Mikko Mononen](https://github.com/memononen/nanosvg))
+- MinZIP ([thanks Google](https://android.googlesource.com/platform/bootable/recovery.git/+/refs/heads/nougat-release/minzip/))
+## License
+Libaroma is licensed under the Apache 2.0 license ([see LICENSE.MD file](LICENSE.md))
+The embedded libraries listed above have their own licenses:
+- cJSON and ezXML are covered by the MIT license
+- nanoSVG is covered by the zlib license
+- MinZIP isn't a library per se, but it's code is covered by the Apache 2.0 license

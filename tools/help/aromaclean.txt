@@ -1,7 +1,0 @@
-aromaclean [target] - clear built libraries
-
-By default, deletes all libraries built for the current architecture.
-
-Available targets:
-all                   clean all architectures
-[library]             clean just the selected library for the current architecture

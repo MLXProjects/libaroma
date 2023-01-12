@@ -1,0 +1,58 @@
+###
+# Libaroma configuration sample
+# Remove the # at start of any line to apply that setting
+#
+###
+# Library settings
+#
+# target linux platform
+LIBAROMA_PLATFORM=sdl
+#LIBAROMA_TTY_KDSETMODE=0
+# enable SSSE3 optimization
+#LIBAROMA_FEATURE_CPU=ssse3
+# set extra dependencies
+LIBAROMA_LIBDEPENDS=-lbrotlidec -lbrotlicommon
+# disable debug
+#LIBAROMA_DEBUG_ENABLE=yes
+# set library verbosity (see the file CUSTOMIZE.md)
+#LIBAROMA_DEBUG_PRINTLEVEL=3
+# toggle file & line number on logs
+#LIBAROMA_DEBUG_SHOWFILE=no
+# disable memory tracking
+#LIBAROMA_DEBUG_MEMTRACKER=no
+###
+# Extra features
+#
+# disable jpeg
+#LIBAROMA_FEATURE_JPEG=yes
+# enable harfbuzz (needs freetype to have been built with harfbuzz support)
+#LIBAROMA_FEATURE_HARFBUZZ=yes
+# enable svg
+#LIBAROMA_FEATURE_SVG=yes
+# disable openmp
+#LIBAROMA_FEATURE_OPENMP=no
+# disable minzip (ZIP support)
+#LIBAROMA_FEATURE_MINZIP=no
+###
+# Compiler settings
+#
+# enable all warnings
+LIBAROMA_COMPILE_WARN=all
+#throw error on compile warning
+LIBAROMA_COMPILE_WARNERROR=yes
+# show build & features information
+LIBAROMA_COMPILE_SHOWINFO=yes
+# disable console on Windows builds
+#LIBAROMA_COMPILE_NOCONSOLE=yes
+# disable position independent code
+#LIBAROMA_COMPILE_PIC=no
+# add extra include paths
+LIBAROMA_COMPILE_INCLUDES=/usr/include/freetype2
+# library install prefix
+#LIBAROMA_INSTALL_PREFIX=/usr/local
+# use these to override any build command
+#LIBAROMA_AR=ar
+#LIBAROMA_CC=clang
+#LIBAROMA_RANLIB=ranlib
+#LIBAROMA_MKDIR=mkdir -p
+#LIBAROMA_RM=rm -rf

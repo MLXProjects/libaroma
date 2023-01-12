@@ -1,6 +1,0 @@
-runapp <appname> [r] - run libaroma apps directly
-I hope you target the platform you're building on
-
-Available parameters:
-appname                   The application to be ran.
-r                         If passed, don't build (run)

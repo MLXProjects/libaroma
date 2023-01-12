@@ -1,6 +1,0 @@
-mkalibs <library> - build libaroma dependencies
-
-Available parameters:
-library                   Build the specified library. Possible libraries are
-                          drm, freetype, harfbuzz, jpeg, minui, minzip, png,
-                          squirrel, ucdn, zlib.

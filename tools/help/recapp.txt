@@ -1,6 +1,0 @@
-recapp <appname> [r] - test libaroma apps using an Android device.
-The device must be in recovery mode, and ADB drivers must be installed.
-
-Available parameters:
-appname                   The application to be tested.
-r                         If passed, don't build (just push and run)

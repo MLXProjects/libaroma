@@ -24,11 +24,46 @@
 #ifndef __libaroma_aroma_internal_h__
 #define __libaroma_aroma_internal_h__
 
-/* config & public headers */
-#include "config.h"
-#include "config_features.h"
-
+/* include main header */
 #include <aroma.h>
+
+/* some fallbacks */
+#ifndef MIN
+#define MIN(a, b) ((a<b)?a:b)
+#endif
+#ifndef MAX
+#define MAX(a, b) ((a>b)?a:b)
+#endif
+
+/*
+ * Libaroma version configurations
+ */
+#define LIBAROMA_CONFIG_NAME			"libaroma"
+#define LIBAROMA_CONFIG_VERSION_MAJOR	1
+#define LIBAROMA_CONFIG_VERSION_MINOR	1
+#define LIBAROMA_CONFIG_VERSION_MICRO	0
+#define LIBAROMA_CONFIG_VERSION_BUILD	"230110"
+#define LIBAROMA_CONFIG_CODENAME		"Kinanthi"
+#define LIBAROMA_CONFIG_YEAR			"2011-2023"
+#define LIBAROMA_CONFIG_AUTHOR			"Ahmad Amarullah"
+
+#define LIBAROMA_FB_INIT_FUNCTION		libaroma_fb_driver_init
+#define LIBAROMA_HID_INIT_FUNCTION		libaroma_hid_driver_init
+
+#ifdef LIBAROMA_CONFIG_HICOLOR_BIT
+#if LIBAROMA_CONFIG_HICOLOR_BIT > 0
+	#define LIBAROMA_CONFIG_USE_HICOLOR_BIT
+#endif
+#endif /* LIBAROMA_CONFIG_HICOLOR_BIT */
+
+/* currently, runtime monitor only supports Linux */
+#ifdef __linux__
+#define LIBAROMA_RUNTIME_MONITOR
+#else
+#ifdef LIBAROMA_RUNTIME_MONITOR
+#undef LIBAROMA_RUNTIME_MONITOR
+#endif /* LIBAROMA_RUNTIME_MONITOR */
+#endif /* __linux__ */
 
 /* standard c headers */
 #include <string.h>
@@ -36,11 +71,17 @@
 #include <limits.h>
 #include <ctype.h>
 
-/* debug, platform & fallback header */
-#include "aroma/debug/debug.h"
-#include <aroma_platform.h>
-#include "fallbacks.h"
-#include "aroma/graph/engine/engine_internal.h"
-#include "aroma_memory.h"
+/* debug, platform & graph engine */
+#include "debug/debug.h"
+#include <aroma_plat.h>
+#include "graph/engine.h"
+#include "ui/internal.h"
+
+/* some control functions/callbacks don't need all their parameters */
+#ifdef __clang__
+	#pragma clang diagnostic ignored "-Wunused-parameter"
+#else
+	#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif /* __clang__ */
 
 #endif /* __libaroma_aroma_internal_h__ */
