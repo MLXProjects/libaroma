@@ -1,4 +1,4 @@
-libaroma 1.1.0-230111:
+libaroma 1.1.0-230111:  
 changes: 
 - huge file layout refactor
 - Now buildable with Make
@@ -10,7 +10,7 @@ changes:
 - fixed missing/wrong returns in ctl_clock & listitem_text
 - fixed no-mmap file loading
 - reworked canvas shmem open/create
-- minzip now uses libaroma_file for zip opening}
+- minzip now uses libaroma_file for zip opening
 - combined SDL and SDL2 platforms into a generic one
 - refactored SDL2 platform (fixes out-of-vram issue)
 - implemented simple pseudo-random number generator (replaces rand())
