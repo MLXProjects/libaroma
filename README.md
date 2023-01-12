@@ -25,7 +25,7 @@ int main(int argc, char **argv){
       return 0;
   }
   LIBAROMA_WINDOWP win = libaroma_window(NULL, 0, 0, 
-						  LIBAROMA_SIZE_FULL, LIBAROMA_SIZE_FULL);
+			LIBAROMA_SIZE_FULL, LIBAROMA_SIZE_FULL);
   if (win==NULL){
       printf("libaroma window failed\n");
       libaroma_end();
@@ -39,7 +39,7 @@ int main(int argc, char **argv){
           win->onpool=0;
       }
       else if (msg.msg==LIBAROMA_MSG_TOUCH &&
-		      msg.state==LIBAROMA_HID_EV_STATE_UP){
+		msg.state==LIBAROMA_HID_EV_STATE_UP){
           libaroma_msg_post(LIBAROMA_MSG_EXIT, 0, 0, 0, 0, NULL);
       }
       else printf("msg=% state=%d, key=%d, x=%d, y=%d, data=%p\n", 
@@ -49,8 +49,8 @@ int main(int argc, char **argv){
   libaroma_end();
 }
 ```
-After this, just compile the program as you would with any project, for example:
-`gcc main.c -o test -laroma`
+After this, just compile the program as you would with any project, for example:  
+`gcc main.c -o test -laroma`  
 Run it and should show an empty screen/window that closes after releasing the mouse left click.
 ## TODO
 - fix scroll control relying on screen size for fling velocity 
