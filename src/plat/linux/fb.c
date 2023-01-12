@@ -133,16 +133,16 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 	LINUXFBDR_dump(mi);
 
 	/* set libaroma framebuffer instance values */
-	me->w				= mi->var.xres;	/* width */
-	me->h				= mi->var.yres;	/* height */
-	me->sz			 = me->w*me->h;	 /* width x height */
+	me->w	= mi->var.xres;	/* width */
+	me->h	= mi->var.yres;	/* height */
+	me->sz	= me->w*me->h;	 /* width x height */
 
 	if (QCOMFB_init(me)){
 		/* qcom fb */
 		me->start_post	= &QCOMFB_start_post;
-		me->end_post		= &QCOMFB_end_post;
-		me->post				= &QCOMFB_post;
-		me->snapshoot	 = NULL;
+		me->end_post	= &QCOMFB_end_post;
+		me->post		= &QCOMFB_post;
+		me->snapshoot	= NULL;
 		ALOGI("using qcom framebuffer driver");
 	}
 	else{
@@ -176,7 +176,7 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 									PROT_READ | PROT_WRITE, MAP_SHARED,
 									mi->fb, 0);
 
-		if (!mi->buffer) {
+		if (mi->buffer == MAP_FAILED) {
 			ALOGE("LINUXFBDR mmap framebuffer memory error");
 			goto error;
 		}
