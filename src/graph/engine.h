@@ -29,7 +29,9 @@
 
 #ifdef __clang__
 	#pragma clang diagnostic ignored "-Wclobbered"
+	#pragma clang diagnostic ignored "-Wrestrict"
 #else
+	#pragma GCC diagnostic ignored "-Wclobbered"
 	#pragma GCC diagnostic ignored "-Wrestrict"
 #endif
 
