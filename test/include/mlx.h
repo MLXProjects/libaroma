@@ -1,1 +1,0 @@
-extern char *mlx_getver();
