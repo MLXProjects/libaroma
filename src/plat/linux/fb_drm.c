@@ -362,7 +362,7 @@ static int DRMFB_mkdumb(LINUXFBDR_INTERNALP mi, int w, int h, int i){
 	else {
 		pixel_format = DRM_FORMAT_RGB565;
 	}
-	retval = drmModeAddFB2(mi->fb, w, h, pixel_format, handles, pitches, offsets, di->buffer_id[i], 0);
+	retval = drmModeAddFB2(mi->fb, w, h, pixel_format, handles, pitches, offsets, &(di->buffer_id[i]), 0);
 	/*retval = drmModeAddFB(mi->fb, w, h, 16, 16,
 			create_dumb.pitch, create_dumb.handle, 
 			&di->buffer_id[i]);*/
