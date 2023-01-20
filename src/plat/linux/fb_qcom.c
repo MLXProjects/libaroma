@@ -542,8 +542,7 @@ void QCOMFB_swap_buffer(LIBAROMA_FBP me){
 		else{
 			mi->qcom->yoffset=0;
 		}
-		mi->current_buffer =
-			mi->buffer + (mi->qcom->yoffset * mi->line);
+		mi->current_buffer = ((bytep) mi->buffer) + (mi->qcom->yoffset * mi->line);
 	}
 	else{
 		mi->qcom->yoffset=0;

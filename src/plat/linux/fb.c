@@ -258,7 +258,7 @@ void LINUXFBDR_release(LIBAROMA_FBP me) {
  * Descriptions: swap back buffer
  */
 void LINUXFBDR_swap_buffer(LINUXFBDR_INTERNALP mi){
-	mi->current_buffer = mi->buffer + (mi->var.yoffset * mi->fix.line_length);
+	mi->current_buffer = ((bytep) mi->buffer) + (mi->var.yoffset * mi->fix.line_length);
 	if ((mi->double_buffering)&&(mi->var.yoffset==0)){
 		mi->var.yoffset = mi->var.yres;
 	}
