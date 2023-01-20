@@ -59,21 +59,21 @@ typedef struct{
  * Return Value: byte
  * Descriptions: initialize dri device
  */
-extern byte DRMFB_init(LIBAROMA_FBP me);
+byte DRMFB_init(LIBAROMA_FBP me);
 
 /*
  * Function		: DRMFB_end_post
  * Return Value: byte
  * Descriptions: start post
  */
-extern byte DRMFB_start_post(LIBAROMA_FBP me);
+byte DRMFB_start_post(LIBAROMA_FBP me);
 
 /*
  * Function		: DRMFB_post
  * Return Value: byte
  * Descriptions: post
  */
-extern byte DRMFB_post(
+byte DRMFB_post(
 	LIBAROMA_FBP me, wordp __restrict src,
 	int dx, int dy, int dw, int dh,
 	int sx, int sy, int sw, int sh
@@ -84,21 +84,21 @@ extern byte DRMFB_post(
  * Return Value: byte
  * Descriptions: end post
  */
-extern byte DRMFB_end_post(LIBAROMA_FBP me);
+byte DRMFB_end_post(LIBAROMA_FBP me);
 
 /*
  * Function		: DRMFB_flush
  * Return Value: void
  * Descriptions: flush display update
  */
-extern byte DRMFB_flush(LIBAROMA_FBP me);
+byte DRMFB_flush(LIBAROMA_FBP me);
 
 /*
  * Function		: DRMFB_release
  * Return Value: void
  * Descriptions: release drm driver
  */
-extern void DRMFB_release(LIBAROMA_FBP me); 
+void DRMFB_release(LIBAROMA_FBP me);
 
 #ifdef __cplusplus
 }

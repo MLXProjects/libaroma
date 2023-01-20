@@ -44,13 +44,19 @@ typedef struct _LINUXFBDR_INTERNAL * LINUXFBDR_INTERNALP;
 
 /* include qcom header */
 #include "fb_qcom.h"
+#ifndef LIBAROMA_CONFIG_NODRM
+/* include drm header */
+#include "fb_drm.h"
+#endif
 
 /* 
  * backend types
  */
 #define LINUXFBDR_BACKEND_NONE	0
 #define LINUXFBDR_BACKEND_QCOM	1
+#ifndef LIBAROMA_CONFIG_NODRM
 #define LINUXFBDR_BACKEND_DRM	2
+#endif
 
 /*
  * device path

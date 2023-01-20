@@ -24,7 +24,6 @@
 #ifndef __libaroma_linux_fb_drm_driver_c__
 #define __libaroma_linux_fb_drm_driver_c__
 
-#define LIBAROMA_CONFIG_NODRM
 #ifndef LIBAROMA_CONFIG_NODRM
 #include <aroma_internal.h>
 #include "fb.h"
@@ -195,11 +194,13 @@ byte DRMFB_init(LIBAROMA_FBP me){
 	me->sz = me->w * me->h;
 	me->double_buffer = 1;
 	/* set internal values */
+	mi->buffer = di->buffer[0];
 	mi->line = di->buffer_stride[0];
 	mi->depth = 16;
 	mi->pixsz = 2;
 	mi->fb_sz = di->buffer_sz[0];
-	mi->stride = mi->line/me->w;
+	//mi->stride = mi->line/me->w;
+	mi->stride = (mi->line - (me->w * mi->pixsz));
 	/* dump display info */
 	DRMFB_dump(mi, di);
 	return 1;
@@ -238,17 +239,13 @@ byte DRMFB_post(
 		return 0;
 	}
 	LINUXFBDR_INTERNALP mi = (LINUXFBDR_INTERNALP) me->internal;
-
-	int sstride = (sw - dw) * 2;
-	int dstride = (me->w - dw) * mi->pixsz;
-	wordp copy_src = (wordp) (src + (sw * sy) + sx);
-	bytep dst_addr = (((bytep) mi->buffer)+(mi->line*dy)+(dx*mi->pixsz));
+	/* DRM doesn't allow to update regions, so we must blit the entire buffer */
 	libaroma_blt_align16(
-		(wordp) dst_addr,
-		copy_src,
-		dw, dh,
-		dstride,
-		sstride
+		(wordp) mi->buffer,
+		src,
+		me->w, me->h,
+		mi->stride,
+		0
 	);
 	return 1;
 } /* End of DRMFB_post */
@@ -426,35 +423,35 @@ static void DRMFB_deldumb(LINUXFBDR_INTERNALP mi, int i){
  */
 static void DRMFB_dump(LINUXFBDR_INTERNALP mi, DRMFB_INTERNALP di){
 	ALOGI("DRM DRIVER INFORMATIONS:");
-	ALOGV("RES");
-	ALOGV(" count_fbs		 	: %i", di->res->count_fbs);
-	ALOGV(" count_crtcs		 	: %i", di->res->count_crtcs);
-	ALOGV(" count_connectors 	: %i", di->res->count_connectors);
-	ALOGV(" count_encoders	 	: %i", di->res->count_encoders);
-	ALOGV(" min_width		 	: %i", di->res->min_width);
-	ALOGV(" max_width		 	: %i", di->res->max_width);
-	ALOGV(" min_height		 	: %i", di->res->min_height);
-	ALOGV(" max_height		 	: %i", di->res->max_height);
-	ALOGI("CRTC");
-	ALOGV(" id				 	: %i", di->crtc->crtc_id);
-	ALOGV(" x					: %i", di->crtc->x);
-	ALOGV(" y					: %i", di->crtc->y);
-	ALOGI(" width				: %i", di->crtc->width);
-	ALOGI(" height				: %i", di->crtc->height);
-	ALOGV("MODE");
-	ALOGV(" hdisplay			: %i", di->crtc->mode.hdisplay);
-	ALOGV(" vdisplay			: %i", di->crtc->mode.vdisplay);
-	ALOGV(" htotal				: %i", di->crtc->mode.htotal);
-	ALOGV(" vtotal				: %i", di->crtc->mode.vtotal);
-	ALOGV(" clock				: %i", di->crtc->mode.clock);
-	ALOGV(" vrefresh			: %i", di->crtc->mode.vrefresh);
-	ALOGV(" name				: %s", di->crtc->mode.name);
-	ALOGI("DUMB FB");
-	ALOGI(" depth				: %i", mi->depth);
-	ALOGI(" pixsz				: %i", mi->pixsz);
-	ALOGI(" mem size			: %i", mi->fb_sz);
-	ALOGI(" line size			: %i", mi->line);
-	ALOGV(" stride				: %i", mi->stride);
+    ALOGV("RES");
+    ALOGV(" count_fbs           : %i", di->res->count_fbs);
+    ALOGV(" count_crtcs         : %i", di->res->count_crtcs);
+    ALOGV(" count_connectors    : %i", di->res->count_connectors);
+    ALOGV(" count_encoders      : %i", di->res->count_encoders);
+    ALOGV(" min_width           : %i", di->res->min_width);
+    ALOGV(" max_width           : %i", di->res->max_width);
+    ALOGV(" min_height          : %i", di->res->min_height);
+    ALOGV(" max_height          : %i", di->res->max_height);
+    ALOGV("CRTC");
+    ALOGV(" id                  : %i", di->crtc->crtc_id);
+    ALOGV(" x                   : %i", di->crtc->x);
+    ALOGV(" y                   : %i", di->crtc->y);
+    ALOGV(" width               : %i", di->crtc->width);
+    ALOGV(" height              : %i", di->crtc->height);
+    ALOGV("MODE");
+    ALOGI(" hdisplay            : %i", di->crtc->mode.hdisplay);
+    ALOGI(" vdisplay            : %i", di->crtc->mode.vdisplay);
+    ALOGV(" htotal              : %i", di->crtc->mode.htotal);
+    ALOGV(" vtotal              : %i", di->crtc->mode.vtotal);
+    ALOGV(" clock               : %i", di->crtc->mode.clock);
+    ALOGV(" vrefresh            : %i", di->crtc->mode.vrefresh);
+    ALOGV(" name                : %s", di->crtc->mode.name);
+    ALOGI("DUMB FB");
+    ALOGI(" depth               : %i", mi->depth);
+    ALOGI(" pixsz               : %i", mi->pixsz);
+    ALOGI(" mem size            : %i", mi->fb_sz);
+    ALOGI(" line size           : %i", mi->line);
+    ALOGV(" stride              : %i", mi->stride);
 } /* End of LINUXFBDR_dump */
 
 #ifdef __cplusplus
