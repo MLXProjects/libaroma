@@ -45,6 +45,12 @@ typedef struct _LINUXFBDR_INTERNAL * LINUXFBDR_INTERNALP;
 /* include qcom header */
 #include "fb_qcom.h"
 
+/* 
+ * backend types
+ */
+#define LINUXFBDR_BACKEND_NONE	0
+#define LINUXFBDR_BACKEND_QCOM	1
+
 /*
  * device path
  */
@@ -57,6 +63,12 @@ typedef struct _LINUXFBDR_INTERNAL * LINUXFBDR_INTERNALP;
 #define OMAPFB_ENABLEVSYNC OMAP_IOW(64, int)
 #define OMAPFB_WAITFORVSYNC OMAP_IO(57)
 
+/*
+ * structure : generic backend data
+ */
+typedef struct {
+	byte type;
+} BACKEND_INTERNAL, * BACKEND_INTERNALP;
 /*
  * structure : internal framebuffer data
  */
@@ -77,11 +89,11 @@ struct _LINUXFBDR_INTERNAL{
 	voidp		current_buffer;				/* current buffer to write */
 	voidp		unswap_buffer;				/* unswapped buffer to write */
 
-	LIBAROMA_MUTEX	mutex;
+	LIBAROMA_MUTEX mutex;
 
 	int			last_vsync;
 	byte		is_omap;					/* is omap fb? - vsync */
-	QCOMFB_INTERNALP qcom;					/* qcom fb internal data */
+	voidp		backend;					/* backend internal data */
 
 	/* pointer */
 	byte pointered;
@@ -124,7 +136,7 @@ byte LINUXFBDR_post_16bit(
 	LIBAROMA_FBP me, wordp __restrict src,
 	int dx, int dy, int dw, int dh,
 	int sx, int sy, int sw, int sh
-	);
+);
 
 /* snapshoot - 16bit */
 byte LINUXFBDR_snapshoot_16bit(LIBAROMA_FBP me, wordp dst);
@@ -137,7 +149,7 @@ byte LINUXFBDR_post_32bit(
 	LIBAROMA_FBP me, wordp __restrict src,
 	int dx, int dy, int dw, int dh,
 	int sx, int sy, int sw, int sh
-	);
+);
 
 /* snapshoot - 32bit */
 byte LINUXFBDR_snapshoot_32bit(LIBAROMA_FBP me, wordp dst);

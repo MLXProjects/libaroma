@@ -42,7 +42,6 @@ byte LINUXFBDR_start_post(LIBAROMA_FBP me){
 	}
 	LINUXFBDR_INTERNALP mi = (LINUXFBDR_INTERNALP) me->internal;
 	libaroma_mutex_lock(mi->mutex);
-	LINUXFBDR_wait_vsync(mi);
 	return 1;
 }
 
@@ -56,6 +55,7 @@ byte LINUXFBDR_end_post(LIBAROMA_FBP me){
 		return 0;
 	}
 	LINUXFBDR_INTERNALP mi = (LINUXFBDR_INTERNALP) me->internal;
+	LINUXFBDR_wait_vsync(mi);
 	LINUXFBDR_flush(me);
 	libaroma_mutex_unlock(mi->mutex);
 	return 1;
@@ -97,8 +97,7 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 	ALOGV("LINUXFBDR initialized internal data");
 
 	/* allocating internal data */
-	LINUXFBDR_INTERNALP mi = (LINUXFBDR_INTERNALP)
-											calloc(sizeof(LINUXFBDR_INTERNAL),1);
+	LINUXFBDR_INTERNALP mi = (LINUXFBDR_INTERNALP) calloc(sizeof(LINUXFBDR_INTERNAL),1);
 	if (!mi) {
 		ALOGE("LINUXFBDR calloc internal data - memory error");
 		return 0;
@@ -135,7 +134,7 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 	/* set libaroma framebuffer instance values */
 	me->w	= mi->var.xres;	/* width */
 	me->h	= mi->var.yres;	/* height */
-	me->sz	= me->w*me->h;	 /* width x height */
+	me->sz	= me->w*me->h;	/* width x height */
 
 	if (QCOMFB_init(me)){
 		/* qcom fb */
@@ -165,16 +164,16 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 		mi->pixsz= mi->depth >> 3 ;			/* pixel size per byte */
 		mi->fb_sz= (mi->var.xres_virtual * mi->var.yres_virtual * mi->pixsz);
 
-		if (mi->fix.smem_len<(dword) mi->fb_sz){
+		if (mi->fix.smem_len < (unsigned int) mi->fb_sz){
 			/* smem_len is invalid */
 			ALOGW("LINUXFBDR smem_len(%i) < fb_sz(%i)", mi->fix.smem_len, mi->fb_sz);
 			//goto error;
 		}
 		/* map buffer */
 		ALOGV("LINUXFBDR mmap Framebuffer Memory");
-		mi->buffer	= (voidp) mmap(0, mi->fix.smem_len,
-									PROT_READ | PROT_WRITE, MAP_SHARED,
-									mi->fb, 0);
+		mi->buffer = mmap(0, mi->fix.smem_len,
+							PROT_READ | PROT_WRITE, MAP_SHARED,
+							mi->fb, 0);
 
 		if (mi->buffer == MAP_FAILED) {
 			ALOGE("LINUXFBDR mmap framebuffer memory error");
@@ -229,9 +228,12 @@ void LINUXFBDR_release(LIBAROMA_FBP me) {
 		return;
 	}
 
-	if (mi->qcom!=NULL){
-		/* release qcom overlay driver */
-		QCOMFB_release(me);
+	if (mi->backend!=NULL){
+		BACKEND_INTERNALP bi = (BACKEND_INTERNALP) mi->backend;
+		if (bi->type == LINUXFBDR_BACKEND_QCOM){
+			/* release qcom overlay driver */
+			QCOMFB_release(me);
+		}
 	}
 
 	/* unmap */
@@ -241,8 +243,10 @@ void LINUXFBDR_release(LIBAROMA_FBP me) {
 	}
 
 	/* close fb */
-	ALOGV("LINUXFBDR close fb-fd");
-	close(mi->fb);
+	if (mi->fb >= 0){
+		ALOGV("LINUXFBDR close fb-fd");
+		close(mi->fb);
+	}
 
 	/* destroy mutex & cond */
 	libaroma_mutex_free(mi->mutex);
@@ -273,7 +277,6 @@ void LINUXFBDR_swap_buffer(LINUXFBDR_INTERNALP mi){
  * Descriptions: wait for vsync
  */
 void LINUXFBDR_wait_vsync(LINUXFBDR_INTERNALP mi){
-	/*
 	if (mi->is_omap){
 		int s=0;
 		mi->last_vsync=ioctl(mi->fb, OMAPFB_WAITFORVSYNC, &s);
@@ -281,7 +284,6 @@ void LINUXFBDR_wait_vsync(LINUXFBDR_INTERNALP mi){
 	else{
 		mi->last_vsync=ioctl(mi->fb, FBIO_WAITFORVSYNC, 0);
 	}
-	*/
 } /* End of LINUXFBDR_wait_vsync */
 
 /*
@@ -295,18 +297,15 @@ byte LINUXFBDR_flush(LIBAROMA_FBP me) {
 	}
 	LINUXFBDR_INTERNALP mi = (LINUXFBDR_INTERNALP) me->internal;
 
-	// fsync(mi->fb);
 	LINUXFBDR_swap_buffer(mi);
-	/*
-	if (mi->last_vsync==0){
-		mi->var.activate = FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
-	}
-	else{
-		mi->var.activate = FB_ACTIVATE_VBL;
-	}
-	*/
-	mi->var.activate = FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+	
 	if (ioctl(mi->fb, FBIOPAN_DISPLAY, &mi->var)!=0){
+		if (mi->last_vsync==0){
+			mi->var.activate = FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
+		}
+		else{
+			mi->var.activate = FB_ACTIVATE_VBL;
+		}
 		ioctl(mi->fb, FBIOPUT_VSCREENINFO, &mi->var);
 	}
 	return 1;

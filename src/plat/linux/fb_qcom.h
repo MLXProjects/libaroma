@@ -137,20 +137,24 @@ struct mdp_display_commit_44 {
 		sizeof(struct mdp_display_commit)-sizeof(struct mdp_rect))
 
 /* qcom internal data */
-typedef struct{
-	byte			id;
-	int			 ionfd;
-	int			 memfd;
-	voidp		 handle;
+typedef struct {
+	/* generic backend type */
+	byte 		type;
+	
+	/* qcom variables */
+	byte		id;
+	int			ionfd;
+	int			memfd;
+	voidp		handle;
 
-	int			 yoffset;
-	int			 overlay_lid;
-	int			 overlay_rid;
+	int			yoffset;
+	int			overlay_lid;
+	int			overlay_rid;
 
-	byte			split;
-	int			 split_left;
-	int			 split_right;
-	byte			dbuf;
+	byte		split;
+	int			split_left;
+	int			split_right;
+	byte		dbuf;
 
 	struct msmfb_overlay_data overlay;
 	struct mdp_display_commit commiter;
