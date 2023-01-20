@@ -110,6 +110,15 @@ struct drm_pciinfo {
 #define DRM_IOCTL_GET_PCIINFO	DRM_IOR(0x15, struct drm_pciinfo)
 #endif
 
+/* disable warning introduced in snprintf usage */
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wformat-truncation"
+#elif defined(__GNUC__)
+#if (__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ >= 1))
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif 
+#endif
+
 #define DRM_MSG_VERBOSITY 3
 
 #define memclear(s) memset(&s, 0, sizeof(s))
