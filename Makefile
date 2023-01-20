@@ -83,10 +83,10 @@ LIB_DEPENDS += -lSDL2
 LIBAROMA_PLATFORM := sdl
 endif #LIBAROMA_PLATFORM sdl2
 endif #LIBAROMA_PLATFORM sdl
-# include platform directory to sources (max one subfolder recursion level)
+# include platform directory to sources
 LIB_CFLAGS += -I$(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)
-LIB_SRC += $(wildcard $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*.c $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*/*.c)
-LIB_HDR += $(wildcard $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*.h $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*/*.h)
+LIB_SRC += $(wildcard $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*.c)
+LIB_HDR += $(wildcard $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*.h)
 ifeq ($(LIBAROMA_FEATURE_CPU),neon)
 LIB_CFLAGS += -mfloat-abi=hard -mfpu=neon -D__ARM_NEON
 else #LIBAROMA_FEATURE_CPU neon
@@ -140,6 +140,15 @@ endif #LIBAROMA_FEATURE_SVG
 ifneq ($(LIBAROMA_FEATURE_OPENMP),no)
 LIB_CFLAGS += -DLIBAROMA_CONFIG_OPENMP -fopenmp
 endif #LIBAROMA_FEATURE_OPENMP no
+ifeq ($(LIBAROMA_PLATFORM),linux)
+ifeq ($(LIBAROMA_FEATURE_DRM),no)
+LIB_CFLAGS += -DLIBAROMA_CONFIG_NODRM
+else #LIBAROMA_FEATURE_DRM no
+LIB_CFLAGS += -I$(LIB_DIR)/drm
+LIB_SRC += $(wildcard $(LIB_DIR)/drm/*.c)
+LIB_HDR += $(wildcard $(LIB_DIR)/drm/*.h)
+endif #LIBAROMA_FEATURE_DRM no
+endif #LIBAROMA_PLATFORM linux
 ifeq ($(LIBAROMA_FEATURE_MINZIP),no)
 LIB_CFLAGS += -DLIBAROMA_CONFIG_NOMINZIP
 else #LIBAROMA_FEATURE_MINZIP no

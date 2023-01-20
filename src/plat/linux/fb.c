@@ -111,6 +111,19 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 
 	/* init mutex & cond */
 	libaroma_mutex_init(mi->mutex);
+	
+#ifndef LIBAROMA_CONFIG_NODRM
+	/* try drm device */
+	if (DRMFB_init(me)){
+		/* set callbacks & return */
+		me->start_post	= &DRMFB_start_post;
+		me->end_post	= &DRMFB_end_post;
+		me->post		= &DRMFB_post;
+		me->snapshoot	= NULL;
+		ALOGI("using drm framebuffer driver");
+		return 1;
+	}
+#endif /* LIBAROMA_CONFIG_NODRM */
 
 	/* open framebuffer device */
 	mi->fb = open(LINUXFBDR_DEVICE, O_RDWR, 0);
@@ -233,6 +246,10 @@ void LINUXFBDR_release(LIBAROMA_FBP me) {
 		if (bi->type == LINUXFBDR_BACKEND_QCOM){
 			/* release qcom overlay driver */
 			QCOMFB_release(me);
+		}
+		else if (bi->type == LINUXFBDR_BACKEND_DRM){
+			/* release drm driver */
+			DRMFB_release(me);
 		}
 	}
 
