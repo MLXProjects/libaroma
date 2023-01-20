@@ -97,8 +97,8 @@ void LINUXFBDR_init_16bit(LIBAROMA_FBP me) {
 	}
 	/* set sync callbacks */
 	me->start_post	= &LINUXFBDR_start_post;
-	me->end_post		= &LINUXFBDR_end_post;
-	me->post				= &LINUXFBDR_post_16bit;
-	me->snapshoot	 = &LINUXFBDR_snapshoot_16bit;
+	me->end_post	= &LINUXFBDR_end_post;
+	me->post		= &LINUXFBDR_post_16bit;
+	me->snapshoot	= &LINUXFBDR_snapshoot_16bit;
 }
 #endif /* __libaroma_linux_fb16bit_driver_c__ */
