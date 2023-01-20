@@ -333,12 +333,15 @@ byte libaroma_font_ex(
 			/* save it */
 			if (libaroma_font_exists(fontid)){
 				ALOGV("previous font with same id exists, freeing");
+				_libaroma_font_lock(0);
 				libaroma_font_free(fontid);
+				_libaroma_font_lock(1);
 			}
 			if (szset_err == 23){
 				int best_match = 0;
 				int diff = abs(def_size - tmp_face->available_sizes[0].width);
-				for (int i = 1; i < tmp_face->num_fixed_sizes; i++) {
+				int i;
+				for (i = 1; i < tmp_face->num_fixed_sizes; i++) {
 					int ndiff = abs(def_size - tmp_face->available_sizes[i].width);
 					if (ndiff < diff) {
 						best_match = i;
@@ -376,7 +379,7 @@ byte libaroma_font_ex(
 		}
 	}
 	else {
-		ALOGW("libaroma_font FT_New_Memory_Face Error %s", FT_Error_String(nmf));
+		ALOGW("libaroma_font FT_New_Memory_Face Error %d", nmf);
 		libaroma_stream_close(stream);
 	}
 	_libaroma_font_lock(0);
@@ -423,7 +426,6 @@ byte libaroma_font_free(
 		_libaroma_font_faces[fontid].hb_font = NULL;
 	}
 #endif
-
 	/* Free Freetype Font Face */
 	if (_libaroma_font_faces[fontid].face != NULL) {
 		FT_Done_Face(_libaroma_font_faces[fontid].face);
@@ -670,7 +672,6 @@ byte libaroma_font_init() {
  * Descriptions: release font instance
  */
 byte libaroma_font_release() {
-	_libaroma_font_lock(1);
 	if (_libaroma_font_instance == NULL) {
 		ALOGE("libaroma_font_release _libaroma_font_instance=NULL");
 		_libaroma_font_lock(0);
@@ -680,7 +681,9 @@ byte libaroma_font_release() {
 
 	/* release harfbuzz callback functions */
 #ifndef LIBAROMA_CONFIG_TEXT_NOHARFBUZZ
+	_libaroma_font_lock(1);
 	_libaroma_font_hb_free_functions();
+	_libaroma_font_lock(0);
 #endif
 
 	/* release font face */
@@ -688,11 +691,11 @@ byte libaroma_font_release() {
 	for (i = 0; i < _LIBAROMA_FONT_MAX_FACE; i++) {
 		libaroma_font_free(i);
 	}
+	_libaroma_font_lock(1);
 	if (FT_Done_FreeType(_libaroma_font_instance) == 0) {
 		_libaroma_font_instance = NULL;
 		_libaroma_font_lock(0);
 		__libaroma_text_locker_init(1);
-		ALOGV("Fonts Resource Released");
 		return 1;
 	}
 	ALOGE("libaroma_font_release FT_Done_FreeType Error");

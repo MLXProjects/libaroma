@@ -146,8 +146,8 @@ void libaroma_hid_release() {
 	ALOGV("release hid driver");
 	_libaroma_hid->release(_libaroma_hid);
 	/* free instance */
-	ALOGV("release hid instance");
 	free(_libaroma_hid);
+	_libaroma_hid = NULL;
 } /* End of libaroma_hid_release */
 
 /*

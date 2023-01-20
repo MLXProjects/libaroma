@@ -183,8 +183,6 @@ void libaroma_canvas_fillalpha(
 	if (!cv->alpha) {
 		cv->alpha = calloc(cv->s, 1);
 	}
-	if (!alpha) alpha=0x00; //clear region by default
-
 	int cury=cv->w*y;
 	int i;
 	for (i=0; i<h; i++){

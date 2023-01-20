@@ -70,11 +70,11 @@ void *_libaroma_init_helper(void *cookie);
  * Type				: LIBAROMA_CONFIG
  * Descriptions: runtime configuration
  */
-static LIBAROMA_CONFIG _libaroma_config={0};
+static LIBAROMA_CONFIG _libaroma_config;
 static byte _libaroma_config_ready=0;
 static FILE * _libaroma_debug_fp=NULL;
 static char _libaroma_debug_tag[256]="LIBAROMA()";
-static char _libaroma_debug_prefix[32]="";
+static char _libaroma_debug_prefix[32];
 
 
 /*
@@ -388,6 +388,7 @@ byte libaroma_end() {
 
 	return 1;
 }
+
 #ifdef LIBAROMA_FB_INITHELPER
 void *_libaroma_init_helper(void *cookie){
 	if (libaroma_fb_init()) {
@@ -408,9 +409,9 @@ void *_libaroma_init_helper(void *cookie){
  * Type				: char []
  * Descriptions: version storage
  */
-static char _LIBAROMA_VERSION[50] = {0};
-static char _LIBAROMA_VERSION_FULLVER[50] = {0};
-static char _LIBAROMA_VERSION_SIGNATURE[80] = {0};
+static char _LIBAROMA_VERSION[50];
+static char _LIBAROMA_VERSION_FULLVER[50];
+static char _LIBAROMA_VERSION_SIGNATURE[80];
 
 /*
  * Function		: _libaroma_version

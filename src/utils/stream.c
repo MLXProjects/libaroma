@@ -80,7 +80,8 @@ LIBAROMA_STREAMP libaroma_stream_file_ex(
 	close(fd);
 	if (mem == MAP_FAILED) {
 		ALOGW("libaroma_stream_file unable to mmap (%s)", path);
-		return NULL;
+		/* retry without mmap */
+		goto nommap;
 	}
 	/* Return */
 	ret = (LIBAROMA_STREAMP) malloc(sizeof(LIBAROMA_STREAM));
@@ -99,7 +100,8 @@ LIBAROMA_STREAMP libaroma_stream_file_ex(
 	}
 	snprintf(ret->uri,
 			LIBAROMA_STREAM_URI_LENGTH, "file://%s", path);
-#else
+#endif
+nommap:
 	if (!path) {
 		ALOGW("libaroma_stream_file path is invalid");
 		return 0;
@@ -167,7 +169,6 @@ done:
 	ret->isalloc= 1; /* if not using mmap, data is always malloc'ed */
 	snprintf(ret->uri,
 			LIBAROMA_STREAM_URI_LENGTH, "file://%s", path);
-#endif
 	return ret;
 } /* End of libaroma_stream_file */
 
