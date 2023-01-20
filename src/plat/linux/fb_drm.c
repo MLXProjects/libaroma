@@ -352,16 +352,20 @@ static int DRMFB_mkdumb(LINUXFBDR_INTERNALP mi, int w, int h, int i){
 	di->buffer_id[i] = create_dumb.handle;
 	/* add buffer to DRM */
 	ALOGV("DRMFB_mkdumb add fb to KMS");
-	/*uint32_t handles[4]={0}, pitches[4]={0}, offsets[4]={0};
+	uint32_t handles[4]={0}, pitches[4]={0}, offsets[4]={0};
 	handles[0] = create_dumb.handle;
 	pitches[0] = create_dumb.pitch;
-	retval = drmModeAddFB2(mi->fb, w, h,
-			DRM_FORMAT_RGB565,
-			handles, pitches, offsets,
-			&di->buffer_id[i], 0);*/
-	retval = drmModeAddFB(mi->fb, w, h, 16, 16,
+	uint32_t pixel_format;
+	if (libaroma_config()->gfx_override_rgb){
+		pixel_format = DRM_FORMAT_BGR565;
+	}
+	else {
+		pixel_format = DRM_FORMAT_RGB565;
+	}
+	retval = drmModeAddFB2(mi->fb, w, h, pixel_format, handles, pitches, offsets, di->buffer_id[i], 0);
+	/*retval = drmModeAddFB(mi->fb, w, h, 16, 16,
 			create_dumb.pitch, create_dumb.handle, 
-			&di->buffer_id[i]);
+			&di->buffer_id[i]);*/
 	if (retval){
 		/* failed to add fb to KSM */
 		ALOGV("DRMFB_mkdumb drmModeAddFB failed (%d)", retval);
