@@ -34,7 +34,7 @@ extern "C" {
  * Descriptions: create primitive control
  */
 LIBAROMA_CONTROLP libaroma_control_new(
-	word id,
+	dword id,
 	int x, int y, int w, int h,
 	int minw, int minh,
 	voidp internal,

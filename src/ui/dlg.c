@@ -290,7 +290,7 @@ int libaroma_dialog_confirm(
 	LIBAROMA_MSG msg;
 	dword command;
 	byte cmd;
-	word id;
+	dword id;
 	byte retval=0;
 
 	do{
@@ -449,7 +449,7 @@ LIBAROMA_CONTROLP libaroma_dialog_progress(
 	LIBAROMA_MSG msg;
 	dword command;
 	byte cmd;
-	word id;
+	dword id;
 	int retval=-1;
 
 	do{
@@ -492,7 +492,7 @@ LIBAROMA_CONTROLP libaroma_dialog_progress(
 byte _libaroma_dialog_list_simple_option_cb(
 	LIBAROMA_CONTROLP ctl,
 	LIBAROMA_CTL_LIST_ITEMP item,
-	int id,
+	dword id,
 	byte checked,
 	voidp data,
 	byte state
@@ -576,7 +576,7 @@ int libaroma_dialog_list(
 	LIBAROMA_CTL_LIST_ITEMP selitem=NULL;
 
 	size_t i;
-	int last_id = 1;
+	dword last_id = 1;
 	for (i=0; i < items_num; i++){
 		LIBAROMA_CTL_LIST_ITEMP itm = malloc(sizeof(LIBAROMA_CTL_LIST_ITEM));
 		switch (templates[i].type)
@@ -728,7 +728,7 @@ int libaroma_dialog_list(
 	LIBAROMA_MSG msg;
 	dword command;
 	byte cmd;
-	word id;
+	dword id;
 	byte retval=0;
 
 	do{

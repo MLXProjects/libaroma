@@ -899,7 +899,7 @@ void _libaroma_ctl_list_destroy(
  * Descriptions: create list scroll control
  */
 LIBAROMA_CONTROLP libaroma_ctl_list(
-		LIBAROMA_WINDOWP win, word id,
+		LIBAROMA_WINDOWP win, dword id,
 		int x, int y, int w, int h,
 		int horizontal_padding,
 		int vertical_padding,
@@ -1099,7 +1099,7 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_ctl_list_get_item_internal(
 	LIBAROMA_CTL_LIST_ITEMP f = mi->first;
 	if (f){
 		while(f){
-			if (((!find_id)&&(curr_index==index))||((find_id)&&(f->id==index))) {
+			if (((!find_id)&&(curr_index==index))||((find_id)&&(f->id==(dword)index))) {
 				libaroma_mutex_unlock(mi->imutex);
 				return f;
 			}
@@ -1317,7 +1317,7 @@ byte libaroma_ctl_list_scroll_to_item(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_ctl_list_add_item_internal(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		int height,
 		word flags,
 		voidp internal,

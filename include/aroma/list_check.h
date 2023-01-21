@@ -45,7 +45,7 @@
 typedef byte (*LIBAROMA_LISTITEM_CB)(
   LIBAROMA_CONTROLP ctl,
   LIBAROMA_CTL_LIST_ITEMP item,
-  int id,
+  dword id,
   byte checked,
   voidp data,
   byte state
@@ -125,7 +125,7 @@ byte libaroma_listitem_ischecked(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_check(
     LIBAROMA_CONTROLP ctl,
-    int id,
+    dword id,
     byte selected,
     const char * main_text,
     const char * extra_text,

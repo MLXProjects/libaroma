@@ -60,7 +60,7 @@ void libaroma_listitem_menu_settext(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_menu(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		const char * main_text,
 		const char * extra_text,
 		LIBAROMA_CANVASP icon,

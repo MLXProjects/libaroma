@@ -47,12 +47,12 @@ byte libaroma_ctl_image_setflags(
 	LIBAROMA_CONTROLP ctl,byte flags);
 
 LIBAROMA_CONTROLP libaroma_ctl_image(
-	LIBAROMA_WINDOWP win, word id, char * src,
+	LIBAROMA_WINDOWP win, dword id, char * src,
 	int x, int y, int w, int h
 );
 
 LIBAROMA_CONTROLP libaroma_ctl_image_canvas_ex(
-	LIBAROMA_WINDOWP win, word id, LIBAROMA_CANVASP src,
+	LIBAROMA_WINDOWP win, dword id, LIBAROMA_CANVASP src,
 	int x, int y, int w, int h, byte flags
 );
 

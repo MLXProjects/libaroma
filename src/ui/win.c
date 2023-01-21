@@ -688,7 +688,7 @@ LIBAROMA_CONTROLP libaroma_window_attach(
  * Descriptions: get control by id
  */
 LIBAROMA_CONTROLP libaroma_window_getid(
-		LIBAROMA_WINDOWP win, word id){
+		LIBAROMA_WINDOWP win, dword id){
 	__CHECK_WM(NULL);
 	if (win==NULL){
 		ALOGW("window_control_id win is null");

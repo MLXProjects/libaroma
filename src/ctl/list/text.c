@@ -274,7 +274,7 @@ byte libaroma_listitem_text_add_ex(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_text_color(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		char * text,
 		word textcolor,
 		int hpad,
@@ -330,7 +330,7 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_text_color(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_text(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		char * text,
 		int hpad,
 		int vpad,

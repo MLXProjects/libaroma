@@ -1092,7 +1092,7 @@ byte libaroma_ctl_pager_set_animation_callback(
  */
 LIBAROMA_CONTROLP libaroma_ctl_pager(
 		LIBAROMA_WINDOWP win,
-		word id, int pager_number,
+		dword id, int pager_number,
 		int x, int y, int w, int h
 ){
 	if (!win){

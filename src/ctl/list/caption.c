@@ -189,7 +189,7 @@ void _libaroma_listitem_caption_destroy(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_caption_color(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		const char * text,
 		word textcolor,
 		int at_index){
@@ -255,7 +255,7 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_caption_color(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_caption(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		const char * text,
 		int at_index){
 	return libaroma_listitem_caption_color(ctl,id,text,

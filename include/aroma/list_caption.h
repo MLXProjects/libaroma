@@ -41,7 +41,7 @@ byte libaroma_listitem_iscaption(LIBAROMA_CTL_LIST_ITEMP item);
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_caption_color(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		const char * text,
 		word textcolor,
 		int at_index);
@@ -53,7 +53,7 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_caption_color(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_caption(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		const char * text,
 		int at_index);
 

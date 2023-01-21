@@ -34,7 +34,7 @@
  */
 LIBAROMA_CONTROLP libaroma_ctl_slider(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		int max,
 		int value

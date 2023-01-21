@@ -97,7 +97,7 @@ struct __LIBAROMA_CTL_FRAGMENT{
 	int win_next_del_id;
 };
 typedef struct{
-	int id;
+	dword id;
 	byte active_state;
 	LIBAROMA_CONTROLP ctl;
 } _LIBAROMA_CTL_FRAGMENT_WIN, * _LIBAROMA_CTL_FRAGMENT_WINP;
@@ -489,7 +489,7 @@ void _libaroma_ctl_fragment_draw(
 } /* End of _libaroma_ctl_fragment_draw */
 
 byte libaroma_ctl_fragment_del_window_nomutex(
-	LIBAROMA_CONTROLP ctl, int id);
+	LIBAROMA_CONTROLP ctl, dword id);
 
 /*
  * Function		: _libaroma_ctl_fragment_thread
@@ -724,7 +724,7 @@ dword _libaroma_ctl_fragment_msg(
  */
 LIBAROMA_CONTROLP libaroma_ctl_fragment(
 		LIBAROMA_WINDOWP win,
-		word id, int x, int y, int w, int h
+		dword id, int x, int y, int w, int h
 ){
 	if (!win){
 		ALOGW("pager need direct window attach");
@@ -770,7 +770,7 @@ LIBAROMA_CONTROLP libaroma_ctl_fragment(
  * Descriptions: new window
  */
 LIBAROMA_WINDOWP libaroma_ctl_fragment_new_window(
-	LIBAROMA_CONTROLP ctl, int id){
+	LIBAROMA_CONTROLP ctl, dword id){
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, NULL
 	);
@@ -852,7 +852,7 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_new_window(
  * Descriptions: get window
  */
 LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window(
-	LIBAROMA_CONTROLP ctl, int id){
+	LIBAROMA_CONTROLP ctl, dword id){
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, NULL
 	);
@@ -876,7 +876,7 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window(
  * Descriptions: delete window
  */
 byte libaroma_ctl_fragment_del_window_nomutex(
-	LIBAROMA_CONTROLP ctl, int id){
+	LIBAROMA_CONTROLP ctl, dword id){
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, 0
 	);
@@ -930,7 +930,7 @@ byte libaroma_ctl_fragment_del_window_nomutex(
 	return ret;
 }
 byte libaroma_ctl_fragment_del_window(
-	LIBAROMA_CONTROLP ctl, int id){
+	LIBAROMA_CONTROLP ctl, dword id){
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, 0
 	);
@@ -946,7 +946,7 @@ byte libaroma_ctl_fragment_del_window(
  * Descriptions: set active page
  */
 byte libaroma_ctl_fragment_set_active_window(
-	LIBAROMA_CONTROLP ctl, int id,
+	LIBAROMA_CONTROLP ctl, dword id,
 	byte anitype, long duration, byte remove_prev,
 	LIBAROMA_TRANSITION_CB transcb,
 	LIBAROMA_RECTP rect_start,

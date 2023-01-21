@@ -42,7 +42,7 @@
  */
 LIBAROMA_CONTROLP libaroma_ctl_progress(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		byte type,
 		int max,

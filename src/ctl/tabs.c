@@ -826,7 +826,7 @@ dword _libaroma_ctl_tabs_msg(
  */
 LIBAROMA_CONTROLP libaroma_ctl_tabs(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		word bgcolor,
 		word selcolor,

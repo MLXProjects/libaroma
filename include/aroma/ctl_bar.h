@@ -43,7 +43,7 @@ typedef struct {
 	char * title;
 	LIBAROMA_CANVASP icon;
 	byte icon_flags;
-	byte id;
+	dword id;
 } LIBAROMA_CTL_BAR_TOOL, * LIBAROMA_CTL_BAR_TOOLP;
 
 /* bar tools */
@@ -81,7 +81,7 @@ byte libaroma_ctl_bar_get_icon_flags(LIBAROMA_CONTROLP ctl);
 byte libaroma_ctl_bar_tools_set(
 	LIBAROMA_CTL_BAR_TOOLSP tools,
 	int index,
-	byte id,
+	dword id,
 	char * title,
 	LIBAROMA_CANVASP icon,
 	byte flags
@@ -95,7 +95,7 @@ byte libaroma_ctl_bar_tools_set(
  */
 LIBAROMA_CONTROLP libaroma_ctl_bar(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		char * title,
 		word bgcolor,

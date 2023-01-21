@@ -101,7 +101,7 @@ dword _libaroma_ctl_clock_msg(LIBAROMA_CONTROLP ctl, LIBAROMA_MSGP msg){
 
 LIBAROMA_CONTROLP libaroma_ctl_clock(
 	LIBAROMA_WINDOWP win,
-	word id, int x,	int y,
+	dword id, int x,	int y,
 	int w, int h,
 	LIBAROMA_CANVASP bg,
 	byte flags

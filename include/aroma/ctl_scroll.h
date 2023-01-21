@@ -176,7 +176,7 @@ byte libaroma_ctl_scroll_blit(
  * Descriptions: create button control
  */
 LIBAROMA_CONTROLP libaroma_ctl_scroll(
-		LIBAROMA_WINDOWP win, word id,
+		LIBAROMA_WINDOWP win, dword id,
 		int x, int y, int w, int h,
 		word bg_color, byte flags
 );

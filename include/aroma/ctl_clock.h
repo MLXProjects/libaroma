@@ -24,7 +24,7 @@
 #define LIBAROMA_CTL_CLOCK_COLOR_BORDER	0x3
 #define LIBAROMA_CTL_CLOCK_COLOR_CENTER	0x4
 
-LIBAROMA_CONTROLP libaroma_ctl_clock(LIBAROMA_WINDOWP win, word id, int x,
+LIBAROMA_CONTROLP libaroma_ctl_clock(LIBAROMA_WINDOWP win, dword id, int x,
 		int y, int w, int h, LIBAROMA_CANVASP bg, byte flags);
 
 byte libaroma_ctl_clock_setcolor(LIBAROMA_CONTROLP ctl, byte type, word color);

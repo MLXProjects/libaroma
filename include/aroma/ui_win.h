@@ -268,7 +268,7 @@ byte libaroma_window_del(
  * Descriptions: get control by id
  */
 LIBAROMA_CONTROLP libaroma_window_getid(
-		LIBAROMA_WINDOWP win, word id);
+		LIBAROMA_WINDOWP win, dword id);
 
 /*
  * Function		: libaroma_window_setfocus

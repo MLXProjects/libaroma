@@ -239,7 +239,7 @@ byte libaroma_ctl_image_set_canvas(
 }
 
 LIBAROMA_CONTROLP libaroma_ctl_image_canvas_ex(
-	LIBAROMA_WINDOWP win, word id, LIBAROMA_CANVASP src,
+	LIBAROMA_WINDOWP win, dword id, LIBAROMA_CANVASP src,
 	int x, int y, int w, int h, byte flags
 ){
 	_LIBAROMA_CTL_IMAGEP me = (_LIBAROMA_CTL_IMAGEP)
@@ -275,7 +275,7 @@ LIBAROMA_CONTROLP libaroma_ctl_image_canvas_ex(
 
 
 LIBAROMA_CONTROLP libaroma_ctl_image_ex(
-	LIBAROMA_WINDOWP win, word id, char * src,
+	LIBAROMA_WINDOWP win, dword id, char * src,
 	int x, int y, int w, int h, byte flags
 ){
 	LIBAROMA_CANVASP cv=NULL;

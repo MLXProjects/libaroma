@@ -34,7 +34,7 @@
  */
 LIBAROMA_CONTROLP libaroma_ctl_fragment(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h
 );
 
@@ -44,7 +44,7 @@ LIBAROMA_CONTROLP libaroma_ctl_fragment(
  * Descriptions: new window
  */
 LIBAROMA_WINDOWP libaroma_ctl_fragment_new_window(
-	LIBAROMA_CONTROLP ctl, int id);
+	LIBAROMA_CONTROLP ctl, dword id);
 
 /*
  * Function		: libaroma_ctl_fragment_del_window
@@ -52,7 +52,7 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_new_window(
  * Descriptions: delete window
  */
 byte libaroma_ctl_fragment_del_window(
-	LIBAROMA_CONTROLP ctl, int id);
+	LIBAROMA_CONTROLP ctl, dword id);
 	
 /*
  * Function		: libaroma_ctl_fragment_get_window
@@ -60,7 +60,7 @@ byte libaroma_ctl_fragment_del_window(
  * Descriptions: get window
  */
 LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window(
-	LIBAROMA_CONTROLP ctl, int id);
+	LIBAROMA_CONTROLP ctl, dword id);
 
 /*
  * Function		: libaroma_ctl_fragment_get_window_at
@@ -76,7 +76,7 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window_at(
  * Descriptions: set active page
  */
 byte libaroma_ctl_fragment_set_active_window(
-	LIBAROMA_CONTROLP ctl, int id,
+	LIBAROMA_CONTROLP ctl, dword id,
 	byte anitype, long duration, byte remove_prev,
 	LIBAROMA_TRANSITION_CB transcb,
 	LIBAROMA_RECTP rect_start,

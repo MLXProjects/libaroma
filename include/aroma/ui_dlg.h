@@ -46,7 +46,7 @@ typedef struct{
 
 typedef struct{
 	byte type;
-	int id;
+	dword id;
 	char *title;
 	char *message;
 	LIBAROMA_CANVASP image;

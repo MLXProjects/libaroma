@@ -43,7 +43,7 @@ byte libaroma_listitem_isdivider(LIBAROMA_CTL_LIST_ITEMP item);
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_divider(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		word flags,
 		int at_index);
 

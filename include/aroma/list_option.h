@@ -41,7 +41,7 @@
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_option(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		byte selected,
 		const char * main_text,
 		const char * extra_text,

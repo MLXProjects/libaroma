@@ -34,7 +34,7 @@ int libaroma_ctl_label_height(
 );
 
 LIBAROMA_CONTROLP libaroma_ctl_label_valign(
-	LIBAROMA_WINDOWP win, word id, const char * text,
+	LIBAROMA_WINDOWP win, dword id, const char * text,
 	int x, int y, int w, int h,
 	word color, byte fontid, byte size, dword flags, byte lineheight,
 	byte valign

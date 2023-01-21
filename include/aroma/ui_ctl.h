@@ -45,7 +45,7 @@ typedef struct {
  * Descriptions: control structure
  */
 struct _LIBAROMA_CONTROL{
-	word id;
+	dword id;
 	voidp internal;
 	LIBAROMA_WINDOWP window;
 	LIBAROMA_COLORSETP colorset;
@@ -87,7 +87,7 @@ struct _LIBAROMA_CONTROL{
  * Descriptions: create primitive control
  */
 LIBAROMA_CONTROLP libaroma_control_new(
-	word id,
+	dword id,
 	int x, int y, int w, int h,
 	int minw, int minh,
 	voidp internal,

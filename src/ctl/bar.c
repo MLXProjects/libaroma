@@ -169,7 +169,7 @@ byte libaroma_ctl_bar_tools_free(LIBAROMA_CTL_BAR_TOOLSP tools){
 byte libaroma_ctl_bar_tools_set(
 	LIBAROMA_CTL_BAR_TOOLSP tools,
 	int index,
-	byte id,
+	dword id,
 	char * title,
 	LIBAROMA_CANVASP icon,
 	byte flags
@@ -1175,7 +1175,7 @@ dword _libaroma_ctl_bar_msg(
  */
 LIBAROMA_CONTROLP libaroma_ctl_bar(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		char * title,
 		word bgcolor,

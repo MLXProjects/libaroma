@@ -46,7 +46,7 @@
  */
 LIBAROMA_CONTROLP libaroma_ctl_button(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		const char * text,
 		byte button_style,
@@ -60,7 +60,7 @@ LIBAROMA_CONTROLP libaroma_ctl_button(
  */
 LIBAROMA_CONTROLP libaroma_ctl_button_icon(
 		LIBAROMA_WINDOWP win,
-		word id,
+		dword id,
 		int x, int y, int w, int h,
 		const char * text,
 		LIBAROMA_CANVASP icon,

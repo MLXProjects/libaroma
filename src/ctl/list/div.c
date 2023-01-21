@@ -148,7 +148,7 @@ void _libaroma_listitem_divider_destroy(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_divider(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		word flags,
 		int at_index){
 	/* check valid list control */

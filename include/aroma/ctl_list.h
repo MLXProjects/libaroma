@@ -114,7 +114,7 @@ typedef struct{
 struct _LIBAROMA_CTL_LIST_ITEM{
 	int y;
 	int h;
-	int id;
+	dword id;
 	voidp internal;
 	word flags;
 	LIBAROMA_CTL_LIST_ITEM_HANDLERP handler;
@@ -135,7 +135,7 @@ struct _LIBAROMA_CTL_LIST_ITEM{
  * Descriptions: create list scroll control
  */
 LIBAROMA_CONTROLP libaroma_ctl_list(
-		LIBAROMA_WINDOWP win, word id,
+		LIBAROMA_WINDOWP win, dword id,
 		int x, int y, int w, int h,
 		int horizontal_padding,
 		int vertical_padding,
@@ -258,7 +258,7 @@ byte libaroma_ctl_list_item_setheight(
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_ctl_list_add_item_internal(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		int height,
 		word flags,
 		voidp internal,

@@ -41,7 +41,7 @@
  */
 LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_image(
 		LIBAROMA_CONTROLP ctl,
-		int id,
+		dword id,
 		LIBAROMA_CANVASP image,
 		int h,
 		word flags,
