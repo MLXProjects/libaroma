@@ -58,7 +58,7 @@ struct ezxml_root {       // additional data for the root tag
     struct ezxml xml;     // is a super-struct built on top of ezxml struct
     ezxml_t cur;          // current xml tree insertion point
     char *m;              // original xml string
-    size_t len;           // length of allocated memory for mmap, -1 for malloc
+    size_t len;           // length of allocated memory for mmap, 0 for malloc
     char *u;              // UTF-8 conversion of string if original was UTF-16
     char *s;              // start of work area
     char *e;              // end of work area
@@ -644,7 +644,7 @@ ezxml_t ezxml_parse_fp(FILE *fp)
 
     if (! s) return NULL;
     root = (ezxml_root_t)ezxml_parse_str(s, len);
-    root->len = -1; // so we know to free s in ezxml_free()
+    root->len = 0; // so we know to free s in ezxml_free()
     return &root->xml;
 }
 
@@ -673,7 +673,7 @@ ezxml_t ezxml_parse_fd(int fd)
 #endif // EZXML_NOMMAP
         l = read(fd, m = malloc(st.st_size), st.st_size);
         root = (ezxml_root_t)ezxml_parse_str(m, l);
-        root->len = -1; // so we know to free s in ezxml_free()
+        root->len = 0; // so we know to free s in ezxml_free()
 #ifndef EZXML_NOMMAP
     }
 #endif // EZXML_NOMMAP
@@ -815,25 +815,29 @@ static void ezxml_free_root_stuff (ezxml_t xml)
 
     if (! xml) return;
     if (! xml->parent) { // free root tag allocations
-        for (i = 10; root->ent[i]; i += 2) // 0 - 9 are default entites (<>&"')
-            if ((s = root->ent[i + 1]) < root->s || s > root->e) free(s);
-        free(root->ent); // free list of general entities
-
-        for (i = 0; (a = root->attr[i]); i++) {
-            for (j = 1; a[j++]; j += 2) // free malloced attribute values
-                if (a[j] && (a[j] < root->s || a[j] > root->e)) free(a[j]);
-            free(a);
+        if (root->ent) {
+            for (i = 10; root->ent[i]; i += 2) // 0 - 9 are default entites (<>&"')
+                if ((s = root->ent[i + 1]) < root->s || s > root->e) free(s);
+            free(root->ent); // free list of general entities
         }
-        if (root->attr[0]) free(root->attr); // free default attribute list
-
-        for (i = 0; root->pi[i]; i++) {
-            for (j = 1; root->pi[i][j]; j++);
-            free(root->pi[i][j + 1]);
-            free(root->pi[i]);
+        if (root->attr) {
+            for (i = 0; (a = root->attr[i]); i++) {
+                for (j = 1; a[j++]; j += 2) // free malloced attribute values
+                    if (a[j] && (a[j] < root->s || a[j] > root->e)) free(a[j]);
+                free(a);
+            }
+            if (root->attr[0]) free(root->attr); // free default attribute list
         }
-        if (root->pi[0]) free(root->pi); // free processing instructions
+        if (root->pi) {
+            for (i = 0; root->pi[i]; i++) {
+                for (j = 1; root->pi[i][j]; j++);
+                free(root->pi[i][j + 1]);
+                free(root->pi[i]);
+            }
+            if (root->pi[0]) free(root->pi); // free processing instructions
+        }
 
-        if (root->len == 0) free(root->m); // malloced xml data
+        if (root->len == 0 && root->m) free(root->m); // malloced xml data 
 #ifndef EZXML_NOMMAP
         else if (root->len) munmap(root->m, root->len); // mem mapped xml data
 #endif // EZXML_NOMMAP
