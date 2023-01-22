@@ -44,6 +44,7 @@ typedef struct _LIBAROMA_IARRAY_ITEM * LIBAROMA_IARRAY_ITEMP;
 struct _LIBAROMA_IARRAY_ITEM{
 	int key;
 	voidp val;
+	byte iscopy;
 	LIBAROMA_IARRAY_ITEMP	next;
 };
 
@@ -72,6 +73,7 @@ struct _LIBAROMA_SARRAY_ITEM{
 	char * key;
 	dword hash;
 	voidp val;
+	byte iscopy;
 	LIBAROMA_SARRAY_ITEMP next;
 };
 
@@ -135,7 +137,8 @@ byte libaroma_iarray_set_ex(
 		voidp val,
 		size_t sz,
 		byte use_freecb,
-		byte unshift);
+		byte unshift,
+		byte copy);
 
 /*
  * Function		: libaroma_iarray_unshift
@@ -213,6 +216,19 @@ byte libaroma_iarray_free(
  */
 LIBAROMA_SARRAYP libaroma_sarray(
 		LIBAROMA_ARRAY_FREE_CB cb);
+
+/*
+ * Function		: libaroma_sarray_set_ex
+ * Return Value: byte
+ * Descriptions: set value - extended
+ */
+byte libaroma_sarray_set_ex(
+		LIBAROMA_SARRAYP a,
+		char * key,
+		voidp val,
+		size_t sz,
+		byte use_freecb,
+		byte copy);
 
 /*
  * Function		: libaroma_sarray_set

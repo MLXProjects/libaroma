@@ -100,6 +100,9 @@ LIBAROMA_STREAMP libaroma_stream_file_ex(
 	}
 	snprintf(ret->uri,
 			LIBAROMA_STREAM_URI_LENGTH, "file://%s", path);
+#else
+	/* prevent unused label warning */
+	goto nommap;
 #endif
 nommap:
 	if (!path) {
