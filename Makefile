@@ -32,17 +32,38 @@ LIB_CFLAGS+= -Wno-unused-command-line-argument -Wno-ignored-optimization-argumen
 
 # general paths to be used
 OUTDIR := out
+ifeq ($(LIBAROMA_DEBUG_ENABLE),yes)
+OBJDIR := $(OUTDIR)/obj-debug
+else
 OBJDIR := $(OUTDIR)/obj
+endif #LIBAROMA_DEBUG_ENABLE yes
 
 # target files
 ifeq ($(OS),Windows_NT)
+ifeq ($(LIBAROMA_DEBUG_ENABLE),yes)
+LIB_SHARED := libaroma-debug.dll
+else
 LIB_SHARED := libaroma.dll
+endif #LIBAROMA_DEBUG_ENABLE yes
+else
+ifeq ($(LIBAROMA_DEBUG_ENABLE),yes)
+LIB_SHARED := libaroma-debug.so
 else
 LIB_SHARED := libaroma.so
-endif
+endif #LIBAROMA_DEBUG_ENABLE yes
+endif #OS Windows_NT
+ifeq ($(LIBAROMA_DEBUG_ENABLE),yes)
+LIB_STATIC := libaroma-debug.a
+else
 LIB_STATIC := libaroma.a
+endif #LIBAROMA_DEBUG_ENABLE yes
+ifeq ($(LIBAROMA_DEBUG_ENABLE),yes)
+TEST_SHARED:= test_debug
+TEST_STATIC:= test_debug-static
+else
 TEST_SHARED:= test
 TEST_STATIC:= test-static
+endif #LIBAROMA_DEBUG_ENABLE yes
 
 # source & headers list
 LIB_SRC := $(wildcard $(LIB_DIR)/*.c $(foreach fd, $(LIB_SUBDIR), $(LIB_DIR)/$(fd)/*.c))
