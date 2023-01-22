@@ -27,6 +27,8 @@
 #ifndef LIBAROMA_CONFIG_NOMINZIP
 #include <zlib.h>
 #include <Zip.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #endif
 
 #ifdef __cplusplus
