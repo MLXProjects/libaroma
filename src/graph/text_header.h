@@ -265,16 +265,6 @@ FT_Face libaroma_font_get(
 short libaroma_font_size_px(byte size);
 
 /*
- * Function		: libaroma_font_glyph_get_id
- * Return Value: int
- * Descriptions: get glyph codepage
- */
-int libaroma_font_glyph_get_id(
-		int c,
-		byte fontid,
-		byte * fontid_avail);
-
-/*
  * Function		: libaroma_font_init
  * Return Value: byte
  * Descriptions: init font instance

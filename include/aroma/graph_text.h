@@ -31,40 +31,40 @@
  * Text Flags
  */
 #define LIBAROMA_TEXT_INITIAL_SHIFT 8
-#define LIBAROMA_TEXT_BOLD					(0x04 << LIBAROMA_TEXT_INITIAL_SHIFT)
-#define LIBAROMA_TEXT_ITALIC				(0x08 << LIBAROMA_TEXT_INITIAL_SHIFT)
-#define LIBAROMA_TEXT_UNDERLINE		 (0x10 << LIBAROMA_TEXT_INITIAL_SHIFT)
-#define LIBAROMA_TEXT_STRIKEOUT		 (0x20 << LIBAROMA_TEXT_INITIAL_SHIFT)
-#define LIBAROMA_TEXT_RULE_SHIFT		16
-#define LIBAROMA_TEXT_FIXED_COLOR	 (0x01 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_FIXED_FONT		(0x02 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_FIXED_SIZE		(0x04 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_FIXED_ALIGN	 (0x05 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_BOLD			(0x04 << LIBAROMA_TEXT_INITIAL_SHIFT)
+#define LIBAROMA_TEXT_ITALIC		(0x08 << LIBAROMA_TEXT_INITIAL_SHIFT)
+#define LIBAROMA_TEXT_UNDERLINE		(0x10 << LIBAROMA_TEXT_INITIAL_SHIFT)
+#define LIBAROMA_TEXT_STRIKEOUT		(0x20 << LIBAROMA_TEXT_INITIAL_SHIFT)
+#define LIBAROMA_TEXT_RULE_SHIFT	16
+#define LIBAROMA_TEXT_FIXED_COLOR	(0x01 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_FIXED_FONT	(0x02 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_FIXED_SIZE	(0x04 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_FIXED_ALIGN	(0x05 << LIBAROMA_TEXT_RULE_SHIFT)
 #define LIBAROMA_TEXT_FIXED_INDENT	(0x10 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_SINGLELINE		(0x20 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_NOIMG				 (0x40 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_NOHR					(0x80 << LIBAROMA_TEXT_RULE_SHIFT)
-#define LIBAROMA_TEXT_ALIGN_SHIFT 24
-#define LIBAROMA_TEXT_LEFT					(0x00 << LIBAROMA_TEXT_ALIGN_SHIFT)
-#define LIBAROMA_TEXT_CENTER				(0x01 << LIBAROMA_TEXT_ALIGN_SHIFT)
-#define LIBAROMA_TEXT_RIGHT				 (0x02 << LIBAROMA_TEXT_ALIGN_SHIFT)
-#define LIBAROMA_TEXT_JUSTIFY			 (0x03 << LIBAROMA_TEXT_ALIGN_SHIFT)
+#define LIBAROMA_TEXT_SINGLELINE	(0x20 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_NOIMG			(0x40 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_NOHR			(0x80 << LIBAROMA_TEXT_RULE_SHIFT)
+#define LIBAROMA_TEXT_ALIGN_SHIFT	24
+#define LIBAROMA_TEXT_LEFT			(0x00 << LIBAROMA_TEXT_ALIGN_SHIFT)
+#define LIBAROMA_TEXT_CENTER		(0x01 << LIBAROMA_TEXT_ALIGN_SHIFT)
+#define LIBAROMA_TEXT_RIGHT			(0x02 << LIBAROMA_TEXT_ALIGN_SHIFT)
+#define LIBAROMA_TEXT_JUSTIFY		(0x03 << LIBAROMA_TEXT_ALIGN_SHIFT)
 
 /*
  * Font macro
  */
-#define LIBAROMA_FONT(id,size)			(((id)&15)|(((size)&15)<<4))
+#define LIBAROMA_FONT(id,size)		(((id)&15)|(((size)&15)<<4))
 #define LIBAROMA_TEXT_FONT(id,size) LIBAROMA_FONT(id,size)
 
 /*
  * Line Info
  */
 #define LIBAROMA_TEXTLINE_INFO_CONTENT_WIDTH	0x1
-#define LIBAROMA_TEXTLINE_INFO_RIGHT					0x2
-#define LIBAROMA_TEXTLINE_INFO_LEFT					 0x3
-#define LIBAROMA_TEXTLINE_INFO_HEIGHT				 0x4
-#define LIBAROMA_TEXTLINE_INFO_WIDTH					0x6
-#define LIBAROMA_TEXTLINE_INFO_BASELINE			 0x7
+#define LIBAROMA_TEXTLINE_INFO_RIGHT			0x2
+#define LIBAROMA_TEXTLINE_INFO_LEFT				0x3
+#define LIBAROMA_TEXTLINE_INFO_HEIGHT			0x4
+#define LIBAROMA_TEXTLINE_INFO_WIDTH			0x6
+#define LIBAROMA_TEXTLINE_INFO_BASELINE			0x7
 
 typedef void * LIBAROMA_TEXT;
 typedef void * LIBAROMA_GLYPH;
@@ -76,9 +76,51 @@ typedef void * LIBAROMA_LINE;
  * Descriptions: get font glyph
  */
 LIBAROMA_GLYPH libaroma_font_glyph(
-	int					 c,
-	byte					fontid,
-	byte					size
+	int c,
+	byte fontid,
+	byte size
+);
+
+/*
+ * Function		: libaroma_font_glyph_width
+ * Return Value: short
+ * Descriptions: get glyph width
+ */
+short libaroma_font_glyph_width(
+		LIBAROMA_GLYPH aglyph_param);
+
+/*
+ * Function		: libaroma_font_glyph_height
+ * Return Value: short
+ * Descriptions: get glyph height
+ */
+short libaroma_font_glyph_height(
+		LIBAROMA_GLYPH aglyph_param);
+
+/*
+ * Function		: libaroma_font_glyph_draw
+ * Return Value: byte
+ * Descriptions: draw glyph into canvas
+ */
+byte libaroma_font_glyph_draw(
+		LIBAROMA_CANVASP dest,
+		LIBAROMA_GLYPH aglyph_param,
+		int x,
+		int y,
+		word color,
+		byte flags,
+		byte opacity
+);
+
+/*
+ * Function		: libaroma_font_glyph_get_id
+ * Return Value: int
+ * Descriptions: get glyph codepage
+ */
+int libaroma_font_glyph_get_id(
+	int c,
+	byte fontid,
+	byte * fontid_avail
 );
 
 /*
@@ -123,37 +165,6 @@ byte libaroma_font_free(
 		byte fontid);
 
 /*
- * Function		: libaroma_font_glyph_width
- * Return Value: short
- * Descriptions: get glyph width
- */
-short libaroma_font_glyph_width(
-		LIBAROMA_GLYPH aglyph_param);
-
-/*
- * Function		: libaroma_font_glyph_height
- * Return Value: short
- * Descriptions: get glyph height
- */
-short libaroma_font_glyph_height(
-		LIBAROMA_GLYPH aglyph_param);
-
-/*
- * Function		: libaroma_font_glyph_draw
- * Return Value: byte
- * Descriptions: draw glyph into canvas
- */
-byte libaroma_font_glyph_draw(
-	LIBAROMA_CANVASP dest,
-	LIBAROMA_GLYPH aglyph_param,
-	int x,
-	int y,
-	word color,
-	byte flags,
-	byte opacity
-);
-
-/*
  * Function		: libaroma_text_line_count
  * Return Value: int
  * Descriptions: get number of line
@@ -183,11 +194,11 @@ int libaroma_text_height(
  * Descriptions: create text
  */
 LIBAROMA_TEXT libaroma_text(
-	const char	* text,
-	word					color,
-	int					 maxwidth,
-	dword				 txtflags,
-	byte					linespacing
+		const char *text,
+		word color,
+		int	maxwidth,
+		dword txtflags,
+		byte linespacing
 );
 
 /*
