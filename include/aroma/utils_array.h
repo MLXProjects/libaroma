@@ -255,7 +255,7 @@ byte libaroma_sarray_set_string(
 /*
  * Function		: libaroma_sarray_get
  * Return Value: voidp
- * Descriptions: get value
+ * Descriptions: get value, return key if not found
  */
 voidp libaroma_sarray_get(
 		LIBAROMA_SARRAYP a,
