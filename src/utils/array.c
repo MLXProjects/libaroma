@@ -58,7 +58,7 @@ byte libaroma_iarray_set_ex(
 		byte unshift,
 		byte copy) {
 
-	if (!a || !val || (sz == 0)) {
+	if (!a || !val || (sz == 0 && copy)) {
 		return 0;
 	}
 	LIBAROMA_IARRAY_ITEMP item = a->first;
@@ -302,7 +302,7 @@ byte libaroma_sarray_set_ex(
 		size_t sz,
 		byte use_freecb,
 		byte copy) {
-	if (!a || !val || !key || (sz == 0)) {
+	if (!a || !val || !key || (sz == 0 && copy)) {
 		return 0;
 	}
 	/* Calculate Hash */
