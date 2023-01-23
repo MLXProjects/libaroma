@@ -129,7 +129,7 @@ struct __LIBAROMA_CTL_SCROLL{
 	LIBAROMA_MUTEX blitmutex;
 
 	LIBAROMA_COND_MUTEX	cmutex;
-	LIBAROMA_COND	 ccond;
+	LIBAROMA_COND ccond;
 
 	/* minscroll handler */
 	LIBAROMA_CTL_SCROLL_MINSCROLL_HANDLER minscroll_cb;
@@ -1642,8 +1642,8 @@ byte libaroma_ctl_scroll_request_pos(LIBAROMA_CONTROLP ctl, int req_y){
 
 /*
  * Function		: libaroma_ctl_scroll_get_bg_color
- * Return Value: byte
- * Descriptions: request to change scroll position - nicely
+ * Return Value: word
+ * Descriptions: get background color
  */
 word libaroma_ctl_scroll_get_bg_color(LIBAROMA_CONTROLP ctl){
 	/* internal check */
@@ -1652,6 +1652,25 @@ word libaroma_ctl_scroll_get_bg_color(LIBAROMA_CONTROLP ctl){
 	);
 	return me->color_bg;
 } /* End of libaroma_ctl_scroll_get_bg_color */
+
+/*
+ * Function		: libaroma_ctl_scroll_set_bg_color
+ * Return Value: byte
+ * Descriptions: set background color
+ */
+byte libaroma_ctl_scroll_set_bg_color(LIBAROMA_CONTROLP ctl, word color){
+	/* internal check */
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_scroll_handler, _LIBAROMA_CTL_SCROLLP, 0
+	);
+	libaroma_mutex_lock(me->mutex);
+	me->color_bg = color;
+	/* force redraw */
+	me->synced_y = -1;
+	me->cache_state = 10;
+	libaroma_mutex_unlock(me->mutex);
+	return 1;
+} /* End of libaroma_ctl_scroll_set_bg_color */
 
 /*
  * Function		: libaroma_ctl_scroll_set_client

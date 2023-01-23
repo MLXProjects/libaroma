@@ -70,11 +70,18 @@ struct _LIBAROMA_CTL_SCROLL_CLIENT{
 };
 
 /*
- * Function		: libaroma_ctl_scroll_request_pos
- * Return Value: byte
- * Descriptions: request to change scroll position - nicely
+ * Function		: libaroma_ctl_scroll_get_bg_color
+ * Return Value: word
+ * Descriptions: get background color
  */
 word libaroma_ctl_scroll_get_bg_color(LIBAROMA_CONTROLP ctl);
+
+/*
+ * Function		: libaroma_ctl_scroll_set_bg_color
+ * Return Value: byte
+ * Descriptions: set background color
+ */
+byte libaroma_ctl_scroll_set_bg_color(LIBAROMA_CONTROLP ctl, word color);
 
 /*
  * Function		: libaroma_ctl_scroll_set_client
