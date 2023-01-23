@@ -62,12 +62,13 @@ Run it and should show an empty screen/window that closes after releasing the mo
 This library is under heavy work in progress, while there are no planned API changes that break compatibility it may happen if needed (e.g. in case of redundant features removed or safety issues found).
 The following libraries were embedded to easily implement features:
 - cJSON ([thanks Dave Gamble](https://github.com/DaveGamble/cJSON))
-- ezXML ([thanks Aaron Voisine](https://ezxml.sourceforge.net) and [misc contributors](https://sourceforge.net/p/ezxml/patches/))
+- Mini-XML ([thanks [Michael Sweet](https://github.com/michaelrsweet/mxml))
 - nanoSVG ([thanks Mikko Mononen](https://github.com/memononen/nanosvg))
 - MinZIP ([thanks Google](https://android.googlesource.com/platform/bootable/recovery.git/+/refs/heads/nougat-release/minzip/))
 ## License
 Libaroma is licensed under the Apache 2.0 license ([see LICENSE.MD file](LICENSE.md))
 The embedded libraries listed above have their own licenses:
-- cJSON and ezXML are covered by the MIT license
+- cJSON is covered by the MIT license
+- Mini-XML is covered by the Apache 2.0 license
 - nanoSVG is covered by the zlib license
 - MinZIP isn't a library per se, but it's code is covered by the Apache 2.0 license
