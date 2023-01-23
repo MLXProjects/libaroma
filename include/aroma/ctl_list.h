@@ -164,9 +164,9 @@ int libaroma_ctl_list_get_item_count(
 /*
  * Function		: libaroma_ctl_list_invalidate_item
  * Return Value: void
- * Descriptions: do draw item directly - public
+ * Descriptions: request item redrawa
  */
-void libaroma_ctl_list_invalidate_item(
+byte libaroma_ctl_list_invalidate_item(
 		LIBAROMA_CONTROLP ctl,
 		LIBAROMA_CTL_LIST_ITEMP item
 );

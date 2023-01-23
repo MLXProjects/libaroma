@@ -60,6 +60,7 @@ typedef struct {
 	LIBAROMA_MUTEX imutex;
 	LIBAROMA_CTL_LIST_TOUCHPOS pos;
 	byte bgcolor_update;
+	LIBAROMA_CTL_LIST_ITEMP update_item;
 } LIBAROMA_CTL_LIST, * LIBAROMA_CTL_LISTP;
 
 
@@ -364,12 +365,17 @@ void _libaroma_ctl_list_draw_item(
 	}
 	LIBAROMA_CTL_LISTP mi = (LIBAROMA_CTL_LISTP) client->internal;
 
+	byte redraw_cache = 0;
+	if (mi->update_item == item){
+		redraw_cache = 1;
+	}
 	/* normal animation handler */
 	if (item->state){
 		if (item->state->normal_handler){
-			/* redraw cache if bgcolor changed */
-			if (mi->bgcolor_update){
-				ALOGT("bgcolor_update==1, redrawing item cache - handler = %d", item->state->normal_handler);
+			/* redraw cache if bgcolor updated or update_item set */
+			if (mi->bgcolor_update) redraw_cache = 1;
+			if (redraw_cache){
+				ALOGT("redrawing item cache - handler = %d", item->state->normal_handler);
 				_libaroma_ctl_list_draw_item_fresh(
 					ctl, item, item->state->cache_rest, bgcolor, mi->hpad,
 					LIBAROMA_CTL_LIST_ITEM_DRAW_NORMAL|LIBAROMA_CTL_LIST_ITEM_DRAW_CACHE
@@ -385,7 +391,9 @@ void _libaroma_ctl_list_draw_item(
 						LIBAROMA_CTL_LIST_ITEM_DRAW_ADDONS
 					);
 				}
-				mi->bgcolor_update = 0;
+				/* reset values */
+				if (mi->bgcolor_update) mi->bgcolor_update = 0;
+				if (mi->update_item == item) mi->update_item = NULL;
 			}
 			libaroma_draw(canvas, item->state->cache_rest, 0, 0, 0);
 			int ripple_i = 0;
@@ -465,15 +473,30 @@ byte _libaroma_ctl_list_dodraw_item(
 
 /*
  * Function		: libaroma_ctl_list_invalidate_item
- * Return Value: void
- * Descriptions: do draw item directly - public
+ * Return Value: byte
+ * Descriptions: request redraw item
  */
-void libaroma_ctl_list_invalidate_item(
+byte libaroma_ctl_list_invalidate_item(
 		LIBAROMA_CONTROLP ctl,
 		LIBAROMA_CTL_LIST_ITEMP item
 ){
-	if (!item || !ctl) return;
-	_libaroma_ctl_list_dodraw_item(ctl, item);
+	if (!item || !ctl) return 0;
+	if (item->list != ctl) return 0;
+	LIBAROMA_CTL_SCROLL_CLIENTP client = libaroma_ctl_scroll_get_client(ctl);
+	if (!client){
+		return 0;
+	}
+	if (client->handler!=&_libaroma_ctl_list_handler){
+		return 0;
+	}
+	LIBAROMA_CTL_LISTP mi = (LIBAROMA_CTL_LISTP) client->internal;
+	libaroma_mutex_lock(mi->mutex);
+	/* set item to be updated */
+	mi->update_item = item;
+	libaroma_mutex_unlock(mi->mutex);
+	/* trigger scroll invalidate */
+	libaroma_ctl_scroll_invalidate(ctl);
+	return 1;
 }
 
 /*
