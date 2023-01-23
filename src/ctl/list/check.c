@@ -912,21 +912,24 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_check(
 	h = MAX(h,th)+libaroma_dp(vpad*2+seph);
 	mi->h=h;
 	// create group variable and assign it if item is option checkbox
-	LIBAROMA_LISTITEM_CHECK_GROUPP grp;
+	LIBAROMA_LISTITEM_CHECK_GROUPP grp = NULL;
 	if (flags&LIBAROMA_LISTITEM_CHECK_OPTION){
 		//if groups stack doesn't exist, initialize it
-		if (libaroma_ctl_list_get_groups(ctl)==NULL)
+		LIBAROMA_STACKP list_groups = libaroma_ctl_list_get_groups(ctl);
+		if (!list_groups){
 			libaroma_ctl_list_init_opt_groups(ctl);
-		//chek if there are any groups at stack
-		int grp_count=libaroma_ctl_list_get_groups(ctl)->n;
-		//if there are no groups, create one
-		if (!grp_count){
-			ALOGV("listitem_check creating first group");
+			list_groups = libaroma_ctl_list_get_groups(ctl);
+		}
+		//check if there are any groups at stack
+		if (!list_groups->n){
+			//no groups, create one
+			ALOGT("listitem_check creating first group");
 			grp=libaroma_listitem_check_create_group(ctl);
 		}
-		else { //if there are groups, use the last one
-			ALOGV("listitem_check adding item to last group");
-			grp=libaroma_listitem_check_get_group_at(ctl, grp_count-1);
+		else {
+			//there are groups, use the last one
+			ALOGT("listitem_check adding item to last group");
+			grp=libaroma_listitem_check_get_group_at(ctl, list_groups->n-1);
 		}
 	}
 	LIBAROMA_CTL_LIST_ITEMP item = libaroma_ctl_list_add_item_internal(
@@ -961,25 +964,33 @@ LIBAROMA_LISTITEM_CHECK_GROUPP libaroma_listitem_check_create_named_group(
 	char *name
 ){
 	if (list==NULL) {
-		ALOGW("create_named_group called with NULL list");
+		ALOGW("check_create_named_group called with NULL list");
 		return NULL;
 	}
 	if (libaroma_ctl_list_get_groups(list)==NULL)
 		libaroma_ctl_list_init_opt_groups(list);
-	int grp_count=libaroma_ctl_list_get_groups(list)->n;
-	LIBAROMA_LISTITEM_CHECK_GROUPP grp=malloc(sizeof(LIBAROMA_LISTITEM_CHECK_GROUP));
-	if (grp==NULL) {
-		ALOGW("create_named_group cannot allocate memory for group");
+	LIBAROMA_STACKP list_groups = libaroma_ctl_list_get_groups(list);
+	if (!list_groups){
+		ALOGW("check_create_named_group list group stack uninitialized");
 		return NULL;
 	}
-	grp->index=grp_count;
-	grp->list_index=libaroma_ctl_list_get_item_count(list);//groups->n;
+	LIBAROMA_LISTITEM_CHECK_GROUPP grp=malloc(sizeof(LIBAROMA_LISTITEM_CHECK_GROUP));
+	if (grp==NULL) {
+		ALOGW("check_create_named_group cannot allocate memory for group");
+		return NULL;
+	}
+	grp->index=list_groups->n;
+	grp->list_index=libaroma_ctl_list_get_item_count(list);
 	grp->list=list;
 	grp->items=libaroma_stack(NULL);
 	if (name!=NULL){
 		libaroma_listitem_caption(list, grp->index, name, -1);
 	}
-	libaroma_stack_add_at(libaroma_ctl_list_get_groups(list), grp_count, (voidp)grp, sizeof(LIBAROMA_LISTITEM_CHECK_GROUP));
+	if (!libaroma_stack_add_at(list_groups, list_groups->n, (voidp)grp,
+								sizeof(LIBAROMA_LISTITEM_CHECK_GROUP))){
+		ALOGW("check_create_named_group failed to add group to list");
+		return NULL;
+	}
 	return grp;
 }
 
@@ -998,7 +1009,10 @@ void libaroma_listitem_check_add_to_group(
 	LIBAROMA_LISTITEM_CHECK_GROUPP oldgrp=libaroma_listitem_check_find_group(group->list, item);
 	if (oldgrp!=NULL) //remove item from other groups
 		libaroma_listitem_check_remove_from_group(group, item); //TODO: reorder list after this
-	libaroma_stack_add_at(group->items, group->items->n, (voidp)item, sizeof(LIBAROMA_CTL_LIST_ITEM));
+	if (!libaroma_stack_add_at(group->items, group->items->n, 
+								(voidp)item, sizeof(LIBAROMA_CTL_LIST_ITEM))){
+		ALOGW("check_add_to_group failed to add item to group");
+	}
 }
 
 /*
@@ -1011,7 +1025,7 @@ void libaroma_listitem_check_remove_from_group(
 	LIBAROMA_CTL_LIST_ITEMP item
 ){
 	if (group==NULL || item==NULL){
-		ALOGW("remove_from_group called with NULL group/item");
+		ALOGW("check_remove_from_group called with NULL group/item");
 		return;
 	}
 	int index=libaroma_listitem_check_get_ingroup_index(group, item);
@@ -1031,16 +1045,20 @@ LIBAROMA_LISTITEM_CHECK_GROUPP libaroma_listitem_check_get_group_at(
 	if (index<0 || list==NULL)
 		return NULL;
 	int i;
-	for (i=0; i<libaroma_ctl_list_get_groups(list)->n; i++){
-		LIBAROMA_LISTITEM_CHECK_GROUPP grp=(LIBAROMA_LISTITEM_CHECK_GROUPP)libaroma_stack_get(libaroma_ctl_list_get_groups(list), i);
-		if (grp==NULL) return NULL;
+	LIBAROMA_STACKP list_groups = libaroma_ctl_list_get_groups(list);
+	if (!list_groups){
+		ALOGW("check_get_group_at list group stack uninitialized");
+		return NULL;
+	}
+	for (i=0; i<list_groups->n; i++){
+		LIBAROMA_LISTITEM_CHECK_GROUPP grp = (LIBAROMA_LISTITEM_CHECK_GROUPP) 
+												libaroma_stack_get(list_groups, i);
+		if (!grp) return NULL;
 		if (grp->index==index){
-			if (grp->list==list){
-				return grp;
-			}
+			return grp;
 		}
 	}
-	ALOGW("get_group_at coud not find group at index %d", index);
+	ALOGW("check_get_group_at coud not find group at index %d", index);
 	return NULL;
 }
 
@@ -1054,7 +1072,7 @@ int libaroma_listitem_check_get_ingroup_index(
 	LIBAROMA_CTL_LIST_ITEMP item
 ){
 	if (group==NULL) {
-		ALOGW("get_ingroup_index group is NULL");
+		ALOGW("check_get_ingroup_index group is NULL");
 		return -1;
 	}
 	int i;
@@ -1063,7 +1081,6 @@ int libaroma_listitem_check_get_ingroup_index(
 		if (libaroma_ctl_list_items_equal(itm, item))
 			return i;
 	}
-	ALOGW("get_ingroup_index could not find item in group");
 	return -1;
 }
 
@@ -1077,12 +1094,12 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_check_get_ingroup_item(
 	int index
 ){
 	if (group==NULL) {
-		ALOGW("get_ingroup_item group is NULL");
+		ALOGW("check_get_ingroup_item group is NULL");
 		return NULL;
 	}
 	LIBAROMA_CTL_LIST_ITEMP item=(LIBAROMA_CTL_LIST_ITEMP)libaroma_stack_get(group->items, index);
 	if (item==NULL){
-		ALOGW("get_ingroup_item could not find item in group");
+		ALOGW("check_get_ingroup_item could not find item in group");
 	}
 	return item;
 }
@@ -1114,7 +1131,7 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_listitem_check_get_group_selected(
 	LIBAROMA_LISTITEM_CHECK_GROUPP group
 ){
 	if (group==NULL) {
-		ALOGW("get_group_selected group is NULL");
+		ALOGW("check_get_group_selected group is NULL");
 		return NULL;
 	}
 	int index=libaroma_listitem_check_get_group_selected_index(group);
@@ -1130,7 +1147,7 @@ int libaroma_listitem_check_get_group_selected_index(
 	LIBAROMA_LISTITEM_CHECK_GROUPP group
 ){
 	if (group==NULL) {
-		ALOGW("get_group_selected_index group is NULL");
+		ALOGW("check_get_group_selected_index group is NULL");
 		return -1;
 	}
 	int i;
@@ -1156,17 +1173,17 @@ LIBAROMA_LISTITEM_CHECK_GROUPP libaroma_listitem_check_get_selected_group(
 	LIBAROMA_CONTROLP list
 ){
 	if (list==NULL) {
-		ALOGW("get_selected_group list is NULL");
+		ALOGW("check_get_selected_group list is NULL");
 		return NULL;
 	}
 	LIBAROMA_CTL_LIST_ITEMP touched=libaroma_ctl_list_get_touched_item(list);
 	if (touched==NULL) {
-		ALOGW("get_selected_group touched item is NULL");
+		ALOGW("check_get_selected_group touched item is NULL");
 		return NULL;
 	}
 	LIBAROMA_LISTITEM_CHECK_GROUPP grp=libaroma_listitem_check_find_group(list, touched);
 	if (grp==NULL){
-		ALOGW("group for touched item not found");
+		ALOGW("check_get_selected_group not found");
 		return NULL;
 	}
 	else return grp;
