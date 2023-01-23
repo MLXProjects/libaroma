@@ -108,17 +108,13 @@ void _libaroma_ctl_button_internal_draw(LIBAROMA_CONTROLP ctl){
 		push_canvas = libaroma_canvas(ctl->w,ctl->h);
 	}
 	LIBAROMA_CANVASP bg = libaroma_canvas(ctl->w,ctl->h);
-	libaroma_draw_ex(bg, ctl->window->bg, 0, 0, ctl->x, ctl->y,
-					 bg->w, bg->h, 0, 0xFF);
-	//libaroma_control_erasebg(ctl,rest_canvas);
+	libaroma_control_erasebg(ctl,bg);
 	libaroma_draw_ex(rest_canvas, bg, 0, 0, 0, 0,
 					 rest_canvas->w, rest_canvas->h, 0, 0xFF);
 	if (!is_disabled || (is_disabled && keepcolor_disabled)){
-		//libaroma_control_erasebg(ctl,push_canvas);
 		libaroma_draw_ex(push_canvas, bg, 0, 0, 0, 0,
 					 	push_canvas->w, push_canvas->h, 0, 0xFF);
 	}
-	//libaroma_control_erasebg(ctl,bg);
 
 	byte is_circle=(me->style&LIBAROMA_CTL_BUTTON_CIRCLE)?1:0;
 	byte has_icon=(me->icon!=NULL)?1:0;
@@ -504,6 +500,14 @@ dword _libaroma_ctl_button_msg(
 						libaroma_ripple_move(&me->ripple, x, y);
 					}
 				}
+			}
+			break;
+		case LIBAROMA_MSG_WIN_INVALIDATE:
+			{
+				/* reset rest/push canvas */
+				libaroma_mutex_lock(me->mutex);
+				me->forcedraw=2;
+				libaroma_mutex_unlock(me->mutex);
 			}
 			break;
 	}
