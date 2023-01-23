@@ -116,4 +116,12 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_get_active_window(
 int libaroma_ctl_fragment_get_active_window_id(
 	LIBAROMA_CONTROLP ctl);
 
+/*
+ * Function		: libaroma_ctl_fragment_invalidate_active
+ * Return Value: byte
+ * Descriptions: invalidate active window
+ */
+byte libaroma_ctl_fragment_invalidate_active(
+	LIBAROMA_CONTROLP ctl);
+
 #endif /* __libaroma_ctl_fragment_h__ */

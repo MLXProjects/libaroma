@@ -95,6 +95,8 @@ struct __LIBAROMA_CTL_FRAGMENT{
 	LIBAROMA_MUTEX mutex;
 	LIBAROMA_MUTEX dmutex;
 	int win_next_del_id;
+	
+	byte inval_active;
 };
 typedef struct{
 	dword id;
@@ -147,21 +149,26 @@ byte _libaroma_ctl_fragment_direct_canvas(LIBAROMA_CONTROLP ctl, byte state){
 	}
 	LIBAROMA_WINDOWP win = me->wins[me->win_pos];
 	if (state){
+		/* use control canvas */
+		if (win->dc) libaroma_canvas_free(win->dc);
+		win->dc = libaroma_control_draw_begin(ctl);
+		if (!win->dc){
+			/* fallback to allocated canvas */
+			win->dc = libaroma_canvas(win->w, win->h);
+			libaroma_control_erasebg(ctl, win->dc);
+			libaroma_mutex_unlock(me->dmutex);
+			return 0;
+		}
 		me->on_direct_canvas=1;
 	}
 	else{
 		if (me->on_direct_canvas){
-			/*LIBAROMA_CANVASP ccv = libaroma_control_draw_begin(ctl);
-			if (ccv) {
-				libaroma_draw(win->dc,ccv,0,0,0);
-				libaroma_canvas_free(ccv);
-			}*/
-			if (win->bg) {
-				libaroma_draw(win->dc, win->bg, 0, 0, 0);
-			}
-			else libaroma_canvas_setcolor(win->dc, libaroma_colorget(NULL, NULL)->window_bg, 0xFF);
+			/* use allocated canvas */
+			if (win->dc) libaroma_canvas_free(win->dc);
+			win->dc = libaroma_canvas(win->w, win->h);
+			libaroma_control_erasebg(ctl, win->dc);
+			me->on_direct_canvas=0;
 		}
-		me->on_direct_canvas=0;
 	}
 	libaroma_mutex_unlock(me->dmutex);
 	return 1;
@@ -174,14 +181,22 @@ byte _libaroma_ctl_fragment_direct_canvas(LIBAROMA_CONTROLP ctl, byte state){
  */
 byte _libaroma_ctl_fragment_window_invalidate(LIBAROMA_WINDOWP win, byte sync){
 	_VALIDATE_FRAGMENT(0);
+	_libaroma_ctl_fragment_window_updatebg(win);
+	LIBAROMA_MSG _msg;
+	LIBAROMA_MSGP inval_msg = libaroma_wm_compose(&_msg, LIBAROMA_MSG_WIN_INVALIDATE, NULL, 0, 0);
 	if ((win->dc)&&(win->bg)){
-		libaroma_draw(win->dc,win->bg,0,0,0);
+		/* redraw background */
+		libaroma_draw(win->dc, win->bg, 0, 0, 0);
 		int i;
 #ifdef LIBAROMA_CONFIG_OPENMP
 	#pragma omp parallel for
 #endif
 		for (i=0;i<win->childn;i++){
-			/* draw no sync */
+			/* send invalidate msg */
+			if (win->childs[i]->handler->message){
+				win->childs[i]->handler->message(win->childs[i], inval_msg);
+			}
+			/* draw childs */
 			libaroma_control_draw(win->childs[i], 0);
 		}
 	}
@@ -199,19 +214,7 @@ void _libaroma_ctl_fragment_measure(LIBAROMA_WINDOWP win){
 	win->ax=ctl->x;
 	win->ay=ctl->y;
 	win->w = ctl->w;
-	win->h = ctl->h;/*
-	if (win->bg){
-		if ((win->bg->w!=win->w)||(win->bg->h!=win->h)){
-			libaroma_canvas_free(win->bg);
-			win->bg=NULL;
-		}
-	}
-	if (!win->bg){
-		win->bg = libaroma_canvas(
-			win->w,
-			win->h
-		);
-	}*/
+	win->h = ctl->h;
 	if (win->dc){
 		if ((win->dc->w!=win->w)||(win->dc->h!=win->h)){
 			libaroma_canvas_free(win->dc);
@@ -219,10 +222,15 @@ void _libaroma_ctl_fragment_measure(LIBAROMA_WINDOWP win){
 		}
 	}
 	if (!win->dc){
-		win->dc = libaroma_canvas(
-			win->w,
-			win->h
-		);
+		if (me->on_direct_canvas){
+			win->dc = libaroma_control_draw_begin(ctl);
+		}
+		else {
+			win->dc = libaroma_canvas(
+				win->w,
+				win->h
+			);
+		}
 	}
 	_libaroma_ctl_fragment_window_updatebg(win);
 	int i;
@@ -342,8 +350,8 @@ LIBAROMA_CANVASP _libaroma_ctl_fragment_window_control_draw_begin(
 	}
 	LIBAROMA_CANVASP c=NULL;
 	libaroma_mutex_lock(me->dmutex);
-	if (me->on_direct_canvas){
-		int x = cctl->x;
+	//if (me->on_direct_canvas){
+		/*int x = cctl->x;
 		int y = cctl->y;
 		int w = cctl->w;
 		int h = cctl->h;
@@ -353,16 +361,16 @@ LIBAROMA_CANVASP _libaroma_ctl_fragment_window_control_draw_begin(
 				c = libaroma_canvas_area(ccv,x,y,w,h);
 			}
 			libaroma_canvas_free(ccv);
-		}
-	}
-	else {
+		}*/
+	//}
+	//else {
 		if (win->dc!=NULL){
 			c = libaroma_canvas_area(
 				win->dc,
 				cctl->x, cctl->y, cctl->w, cctl->h
 			);
 		}
-	}
+	//}
 	libaroma_mutex_unlock(me->dmutex);
 	return c;
 } /* End of _libaroma_ctl_fragment_window_control_draw_begin */
@@ -377,14 +385,17 @@ byte _libaroma_ctl_fragment_window_updatebg(LIBAROMA_WINDOWP win){
 	libaroma_mutex_lock(me->dmutex);
 	int w = win->w;
 	int h = win->h;
-	if (win->bg!=NULL){
+	/* if background allocated & not invalidating active, free it */
+	if (win->bg!=NULL && !me->inval_active){
 		if ((win->bg->w==w)&&(win->bg->h==h)){
+			/* if control not resized, updatebg not needed */
 			libaroma_mutex_unlock(me->dmutex);
 			return 1;
 		}
 		libaroma_canvas_free(win->bg);
+		win->bg = NULL;
 	}
-	win->bg = libaroma_canvas(w,h);
+	if (win->bg == NULL) win->bg = libaroma_canvas(w,h);
 	libaroma_canvas_setcolor(
 		win->bg,
 		libaroma_colorget(ctl,NULL)->window_bg,
@@ -392,7 +403,7 @@ byte _libaroma_ctl_fragment_window_updatebg(LIBAROMA_WINDOWP win){
 	);
 	libaroma_mutex_unlock(me->dmutex);
 	return 1;
-} /* End of _libaroma_ctl_fragment_window_sync */
+} /* End of _libaroma_ctl_fragment_window_updatebg */
 
 /*
  * Function		: _libaroma_ctl_fragment_draw
@@ -413,20 +424,23 @@ void _libaroma_ctl_fragment_draw(
 		return;
 	}
 
-	if (!me->redraw){
+	/* if redrawing control, don't invalidate windows */
+	if (!me->redraw || me->inval_active){
 		int i;
 		#ifdef LIBAROMA_CONFIG_OPENMP
 			#pragma omp parallel for
 		#endif
+		/* look for non-active windows (or active if needed) */
 		for (i=0;i<me->win_n;i++){
 			_LIBAROMA_CTL_FRAGMENT_WINP wind =
 				(_LIBAROMA_CTL_FRAGMENT_WINP) me->wins[i]->client_data;
 			if (wind->active_state){
-				if (!me->wins[i]->active){
+				if (!me->wins[i]->active || (me->wins[i]->active && me->inval_active)){
 					_libaroma_ctl_fragment_window_invalidate(me->wins[i],0);
 				}
 			}
 		}
+		if (me->inval_active) me->inval_active=0;
 	}
 
 	/* draw window canvas */
@@ -478,7 +492,6 @@ void _libaroma_ctl_fragment_draw(
 		}
 	}
 	libaroma_mutex_unlock(me->dmutex);
-
 	/* need revert to direct canvas */
 	if (me->need_direct_canvas){
 		me->need_direct_canvas=0;
@@ -506,33 +519,35 @@ byte _libaroma_ctl_fragment_thread(LIBAROMA_CONTROLP ctl) {
 	}
 
 	libaroma_mutex_lock(me->mutex);
+	/* check for previous window delete request */
 	if (me->win_next_del_id!=-1){
 		libaroma_ctl_fragment_del_window_nomutex(ctl,me->win_next_del_id);
 		me->win_next_del_id=-1;
 	}
 	byte is_draw = me->redraw;
-	{
-		int j;
-		#ifdef LIBAROMA_CONFIG_OPENMP
-			#pragma omp parallel for
-		#endif
-		for (j=0;j<me->win_n;j++){
-			LIBAROMA_WINDOWP win = me->wins[j];
-			_LIBAROMA_CTL_FRAGMENT_WINP wind =
-				(_LIBAROMA_CTL_FRAGMENT_WINP) win->client_data;
-			if (wind->active_state){
-				if (win->active){
-					int i;
-					#ifdef LIBAROMA_CONFIG_OPENMP
-						#pragma omp parallel for
-					#endif
-					for (i=0;i<win->childn;i++){
-						LIBAROMA_CONTROLP c=win->childs[i];
-						if (c->handler->thread!=NULL){
-							if (c->handler->thread(c)){
-								if (libaroma_control_draw(c,0)){
-									is_draw=1;
-								}
+	if (me->inval_active) is_draw = 1;
+	int j;
+	#ifdef LIBAROMA_CONFIG_OPENMP
+		#pragma omp parallel for
+	#endif
+	for (j=0;j<me->win_n;j++){
+		/* look for active child and draw it */
+		LIBAROMA_WINDOWP win = me->wins[j];
+		_LIBAROMA_CTL_FRAGMENT_WINP wind =
+			(_LIBAROMA_CTL_FRAGMENT_WINP) win->client_data;
+		if (wind->active_state){
+			if (win->active){
+				int i;
+				#ifdef LIBAROMA_CONFIG_OPENMP
+					#pragma omp parallel for
+				#endif
+				/* draw childs */
+				for (i=0;i<win->childn;i++){
+					LIBAROMA_CONTROLP c=win->childs[i];
+					if (c->handler->thread!=NULL){
+						if (c->handler->thread(c)){
+							if (libaroma_control_draw(c,0)){
+								is_draw=1;
 							}
 						}
 					}
@@ -540,33 +555,31 @@ byte _libaroma_ctl_fragment_thread(LIBAROMA_CONTROLP ctl) {
 			}
 		}
 	}
-	{
-		if ((me->transition_start!=0)&&(me->win_pos_out!=-1)){
-			float nowstate=libaroma_duration_state(
-				me->transition_start, me->transition_duration
-			);
-			if (nowstate!=me->transition_state){
-				if (nowstate>=1){
-					me->transition_start=0;
-					me->transition_state=1;
-					me->need_direct_canvas=1;
-					if (me->transision_delprev){
-						_LIBAROMA_CTL_FRAGMENT_WINP windd=
-							(_LIBAROMA_CTL_FRAGMENT_WINP)
-								me->wins[me->win_pos_out]->client_data;
-						me->win_next_del_id=windd->id;
-					}
-					_libaroma_ctl_fragment_activate_win(
-						me->wins[me->win_pos_out], 0
-					);
-					me->win_pos_out=-1;
-					me->transision_delprev=0;
+	if ((me->transition_start!=0)&&(me->win_pos_out!=-1)){
+		float nowstate=libaroma_duration_state(
+			me->transition_start, me->transition_duration
+		);
+		if (nowstate!=me->transition_state){
+			if (nowstate>=1){
+				me->transition_start=0;
+				me->transition_state=1;
+				me->need_direct_canvas=1;
+				if (me->transision_delprev){
+					_LIBAROMA_CTL_FRAGMENT_WINP windd=
+						(_LIBAROMA_CTL_FRAGMENT_WINP)
+							me->wins[me->win_pos_out]->client_data;
+					me->win_next_del_id=windd->id;
 				}
-				else{
-					me->transition_state=nowstate;
-				}
-				is_draw=1;
+				_libaroma_ctl_fragment_activate_win(
+					me->wins[me->win_pos_out], 0
+				);
+				me->win_pos_out=-1;
+				me->transision_delprev=0;
 			}
+			else{
+				me->transition_state=nowstate;
+			}
+			is_draw=1;
 		}
 	}
 	libaroma_mutex_unlock(me->mutex);
@@ -631,6 +644,15 @@ dword _libaroma_ctl_fragment_msg(
 						win->client_data;
 					if (!windn->active_state){
 						continue;
+					}
+					if (!win->dc){
+						if (me->on_direct_canvas){
+							win->dc = libaroma_control_draw_begin(ctl);
+						}
+						else {
+							win->dc = libaroma_canvas(ctl->w, ctl->h);
+							libaroma_control_erasebg(ctl, win->dc);
+						}
 					}
 					int i;
 					#ifdef LIBAROMA_CONFIG_OPENMP
@@ -709,6 +731,23 @@ dword _libaroma_ctl_fragment_msg(
 					if (msg->state==LIBAROMA_HID_EV_STATE_UP){
 						win->touched=NULL;
 					}
+				}
+				libaroma_mutex_unlock(me->mutex);
+			}
+			break;
+		case LIBAROMA_MSG_WIN_INVALIDATE:
+			{
+				libaroma_mutex_lock(me->mutex);
+				int z;
+				for (z=0;z<me->win_n;z++){
+					LIBAROMA_WINDOWP win = me->wins[z];
+					_LIBAROMA_CTL_FRAGMENT_WINP windn = (_LIBAROMA_CTL_FRAGMENT_WINP)
+						win->client_data;
+					if (!windn->active_state){
+						/* only invalidate active window */
+						continue;
+					}
+					_libaroma_ctl_fragment_window_invalidate(win, 1);
 				}
 				libaroma_mutex_unlock(me->mutex);
 			}
@@ -835,6 +874,7 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_new_window(
 	LIBAROMA_WINDOWP nwin = me->wins[new_pos];
 	nwin->handler=&_libaroma_ctl_fragment_win_handler;
 	nwin->parent=ctl->window;
+	nwin->colorset=libaroma_colorget(ctl, NULL);
 
 	_LIBAROMA_CTL_FRAGMENT_WINP wind = (_LIBAROMA_CTL_FRAGMENT_WINP) calloc(
 		sizeof(_LIBAROMA_CTL_FRAGMENT_WIN), 1);
@@ -871,9 +911,9 @@ LIBAROMA_WINDOWP libaroma_ctl_fragment_get_window(
 }
 
 /*
- * Function		: libaroma_ctl_fragment_del_window
+ * Function		: libaroma_ctl_fragment_del_window_nomutex
  * Return Value: byte
- * Descriptions: delete window
+ * Descriptions: delete window without locking mutex
  */
 byte libaroma_ctl_fragment_del_window_nomutex(
 	LIBAROMA_CONTROLP ctl, dword id){
@@ -990,7 +1030,7 @@ byte libaroma_ctl_fragment_set_active_window(
 				me->transition_re=rect_end;
 
 				_LIBAROMA_CTL_FRAGMENT_WINP windid =
-				(_LIBAROMA_CTL_FRAGMENT_WINP) me->wins[did]->client_data;
+					(_LIBAROMA_CTL_FRAGMENT_WINP) me->wins[did]->client_data;
 				windid->active_state=2;
 				me->win_pos_out=me->win_pos;
 				me->win_pos=did;
@@ -1086,6 +1126,22 @@ byte libaroma_ctl_fragment_get_window_count(
 	);
 	return me->win_n;
 }
+
+/*
+ * Function		: libaroma_ctl_fragment_invalidate_active
+ * Return Value: byte
+ * Descriptions: invalidate active window
+ */
+byte libaroma_ctl_fragment_invalidate_active(
+	LIBAROMA_CONTROLP ctl){
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_fragment_handler, _LIBAROMA_CTL_FRAGMENTP, 0
+	);
+	libaroma_mutex_lock(me->mutex);
+	me->inval_active = 1;
+	libaroma_mutex_unlock(me->mutex);
+	return 1;
+} /* End of libaroma_ctl_fragment_invalidate_active */
 
 #ifdef __cplusplus
 }
