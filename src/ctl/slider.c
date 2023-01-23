@@ -274,9 +274,9 @@ LIBAROMA_CONTROLP libaroma_ctl_slider(
 
 	/* set internal data */
 	me->max	= max;
-	me->value =value;
-	me->preval=value;
-	me->curval=value;
+	me->value =(value > max)?max:value;
+	me->preval=(value > max)?max:value;
+	me->curval=(value > max)?max:value;
 	me->onchange = NULL;
 	me->state= 1;
 	me->timing=300;
@@ -343,6 +343,7 @@ byte libaroma_ctl_slider_value(
 		LIBAROMA_CONTROLP ctl,
 		int value
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
@@ -367,6 +368,7 @@ byte libaroma_ctl_slider_max(
 		LIBAROMA_CONTROLP ctl,
 		int max
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
@@ -388,6 +390,7 @@ byte libaroma_ctl_slider_set_onchange(
 	LIBAROMA_CONTROLP ctl, 
 	void *onchange
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
@@ -406,6 +409,7 @@ byte libaroma_ctl_slider_set_onchange(
 int libaroma_ctl_slider_get_timing(
 		LIBAROMA_CONTROLP ctl
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
@@ -421,6 +425,7 @@ int libaroma_ctl_slider_get_timing(
 int libaroma_ctl_slider_get_value(
 		LIBAROMA_CONTROLP ctl
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
@@ -436,6 +441,7 @@ int libaroma_ctl_slider_get_value(
 int libaroma_ctl_slider_get_max(
 		LIBAROMA_CONTROLP ctl
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
@@ -451,6 +457,7 @@ int libaroma_ctl_slider_get_max(
 byte libaroma_ctl_slider_get_type(
 		LIBAROMA_CONTROLP ctl
 ){
+	if (!ctl) return 0;
 	/* internal check */
 	_LIBAROMA_CTL_CHECK(
 		_libaroma_ctl_slider_handler, _LIBAROMA_CTL_SLIDERP, 0
