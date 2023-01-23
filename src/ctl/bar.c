@@ -28,10 +28,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define _LIBAROMA_CTL_BAR_CHANGE_TITLE					0x1
-#define _LIBAROMA_CTL_BAR_CHANGE_COLOR					0x2
-#define _LIBAROMA_CTL_BAR_CHANGE_TOOLS					0x4
-#define _LIBAROMA_CTL_BAR_CHANGE_ICON					 0x8
+#define _LIBAROMA_CTL_BAR_CHANGE_TITLE				0x1
+#define _LIBAROMA_CTL_BAR_CHANGE_COLOR				0x2
+#define _LIBAROMA_CTL_BAR_CHANGE_TOOLS				0x4
+#define _LIBAROMA_CTL_BAR_CHANGE_ICON				0x8
 #define _LIBAROMA_CTL_BAR_CHANGE_TITLE_TOOLS		0x10
 
 /* HANDLER */
@@ -79,6 +79,7 @@ struct __LIBAROMA_CTL_BAR{
 	byte icon_ismask;
 	word menu_id;
 	byte title_touchable;
+	int duration;
 
 	/* touch state */
 	byte touched_switch;
@@ -261,10 +262,10 @@ byte _libaroma_ctl_bar_draw_switch(
 				byte is_dark = libaroma_color_isdark(me->bgcolor);
 				word mcolor = is_dark?0xffff:0;
 				word scolor = is_dark?0:0xffff;
-				word h_color_rest	 = libaroma_alpha(me->bgcolor,mcolor,
-					is_dark?0x30:0x10);
+				word h_color_rest = libaroma_alpha(me->bgcolor,mcolor,
+													is_dark?0x30:0x10);
 				word h_color_active = me->selcolor;
-				word b_color_rest	 = libaroma_alpha(me->bgcolor,scolor,160);
+				word b_color_rest	= libaroma_alpha(me->bgcolor,scolor,160);
 				word b_color_active = libaroma_alpha(me->bgcolor,me->selcolor,160);
 				word iccl = checked?h_color_rest:h_color_active;
 				word bc0=checked?b_color_rest:b_color_active;
@@ -273,14 +274,14 @@ byte _libaroma_ctl_bar_draw_switch(
 				word hc1=checked?h_color_active:h_color_rest;
 				word bc = libaroma_alpha(bc0,bc1,state*0xff);
 				word hc = libaroma_alpha(hc0,hc1,state*0xff);
-				int b_width			 = libaroma_dp(34);
-				int b_height			= libaroma_dp(14);
-				float selrelstate = checked?state:1-state;
-				int base_x				= xpos-(b_width>>1);
-				int h_sz					= libaroma_dp(20);
-				int base_w				= b_width - h_sz;
-				int h_draw_x			= base_x + round(base_w*selrelstate);
-				int h_draw_y			= ypos-(h_sz>>1);
+				int b_width		= libaroma_dp(34);
+				int b_height	= libaroma_dp(14);
+				float selrelstate= checked?state:1-state;
+				int base_x		= xpos-(b_width>>1);
+				int h_sz		= libaroma_dp(20);
+				int base_w		= b_width - h_sz;
+				int h_draw_x	= base_x + round(base_w*selrelstate);
+				int h_draw_y	= ypos-(h_sz>>1);
 				int rsz = libaroma_dp(1);
 
 				/* tracker */
@@ -952,7 +953,7 @@ byte _libaroma_ctl_bar_thread(LIBAROMA_CONTROLP ctl) {
 
 	/* changed */
 	if (me->change_start>0){
-		float nowstate=libaroma_control_state(me->change_start, 200);
+		float nowstate=libaroma_control_state(me->change_start, me->duration);
 		if (nowstate>=1){
 			is_draw = 1;
 			me->change_state=1;
@@ -1194,6 +1195,7 @@ LIBAROMA_CONTROLP libaroma_ctl_bar(
 	if (title){
 		me->title = strdup(title);
 	}
+	me->duration = 200;
 	me->text_gap = 60;
 	me->bgcolor = bgcolor;
 	win->appbar_bg = bgcolor;
@@ -1406,9 +1408,9 @@ byte libaroma_ctl_bar_set_icon_mask(LIBAROMA_CONTROLP ctl,
 } /* End of libaroma_ctl_bar_set_icon_mask */
 
 /*
- * Function		: libaroma_ctl_bar_set_icon_mask
+ * Function		: libaroma_ctl_bar_set_touchable_title
  * Return Value: byte
- * Descriptions: set tools
+ * Descriptions: set touchable title
  */
 byte libaroma_ctl_bar_set_touchable_title(LIBAROMA_CONTROLP ctl,
 	byte touchable){
@@ -1419,7 +1421,7 @@ byte libaroma_ctl_bar_set_touchable_title(LIBAROMA_CONTROLP ctl,
 	me->title_touchable=(touchable?1:0);
 	libaroma_mutex_unlock(me->mutex);
 	return 1;
-} /* End of libaroma_ctl_bar_set_icon_mask */
+} /* End of libaroma_ctl_bar_set_touchable_title */
 
 /*
  * Function		: libaroma_ctl_bar_set_icon
@@ -1490,6 +1492,22 @@ byte libaroma_ctl_bar_set_icon(LIBAROMA_CONTROLP ctl,
 	}
 	return 1;
 } /* End of libaroma_ctl_bar_set_icon */
+
+/*
+ * Function		: libaroma_ctl_bar_set_duration
+ * Return Value: byte
+ * Descriptions: set color change duration
+ */
+byte libaroma_ctl_bar_set_duration(LIBAROMA_CONTROLP ctl,
+	int duration){
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_bar_handler, _LIBAROMA_CTL_BARP, 0
+	);
+	libaroma_mutex_lock(me->mutex);
+	me->duration=(duration>=0)?duration:0;
+	libaroma_mutex_unlock(me->mutex);
+	return 1;
+} /* End of libaroma_ctl_bar_set_duration */
 
 #ifdef __cplusplus
 }

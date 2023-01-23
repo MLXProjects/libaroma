@@ -181,4 +181,12 @@ byte libaroma_ctl_bar_set_icon_mask(LIBAROMA_CONTROLP ctl,
 byte libaroma_ctl_bar_set_textgap(LIBAROMA_CONTROLP ctl,
 	byte wide, byte update_now);
 
+/*
+ * Function		: libaroma_ctl_bar_set_duration
+ * Return Value: byte
+ * Descriptions: set color change duration
+ */
+byte libaroma_ctl_bar_set_duration(LIBAROMA_CONTROLP ctl,
+	int duration);
+
 #endif /* __libaroma_ctl_bar_h__ */
