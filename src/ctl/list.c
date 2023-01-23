@@ -1469,6 +1469,19 @@ byte libaroma_ctl_list_set_bg_color(LIBAROMA_CONTROLP ctl, word bgcolor){
 } /* End of libaroma_ctl_list_set_bg_color */
 
 /*
+ * Function		: libaroma_ctl_list_items_equal
+ * Return Value: byte
+ * Descriptions: check if items are equal
+ */
+byte libaroma_ctl_list_items_equal(
+		LIBAROMA_CTL_LIST_ITEMP item1, LIBAROMA_CTL_LIST_ITEMP item2){
+	if (!item1 || !item2){
+		return 0;
+	}
+	return (item1->internal == item2->internal);
+}
+
+/*
  * Function		: libaroma_listitem_nonitem
  * Return Value: byte
  * Descriptions: is non item

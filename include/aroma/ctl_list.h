@@ -73,10 +73,6 @@
 #define LIBAROMA_CTL_LIST_ITEM_MSGRET_UNREG_THREAD			0x4
 #define LIBAROMA_CTL_LIST_ITEM_MSGRET_HAVE_ADDONS_DRAW		0x8
 
-/* check if items are the same one (internal is unique) */
-#define libaroma_ctl_list_items_equal(item1, item2) \
-		(item1->internal==item2->internal)
-
 /* list item */
 typedef struct _LIBAROMA_CTL_LIST_ITEM LIBAROMA_CTL_LIST_ITEM;
 typedef struct _LIBAROMA_CTL_LIST_ITEM * LIBAROMA_CTL_LIST_ITEMP;
@@ -300,5 +296,12 @@ byte libaroma_ctl_list_scroll_to_item(
  */
 byte libaroma_ctl_list_set_bg_color(
 		LIBAROMA_CONTROLP ctl, word bgcolor);
+
+/*
+ * Function		: libaroma_ctl_list_items_equal
+ * Return Value: byte
+ * Descriptions: check if items are equal
+ */
+byte libaroma_ctl_list_items_equal(LIBAROMA_CTL_LIST_ITEMP item1, LIBAROMA_CTL_LIST_ITEMP item2);
 
 #endif /* __libaroma_ctl_list_h__ */
