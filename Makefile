@@ -132,10 +132,18 @@ else #LIBAROMA_DEBUG_SHOWFILE yes
 # otherwise, default to 2 (show filename & line)
 LIBAROMA_DEBUG_FILELINE := 2
 endif #LIBAROMA_DEBUG_SHOWFILE yes
-endif #LIBAROMA_DEBUG_SHOWFILE withline
+endif #LIBAROMA_DEBUG_SHOWFILE no
 LIB_CFLAGS += -g -ggdb -DLIBAROMA_CONFIG_DEBUG_TRACE=3 -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_DEBUG
 else #LIBAROMA_DEBUG_ENABLE yes
 LIB_CFLAGS += -s -O3 -ftree-vectorize
+# check for debug_showfile set
+ifeq ($(LIBAROMA_DEBUG_SHOWFILE),withline)
+LIBAROMA_DEBUG_FILELINE := 2
+else #LIBAROMA_DEBUG_SHOWFILE withline
+ifeq ($(LIBAROMA_DEBUG_SHOWFILE),yes)
+LIBAROMA_DEBUG_FILELINE := 1
+endif #LIBAROMA_DEBUG_SHOWFILE yes
+endif #LIBAROMA_DEBUG_SHOWFILE withline
 endif #LIBAROMA_DEBUG_ENABLE yes
 # defaults to minimal debug (only error/info/string, no file/line)
 LIBAROMA_DEBUG_PRINTLEVEL ?= 3
