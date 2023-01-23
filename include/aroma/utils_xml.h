@@ -1,5 +1,5 @@
 /********************************************************************[libaroma]*
- * Copyright 2004-2006 Aaron Voisine <aaron@voisine.org>
+ * Copyright © 2003-2022 by Michael R Sweet <https://www.msweet.org/mxml>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,16 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * ezxml
- * XML parser in C.
+ * Mini-XML, a small XML file parsing library.
  *______________________________________________________________________________
  *
- * Filename		: xml.h
+ * Filename		: xml.c
  * Description : xml utility
  *
  * + This is part of libaroma, an embedded ui toolkit.
- * + ezxml - Aaron Voisine
- * + 31/08/21 - Author(s): Michael Jauregui
+ * + Mini-XML - Michael R Sweet.
+ * + 22/01/23 - Author(s): Michael Jauregui
  *
  */
 #ifndef __libaroma_aroma_h__
@@ -37,167 +36,258 @@
 #ifndef __libaroma_xml_h__
 #define __libaroma_xml_h__
 
-/* include */
-#include <unistd.h>
-#include <stdarg.h>
-#include <fcntl.h>
+/*
+ * mxml.h
+ */
+/*
+ * Constants...
+ */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#  define MXML_MAJOR_VERSION	3	/* Major version number */
+#  define MXML_MINOR_VERSION	2	/* Minor version number */
 
-#define EZXML_BUFSIZE 1024 // size of internal memory buffers
-#define EZXML_NAMEM   0x80 // name is malloced
-#define EZXML_TXTM    0x40 // txt is malloced
-#define EZXML_DUP     0x20 // attribute name and value are strduped
+#  define MXML_TAB		8	/* Tabs every N columns */
 
-typedef struct ezxml *ezxml_t;
-struct ezxml {
-    char *name;      // tag name
-    char **attr;     // tag attributes { name, value, name, value, ... NULL }
-    char *txt;       // tag character content, empty string if none
-    size_t off;      // tag offset from start of parent tag character content
-	size_t line;     // JEF // 5/29/2012 // track the line within the XML file tags are found.
-    ezxml_t next;    // next tag with same name in this section at this depth
-    ezxml_t sibling; // next tag with different name in same section and depth
-    ezxml_t ordered; // next tag, same section and depth, in original order
-    ezxml_t child;   // head of sub tag list, NULL if none
-    ezxml_t parent;  // parent tag, NULL if current tag is root tag
-    short flags;     // additional information
-};
+#  define MXML_NO_CALLBACK	0	/* Don't use a type callback */
+#  define MXML_INTEGER_CALLBACK	mxml_integer_cb
+					/* Treat all data as integers */
+#  define MXML_OPAQUE_CALLBACK	mxml_opaque_cb
+					/* Treat all data as opaque */
+#  define MXML_REAL_CALLBACK	mxml_real_cb
+					/* Treat all data as real numbers */
+#  define MXML_TEXT_CALLBACK	0	/* Treat all data as text */
+#  define MXML_IGNORE_CALLBACK	mxml_ignore_cb
+					/* Ignore all non-element content */
 
-// Given a string of xml data and its length, parses it and creates an ezxml
-// structure. For efficiency, modifies the data by adding null terminators
-// and decoding ampersand sequences. If you don't want this, copy the data and
-// pass in the copy. Returns NULL on failure.
-ezxml_t ezxml_parse_str(char *s, size_t len);
+#  define MXML_NO_PARENT	0	/* No parent for the node */
 
-// A wrapper for ezxml_parse_str() that accepts a file descriptor. First
-// attempts to mem map the file. Failing that, reads the file into memory.
-// Returns NULL on failure.
-ezxml_t ezxml_parse_fd(int fd);
+#  define MXML_DESCEND		1	/* Descend when finding/walking */
+#  define MXML_NO_DESCEND	0	/* Don't descend when finding/walking */
+#  define MXML_DESCEND_FIRST	-1	/* Descend for first find */
 
-// a wrapper for ezxml_parse_fd() that accepts a file name
-ezxml_t ezxml_parse_file(const char *file);
-    
-// Wrapper for ezxml_parse_str() that accepts a file stream. Reads the entire
-// stream into memory and then parses it. For xml files, use ezxml_parse_file()
-// or ezxml_parse_fd()
-ezxml_t ezxml_parse_fp(FILE *fp);
+#  define MXML_WS_BEFORE_OPEN	0	/* Callback for before open tag */
+#  define MXML_WS_AFTER_OPEN	1	/* Callback for after open tag */
+#  define MXML_WS_BEFORE_CLOSE	2	/* Callback for before close tag */
+#  define MXML_WS_AFTER_CLOSE	3	/* Callback for after close tag */
 
-// returns the first child tag (one level deeper) with the given name or NULL
-// if not found
-ezxml_t ezxml_child(ezxml_t xml, const char *name);
-
-// returns the next tag of the same name in the same section and depth or NULL
-// if not found
-#define ezxml_next(xml) ((xml) ? xml->next : NULL)
-
-// Returns the Nth tag with the same name in the same section at the same depth
-// or NULL if not found. An index of 0 returns the tag given.
-ezxml_t ezxml_idx(ezxml_t xml, int idx);
-
-// returns the name of the given tag
-#define ezxml_name(xml) ((xml) ? xml->name : NULL)
-
-// returns the given tag's character content or empty string if none
-#define ezxml_txt(xml) ((xml) ? xml->txt : "")
-
-// returns the value of the requested tag attribute, or NULL if not found
-const char *ezxml_attr(ezxml_t xml, const char *attr);
-
-// Traverses the ezxml sturcture to retrieve a specific subtag. Takes a
-// variable length list of tag names and indexes. The argument list must be
-// terminated by either an index of -1 or an empty string tag name. Example: 
-// title = ezxml_get(library, "shelf", 0, "book", 2, "title", -1);
-// This retrieves the title of the 3rd book on the 1st shelf of library.
-// Returns NULL if not found.
-ezxml_t ezxml_get(ezxml_t xml, ...);
-
-// Converts an ezxml structure back to xml. Returns a string of xml data that
-// must be freed.
-char *ezxml_toxml(ezxml_t xml);
-
-// returns a NULL terminated array of processing instructions for the given
-// target
-const char **ezxml_pi(ezxml_t xml, const char *target);
-
-// frees the memory allocated for an ezxml structure
-void ezxml_free(ezxml_t xml);
-    
-// returns parser error message or empty string if none
-const char *ezxml_error(ezxml_t xml);
-
-// returns a new empty ezxml structure with the given root tag name
-ezxml_t ezxml_new(const char *name);
-
-// wrapper for ezxml_new() that strdup()s name
-#define ezxml_new_d(name) ezxml_set_flag(ezxml_new(strdup(name)), EZXML_NAMEM)
-
-// Adds a child tag. off is the offset of the child tag relative to the start
-// of the parent tag's character content. Returns the child tag.
-ezxml_t ezxml_add_child(ezxml_t xml, const char *name, size_t off);
-
-// wrapper for ezxml_add_child() that strdup()s name
-#define ezxml_add_child_d(xml, name, off) \
-    ezxml_set_flag(ezxml_add_child(xml, strdup(name), off), EZXML_NAMEM)
-
-// sets the character content for the given tag and returns the tag
-ezxml_t ezxml_set_txt(ezxml_t xml, const char *txt);
-
-// wrapper for ezxml_set_txt() that strdup()s txt
-#define ezxml_set_txt_d(xml, txt) \
-    ezxml_set_flag(ezxml_set_txt(xml, strdup(txt)), EZXML_TXTM)
-
-// Sets the given tag attribute or adds a new attribute if not found. A value
-// of NULL will remove the specified attribute. Returns the tag given.
-ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value);
-
-// Wrapper for ezxml_set_attr() that strdup()s name/value. Value cannot be NULL
-#define ezxml_set_attr_d(xml, name, value) \
-    ezxml_set_attr(ezxml_set_flag(xml, EZXML_DUP), strdup(name), strdup(value))
-
-// sets a flag for the given tag and returns the tag
-ezxml_t ezxml_set_flag(ezxml_t xml, short flag);
-
-// removes a tag along with its subtags without freeing its memory
-ezxml_t ezxml_cut(ezxml_t xml);
-
-// inserts an existing tag into an ezxml structure
-ezxml_t ezxml_insert(ezxml_t xml, ezxml_t dest, size_t off);
-
-// Moves an existing tag to become a subtag of dest at the given offset from
-// the start of dest's character content. Returns the moved tag.
-#define ezxml_move(xml, dest, off) ezxml_insert(ezxml_cut(xml), dest, off)
-
-// removes a tag along with all its subtags
-#define ezxml_remove(xml) ezxml_free(ezxml_cut(xml))
+#  define MXML_ADD_BEFORE	0	/* Add node before specified node */
+#  define MXML_ADD_AFTER	1	/* Add node after specified node */
+#  define MXML_ADD_TO_PARENT	NULL	/* Add node relative to parent */
 
 /*
- * LIBAROMA WRAPPER
+ * Data types...
  */
-typedef ezxml_t LIBAROMA_XML;
-#define libaroma_xml(x, len)			ezxml_parse_str(x, len) //TODO: replace macro with function converting uri to file path
-#define libaroma_xml_get(x, ...)		ezxml_get(x, __VA_ARGS__)
-#define libaroma_xml_new(tag)			ezxml_new(tag)
-#define libaroma_xml_fromfile(x)		ezxml_parse_file(x)
-#define libaroma_xml_fromfp(x)			ezxml_parse_fp(x)
-#define libaroma_xml_fromfd(x)			ezxml_parse_fd(x)
-#define libaroma_xml_next(x)			ezxml_next(x)
-#define libaroma_xml_child(x, name)		ezxml_child(x, name)
-#define libaroma_xml_add(x, name, off)	ezxml_add_child(x, name, off)
-#define libaroma_xml_tostring(x)		ezxml_toxml(x)
-#define libaroma_xml_lasterr(x)			ezxml_error(x)
-#define libaroma_xml_free(x)			ezxml_free(x)
-#define libaroma_xml_attr(x, attr)		ezxml_attr(x, attr)
-#define libaroma_xml_attr_free(a)		ezxml_free_attr(a)
-#define libaroma_xml_cut(x)				ezxml_cut(x)
-#define libaroma_xml_move(x, dst ,off)	ezxml_move(xml, dst, off)
-#define libaroma_xml_setflag(x, f)		ezxml_set_flag(x, f)
-#define libaroma_xml_settxt(x, txt)		ezxml_set_txt(x, txt)
 
+typedef enum mxml_sax_event_e		/**** SAX event type. ****/
+{
+  MXML_SAX_CDATA,			/* CDATA node */
+  MXML_SAX_COMMENT,			/* Comment node */
+  MXML_SAX_DATA,			/* Data node */
+  MXML_SAX_DIRECTIVE,			/* Processing directive node */
+  MXML_SAX_ELEMENT_CLOSE,		/* Element closed */
+  MXML_SAX_ELEMENT_OPEN			/* Element opened */
+} mxml_sax_event_t;
 
-#ifdef __cplusplus
-}
-#endif
-#endif // __libaroma_xml_h__
+typedef enum mxml_type_e		/**** The XML node type. ****/
+{
+  MXML_IGNORE = -1,			/* Ignore/throw away node @since Mini-XML 2.3@ */
+  MXML_ELEMENT,				/* XML element with attributes */
+  MXML_INTEGER,				/* Integer value */
+  MXML_OPAQUE,				/* Opaque string */
+  MXML_REAL,				/* Real value */
+  MXML_TEXT,				/* Text fragment */
+  MXML_CUSTOM				/* Custom data @since Mini-XML 2.1@ */
+} mxml_type_t;
+
+typedef void (*mxml_custom_destroy_cb_t)(void *);
+					/**** Custom data destructor ****/
+
+typedef void (*mxml_error_cb_t)(const char *);
+					/**** Error callback function ****/
+
+typedef struct _mxml_node_s mxml_node_t;	/**** An XML node. ****/
+
+typedef mxml_node_t *LIBAROMA_XML;	/**** Libaroma wrapper. ****/
+
+typedef struct _mxml_index_s mxml_index_t;
+					/**** An XML node index. ****/
+
+typedef int (*mxml_custom_load_cb_t)(mxml_node_t *, const char *);
+					/**** Custom data load callback function ****/
+
+typedef char *(*mxml_custom_save_cb_t)(mxml_node_t *);
+					/**** Custom data save callback function ****/
+
+typedef int (*mxml_entity_cb_t)(const char *);
+					/**** Entity callback function */
+
+typedef mxml_type_t (*mxml_load_cb_t)(mxml_node_t *);
+					/**** Load callback function ****/
+
+typedef const char *(*mxml_save_cb_t)(mxml_node_t *, int);
+					/**** Save callback function ****/
+
+typedef void (*mxml_sax_cb_t)(mxml_node_t *, mxml_sax_event_t, void *);
+					/**** SAX callback function ****/
+
+/*
+ * Libaroma wrappers
+ */
+extern LIBAROMA_XML libaroma_xml(const char *string);
+extern LIBAROMA_XML libaroma_xml_file_ex(const char *path, byte writable);
+extern LIBAROMA_XML libaroma_xml_get(LIBAROMA_XML xml, const char *tag);
+extern LIBAROMA_XML libaroma_xml_parent(LIBAROMA_XML xml);
+extern LIBAROMA_XML libaroma_xml_child(LIBAROMA_XML xml, const char *tag);
+extern LIBAROMA_XML libaroma_xml_prev(LIBAROMA_XML xml);
+extern LIBAROMA_XML libaroma_xml_next(LIBAROMA_XML xml);
+extern LIBAROMA_XML libaroma_xml_sibling(LIBAROMA_XML xml, const char *tag);
+extern const char	*libaroma_xml_attr(LIBAROMA_XML xml, const char *attr);
+extern const char	*libaroma_xml_name(LIBAROMA_XML xml);
+extern const char	*libaroma_xml_value(LIBAROMA_XML xml);
+extern void			libaroma_xml_free(LIBAROMA_XML xml);
+/* useful macros */
+#define libaroma_xml_file(path) libaroma_xml_file_ex(path,0)
+#define libaroma_xml_child_first(xml) libaroma_xml_child(xml,NULL)
+
+/*
+ * Prototypes...
+ */
+
+extern void		mxmlAdd(mxml_node_t *parent, int where,
+			        mxml_node_t *child, mxml_node_t *node);
+extern void		mxmlDelete(mxml_node_t *node);
+extern void		mxmlElementDeleteAttr(mxml_node_t *node,
+			                      const char *name);
+extern const char	*mxmlElementGetAttr(mxml_node_t *node, const char *name);
+extern const char       *mxmlElementGetAttrByIndex(mxml_node_t *node, int idx, const char **name);
+extern int              mxmlElementGetAttrCount(mxml_node_t *node);
+extern void		mxmlElementSetAttr(mxml_node_t *node, const char *name,
+			                   const char *value);
+extern void		mxmlElementSetAttrf(mxml_node_t *node, const char *name,
+			                    const char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#    endif /* __GNUC__ */
+;
+extern int		mxmlEntityAddCallback(mxml_entity_cb_t cb);
+extern const char	*mxmlEntityGetName(int val);
+extern int		mxmlEntityGetValue(const char *name);
+extern void		mxmlEntityRemoveCallback(mxml_entity_cb_t cb);
+extern mxml_node_t	*mxmlFindElement(mxml_node_t *node, mxml_node_t *top,
+			                 const char *element, const char *attr,
+					 const char *value, int descend);
+extern mxml_node_t	*mxmlFindPath(mxml_node_t *node, const char *path);
+extern const char	*mxmlGetCDATA(mxml_node_t *node);
+extern const void	*mxmlGetCustom(mxml_node_t *node);
+extern const char	*mxmlGetElement(mxml_node_t *node);
+extern mxml_node_t	*mxmlGetFirstChild(mxml_node_t *node);
+extern int		mxmlGetInteger(mxml_node_t *node);
+extern mxml_node_t	*mxmlGetLastChild(mxml_node_t *node);
+extern mxml_node_t	*mxmlGetNextSibling(mxml_node_t *node);
+extern const char	*mxmlGetOpaque(mxml_node_t *node);
+extern mxml_node_t	*mxmlGetParent(mxml_node_t *node);
+extern mxml_node_t	*mxmlGetPrevSibling(mxml_node_t *node);
+extern double		mxmlGetReal(mxml_node_t *node);
+extern int		mxmlGetRefCount(mxml_node_t *node);
+extern const char	*mxmlGetText(mxml_node_t *node, int *whitespace);
+extern mxml_type_t	mxmlGetType(mxml_node_t *node);
+extern void		*mxmlGetUserData(mxml_node_t *node);
+extern void		mxmlIndexDelete(mxml_index_t *ind);
+extern mxml_node_t	*mxmlIndexEnum(mxml_index_t *ind);
+extern mxml_node_t	*mxmlIndexFind(mxml_index_t *ind,
+			               const char *element,
+			               const char *value);
+extern int		mxmlIndexGetCount(mxml_index_t *ind);
+extern mxml_index_t	*mxmlIndexNew(mxml_node_t *node, const char *element,
+			              const char *attr);
+extern mxml_node_t	*mxmlIndexReset(mxml_index_t *ind);
+extern mxml_node_t	*mxmlLoadFd(mxml_node_t *top, int fd,
+			            mxml_type_t (*cb)(mxml_node_t *));
+extern mxml_node_t	*mxmlLoadFile(mxml_node_t *top, FILE *fp,
+			              mxml_type_t (*cb)(mxml_node_t *));
+extern mxml_node_t	*mxmlLoadString(mxml_node_t *top, const char *s,
+			                mxml_type_t (*cb)(mxml_node_t *));
+extern mxml_node_t	*mxmlNewCDATA(mxml_node_t *parent, const char *string);
+extern mxml_node_t	*mxmlNewCustom(mxml_node_t *parent, void *data,
+			               mxml_custom_destroy_cb_t destroy);
+extern mxml_node_t	*mxmlNewElement(mxml_node_t *parent, const char *name);
+extern mxml_node_t	*mxmlNewInteger(mxml_node_t *parent, int integer);
+extern mxml_node_t	*mxmlNewOpaque(mxml_node_t *parent, const char *opaque);
+extern mxml_node_t	*mxmlNewOpaquef(mxml_node_t *parent, const char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#    endif /* __GNUC__ */
+;
+extern mxml_node_t	*mxmlNewReal(mxml_node_t *parent, double real);
+extern mxml_node_t	*mxmlNewText(mxml_node_t *parent, int whitespace, const char *string);
+extern mxml_node_t	*mxmlNewTextf(mxml_node_t *parent, int whitespace, const char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#    endif /* __GNUC__ */
+;
+extern mxml_node_t	*mxmlNewXML(const char *version);
+extern int		mxmlRelease(mxml_node_t *node);
+extern void		mxmlRemove(mxml_node_t *node);
+extern int		mxmlRetain(mxml_node_t *node);
+extern char		*mxmlSaveAllocString(mxml_node_t *node,
+			        	     mxml_save_cb_t cb);
+extern int		mxmlSaveFd(mxml_node_t *node, int fd,
+			           mxml_save_cb_t cb);
+extern int		mxmlSaveFile(mxml_node_t *node, FILE *fp,
+			             mxml_save_cb_t cb);
+extern int		mxmlSaveString(mxml_node_t *node, char *buffer,
+			               int bufsize, mxml_save_cb_t cb);
+extern mxml_node_t	*mxmlSAXLoadFd(mxml_node_t *top, int fd,
+			               mxml_type_t (*cb)(mxml_node_t *),
+			               mxml_sax_cb_t sax, void *sax_data);
+extern mxml_node_t	*mxmlSAXLoadFile(mxml_node_t *top, FILE *fp,
+			                 mxml_type_t (*cb)(mxml_node_t *),
+			                 mxml_sax_cb_t sax, void *sax_data);
+extern mxml_node_t	*mxmlSAXLoadString(mxml_node_t *top, const char *s,
+			                   mxml_type_t (*cb)(mxml_node_t *),
+			                   mxml_sax_cb_t sax, void *sax_data);
+extern int		mxmlSetCDATA(mxml_node_t *node, const char *data);
+extern int		mxmlSetCustom(mxml_node_t *node, void *data,
+			              mxml_custom_destroy_cb_t destroy);
+extern void		mxmlSetCustomHandlers(mxml_custom_load_cb_t load,
+			                      mxml_custom_save_cb_t save);
+extern int		mxmlSetElement(mxml_node_t *node, const char *name);
+extern void		mxmlSetErrorCallback(mxml_error_cb_t cb);
+extern int		mxmlSetInteger(mxml_node_t *node, int integer);
+extern int		mxmlSetOpaque(mxml_node_t *node, const char *opaque);
+extern int		mxmlSetOpaquef(mxml_node_t *node, const char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 2, 3)))
+#    endif /* __GNUC__ */
+;
+extern int		mxmlSetReal(mxml_node_t *node, double real);
+extern int		mxmlSetText(mxml_node_t *node, int whitespace,
+			            const char *string);
+extern int		mxmlSetTextf(mxml_node_t *node, int whitespace,
+			             const char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 3, 4)))
+#    endif /* __GNUC__ */
+;
+extern int		mxmlSetUserData(mxml_node_t *node, void *data);
+extern void		mxmlSetWrapMargin(int column);
+extern mxml_node_t	*mxmlWalkNext(mxml_node_t *node, mxml_node_t *top,
+			              int descend);
+extern mxml_node_t	*mxmlWalkPrev(mxml_node_t *node, mxml_node_t *top,
+			              int descend);
+
+/*
+ * Semi-private functions...
+ */
+
+extern void		mxml_error(const char *format, ...)
+#    ifdef __GNUC__
+__attribute__ ((__format__ (__printf__, 1, 2)))
+#    endif /* __GNUC__ */
+;
+extern mxml_type_t	mxml_ignore_cb(mxml_node_t *node);
+extern mxml_type_t	mxml_integer_cb(mxml_node_t *node);
+extern mxml_type_t	mxml_opaque_cb(mxml_node_t *node);
+extern mxml_type_t	mxml_real_cb(mxml_node_t *node);
+
+#endif /* __libaroma_xml_h__ */
