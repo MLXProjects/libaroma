@@ -291,7 +291,14 @@ byte libaroma_ctl_list_item_position(
 byte libaroma_ctl_list_scroll_to_item(
 		LIBAROMA_CONTROLP ctl,
 		LIBAROMA_CTL_LIST_ITEMP item,
-		byte smooth
-	);
+		byte smooth);
+
+/*
+ * Function		: libaroma_ctl_list_set_bg_color
+ * Return Value: byte
+ * Descriptions: update list background color
+ */
+byte libaroma_ctl_list_set_bg_color(
+		LIBAROMA_CONTROLP ctl, word bgcolor);
 
 #endif /* __libaroma_ctl_list_h__ */

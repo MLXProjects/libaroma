@@ -59,6 +59,7 @@ typedef struct {
 	LIBAROMA_MUTEX mutex;
 	LIBAROMA_MUTEX imutex;
 	LIBAROMA_CTL_LIST_TOUCHPOS pos;
+	byte bgcolor_update;
 } LIBAROMA_CTL_LIST, * LIBAROMA_CTL_LISTP;
 
 
@@ -366,6 +367,26 @@ void _libaroma_ctl_list_draw_item(
 	/* normal animation handler */
 	if (item->state){
 		if (item->state->normal_handler){
+			/* redraw cache if bgcolor changed */
+			if (mi->bgcolor_update){
+				ALOGT("bgcolor_update==1, redrawing item cache - handler = %d", item->state->normal_handler);
+				_libaroma_ctl_list_draw_item_fresh(
+					ctl, item, item->state->cache_rest, bgcolor, mi->hpad,
+					LIBAROMA_CTL_LIST_ITEM_DRAW_NORMAL|LIBAROMA_CTL_LIST_ITEM_DRAW_CACHE
+				);
+				_libaroma_ctl_list_draw_item_fresh(
+					ctl, item, item->state->cache_push, bgcolor, mi->hpad,
+					LIBAROMA_CTL_LIST_ITEM_DRAW_PUSHED|LIBAROMA_CTL_LIST_ITEM_DRAW_CACHE
+				);
+				if (item->state->normal_handler==2){
+					/* draw addons if needed */
+					_libaroma_ctl_list_draw_item_fresh(
+						ctl, item, canvas, bgcolor, mi->hpad,
+						LIBAROMA_CTL_LIST_ITEM_DRAW_ADDONS
+					);
+				}
+				mi->bgcolor_update = 0;
+			}
 			libaroma_draw(canvas, item->state->cache_rest, 0, 0, 0);
 			int ripple_i = 0;
 			int ripple_p = 0;
@@ -1422,6 +1443,30 @@ LIBAROMA_CTL_LIST_ITEMP libaroma_ctl_list_add_item_internal(
 	libaroma_ctl_scroll_request_height(ctl, mi->h);
 	return item;
 } /* End of libaroma_ctl_list_add_item_internal */
+
+/*
+ * Function		: libaroma_ctl_list_set_bg_color
+ * Return Value: byte
+ * Descriptions: update list background color
+ */
+byte libaroma_ctl_list_set_bg_color(LIBAROMA_CONTROLP ctl, word bgcolor){
+	if (!ctl){
+		return 0;
+	}
+	LIBAROMA_CTL_SCROLL_CLIENTP client = libaroma_ctl_scroll_get_client(ctl);
+	if (!client){
+		return 0;
+	}
+	if (client->handler!=&_libaroma_ctl_list_handler){
+		return 0;
+	}
+	LIBAROMA_CTL_LISTP mi = (LIBAROMA_CTL_LISTP) client->internal;
+	libaroma_mutex_lock(mi->mutex);
+	libaroma_ctl_scroll_set_bg_color(ctl, bgcolor);
+	mi->bgcolor_update = 1;
+	libaroma_mutex_unlock(mi->mutex);
+	return 1;
+} /* End of libaroma_ctl_list_set_bg_color */
 
 /*
  * Function		: libaroma_listitem_nonitem
