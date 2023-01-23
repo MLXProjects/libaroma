@@ -55,11 +55,6 @@ typedef struct{
 	voidp change_data;
 } _LIBAROMA_LISTITEM_CHECK, * _LIBAROMA_LISTITEM_CHECKP;
 
-byte _libaroma_ctl_list_dodraw_item(
-		LIBAROMA_CONTROLP ctl,
-		LIBAROMA_CTL_LIST_ITEMP item
-);
-
 int libaroma_listitem_get_selected_index_from(
 	LIBAROMA_CONTROLP ctl,
 	int start_index
@@ -150,7 +145,7 @@ byte libaroma_listitem_set_selected(
 	}
 	if (mi->onchangeani){
 		if (!is_ondraw){
-			_libaroma_ctl_list_dodraw_item(ctl,item);
+			libaroma_ctl_list_invalidate_item(ctl, item);
 		}
 	}
 	return 1;
