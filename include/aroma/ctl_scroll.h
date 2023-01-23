@@ -226,4 +226,11 @@ byte libaroma_ctl_scroll_set_ovs_callback(
 	 LIBAROMA_CONTROLP ctl, LIBAROMA_CTL_SCROLL_OVERSHOOT_EFFECT cb
 );
 
+/*
+ * Function		: libaroma_ctl_scroll_invalidate
+ * Return Value: byte
+ * Descriptions: request redraw
+ */
+byte libaroma_ctl_scroll_invalidate(LIBAROMA_CONTROLP ctl);
+
 #endif /* __libaroma_ctl_scroll_h__ */

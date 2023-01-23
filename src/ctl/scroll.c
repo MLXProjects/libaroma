@@ -1673,6 +1673,23 @@ byte libaroma_ctl_scroll_set_bg_color(LIBAROMA_CONTROLP ctl, word color){
 } /* End of libaroma_ctl_scroll_set_bg_color */
 
 /*
+ * Function		: libaroma_ctl_scroll_invalidate
+ * Return Value: byte
+ * Descriptions: request redraw
+ */
+byte libaroma_ctl_scroll_invalidate(LIBAROMA_CONTROLP ctl){
+	/* internal check */
+	_LIBAROMA_CTL_CHECK(
+		_libaroma_ctl_scroll_handler, _LIBAROMA_CTL_SCROLLP, 0
+	);
+	libaroma_mutex_lock(me->mutex);
+	me->synced_y = -1;
+	me->cache_state = 10;
+	libaroma_mutex_unlock(me->mutex);
+	return 1;
+} /* End of libaroma_ctl_scroll_invalidate */
+
+/*
  * Function		: libaroma_ctl_scroll_set_client
  * Return Value: byte
  * Descriptions: set client handler
