@@ -151,11 +151,12 @@ dirCreateHierarchy(const char *path, int mode,
             return -1;
         } else if (ds == DMISSING) {
             int err;
-			#ifdef _WIN32
-			err = mkdir(cpath);
-			#else
+	#ifdef _WIN32
+	    err = mkdir(cpath);
+	    mode = mode + 1; /* prevent unused parameter warning */
+	#else
             err = mkdir(cpath, mode);
-			#endif
+	#endif
             if (err != 0) {
                 free(cpath);
                 return -1;
