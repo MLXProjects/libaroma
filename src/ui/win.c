@@ -726,6 +726,7 @@ LIBAROMA_CONTROLP libaroma_window_setfocus(
 			}
 			if (ctl->handler->focus(ctl,1)){
 				if (win->focused){
+					/* send unfocus to previous control */
 					win->focused->handler->focus(win->focused,0);
 				}
 				win->focused=ctl;
@@ -1279,22 +1280,17 @@ dword libaroma_window_process_event(LIBAROMA_WINDOWP win, LIBAROMA_MSGP msg){
 					int i;
 					for (i=0;i<win->childn;i++){
 						if (_libaroma_window_is_inside(win->childs[i],x,y)){
-							win->touched = win->childs[i];
-							/* set focused if not already */
-							if (win->focused != win->touched){
+							/* set touched if not already */
+							if (win->touched != win->childs[i]){
+								/* set touched & focused */
+								win->touched = win->childs[i];
 								libaroma_window_setfocus(win, win->touched);
 							}
 							break;
 						}
-						else if (win->focused){
-							/* send lost focus using callback */
-							if (win->focused->handler->focus){
-								win->focused->handler->focus(win->focused, 0);
-							}
-							win->focused = NULL;
-						}
 					}
 					if (win->touched!=NULL){
+						/* send touch message */
 						if (win->touched->handler->message){
 							ret=win->touched->handler->message(win->touched, msg);
 						}
