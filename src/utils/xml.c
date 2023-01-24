@@ -36,8 +36,20 @@
 #include <aroma_internal.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <ctype.h>
 #include <errno.h>
+
+/* disable false positive warning */
+#ifdef __clang__
+        #pragma clang diagnostic ignored "-Wuse-after-free"
+#elif defined(__GNUC__)
+        /* -Wuse-after-free was added in GCC 7.1 */
+        #if __GNUC__ >= 12
+                #pragma GCC diagnostic ignored "-Wuse-after-free"
+        #endif
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -1766,12 +1778,10 @@ mxml_add_char(int  ch,			/* I  - Character to add */
    /*
     * Increase the size of the buffer...
     */
-
     if (*bufsize < 1024)
       (*bufsize) *= 2;
     else
       (*bufsize) += 1024;
-
     if ((newbuffer = realloc(*buffer, *bufsize)) == NULL)
     {
       mxml_error("Unable to expand string buffer to %d bytes.", *bufsize);
