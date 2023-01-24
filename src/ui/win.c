@@ -1280,7 +1280,18 @@ dword libaroma_window_process_event(LIBAROMA_WINDOWP win, LIBAROMA_MSGP msg){
 					for (i=0;i<win->childn;i++){
 						if (_libaroma_window_is_inside(win->childs[i],x,y)){
 							win->touched = win->childs[i];
+							/* set focused if not already */
+							if (win->focused != win->touched){
+								libaroma_window_setfocus(win, win->touched);
+							}
 							break;
+						}
+						else if (win->focused){
+							/* send lost focus using callback */
+							if (win->focused->handler->focus){
+								win->focused->handler->focus(win->focused, 0);
+							}
+							win->focused = NULL;
 						}
 					}
 					if (win->touched!=NULL){
