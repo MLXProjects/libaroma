@@ -80,7 +80,7 @@
 /* some control functions/callbacks don't need all their parameters */
 #ifdef __clang__
 	#pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(__GNUC__) || defined(__GNUG__)
+#elif defined(__GNUC__)
 	#pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif /* __clang__ */
 

@@ -30,9 +30,12 @@
 #ifdef __clang__
 	#pragma clang diagnostic ignored "-Wclobbered"
 	#pragma clang diagnostic ignored "-Wrestrict"
-#elif defined(__GNUC__) || defined(__GNUG__)
+#elif defined(__GNUC__)
 	#pragma GCC diagnostic ignored "-Wclobbered"
-	#pragma GCC diagnostic ignored "-Wrestrict"
+	/* -Wrestrict was added in GCC 7.1 */
+	#if __GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ >= 1)
+		#pragma GCC diagnostic ignored "-Wrestrict"
+	#endif
 #endif
 
 /*
