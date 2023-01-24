@@ -38,7 +38,7 @@
 #define LIBAROMA_HID_EV_TYPE_NONE     0x00 /* Won't processed */
 #define LIBAROMA_HID_EV_TYPE_KEY      0x01 /* Keypad/Keyboards */
 #define LIBAROMA_HID_EV_TYPE_TOUCH    0x02 /* Touch Screen */
-#define LIBAROMA_HID_EV_TYPE_MOUSE    0x03 /* Touch Screen */
+#define LIBAROMA_HID_EV_TYPE_MOUSE    0x03 /* Simulated Touch Screen */
 
 /* Get Input Return Values */
 #define LIBAROMA_HID_EV_RET_NONE      0x00 /* ignore  */

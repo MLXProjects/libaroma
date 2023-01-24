@@ -61,6 +61,7 @@ typedef struct _LIBAROMA_CONTROL * LIBAROMA_CONTROLP;
 
 /* input system */
 #include "hid.h"				/* hid & input handler */
+#include "hid_keys.h"			/* input key codes */
 #include "hid_msg.h"			/* message queue */
 
 /* ui modules */
