@@ -1329,9 +1329,9 @@ dword libaroma_window_process_event(LIBAROMA_WINDOWP win, LIBAROMA_MSGP msg){
 				}
 			}
 			break;
-		case LIBAROMA_MSG_KEY_RAWKEY:
+		default:
 			{
-				/* send messages to focused child, if any */
+				/* send all other messages to focused child, if any */
 				if (win->focused){
 					if (win->focused->handler->message){
 							win->focused->handler->message(win->focused, msg);
