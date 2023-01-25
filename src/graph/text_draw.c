@@ -37,13 +37,14 @@ extern "C" {
  * Return Value: dword
  * Descriptions: draw text span
  */
-dword libaroma_text_draw_span(
+dword libaroma_text_draw_span_ex(
 		LIBAROMA_CANVASP canvas,
 		_LIBAROMA_TEXTSHAPED_SPANP span_shaped,
 		int x,
 		int y,
 		dword prev_res_span,
-		byte fixed_color, word color_force) {
+		byte fixed_color, word color_force,
+		byte alpha) {
 	if (!canvas){
 		canvas=libaroma_fb()->canvas;
 	}
@@ -70,7 +71,7 @@ dword libaroma_text_draw_span(
 			draw_y,
 			fixed_color?color_force:span_shaped->color,
 			span_shaped->flags,
-			0xff
+			alpha
 		);
 		/* span underline calculation */
 		if (is_underline) {
@@ -107,7 +108,7 @@ dword libaroma_text_draw_span(
 				span_x2 - span_x1_strikeout,
 				uline_height,
 				fixed_color?color_force:span_shaped->color,
-				0xff);
+				alpha);
 		}
 		if ((span_shaped->flags & _LIBAROMA_TEXTCHUNK_UNDERLINE) &&
 				(span_x1_underline > -1)) {
@@ -119,7 +120,7 @@ dword libaroma_text_draw_span(
 				span_x2 - span_x1_underline,
 				uline_height,
 				fixed_color?color_force:span_shaped->color,
-				0xff);
+				alpha);
 		}
 	}
 	/* return flag and last x position */
@@ -131,13 +132,14 @@ dword libaroma_text_draw_span(
  * Return Value: void
  * Descriptions: draw bulleted span
  */
-void libaroma_text_draw_bullet(
+void libaroma_text_draw_bullet_ex(
 		LIBAROMA_CANVASP canvas,
 		byte style,
 		short x,
 		short y,
 		short sz,
-		word color) {
+		word color,
+		byte alpha) {
 	if (!canvas){
 		canvas=libaroma_fb()->canvas;
 	}
@@ -147,7 +149,7 @@ void libaroma_text_draw_bullet(
 		case 1: {
 				/* rectangle */
 				libaroma_draw_rect(
-					canvas, x + midx, y, sz, sz, color, 0xff
+					canvas, x + midx, y, sz, sz, color, alpha
 				);
 			}
 			break;
@@ -164,7 +166,7 @@ void libaroma_text_draw_bullet(
 						(i * 2) + 1,
 						1,
 						color,
-						0xff
+						alpha
 					);
 
 					if (i < mid - 1) {
@@ -175,7 +177,7 @@ void libaroma_text_draw_bullet(
 							(i * 2) + 1,
 							1,
 							color,
-							0xff
+							alpha
 						);
 					}
 				}
@@ -194,7 +196,7 @@ void libaroma_text_draw_bullet(
 						mid,
 						1,
 						color,
-						0xff
+						alpha
 					);
 				}
 				for (i = 0; i < mid; i++) {
@@ -205,7 +207,7 @@ void libaroma_text_draw_bullet(
 						mid,
 						1,
 						color,
-						0xff
+						alpha
 					);
 				}
 			}
@@ -225,7 +227,7 @@ void libaroma_text_draw_bullet(
 						i + 1,
 						1,
 						color,
-						0xff
+						alpha
 					);
 				}
 				for (i = 0; i < mid; i++) {
@@ -236,7 +238,7 @@ void libaroma_text_draw_bullet(
 						mid - i,
 						1,
 						color,
-						0xff
+						alpha
 					);
 				}
 			}
@@ -244,7 +246,7 @@ void libaroma_text_draw_bullet(
 
 		default: {
 				/* Disc */
-				libaroma_gradient(
+				libaroma_gradient_ex(
 					canvas,
 					x + midx,
 					y,
@@ -253,7 +255,8 @@ void libaroma_text_draw_bullet(
 					color,
 					color,
 					sz,
-					0x1111
+					0x1111,
+					alpha, alpha
 				);
 			}
 			break;
@@ -263,14 +266,15 @@ void libaroma_text_draw_bullet(
 /*
  * Function		: libaroma_textline_draw
  * Return Value: void
- * Descriptions: draw text line
+ * Descriptions: draw text line - extended
  */
-void libaroma_textline_draw(
+void libaroma_textline_draw_ex(
 		LIBAROMA_CANVASP canvas,
 		_LIBAROMA_TEXTLINEP line,
 		int draw_x,
 		int draw_y,
-		byte fixed_color, word color_force) {
+		byte fixed_color, word color_force,
+		byte alpha) {
 	if (!canvas){
 		canvas=libaroma_fb()->canvas;
 	}
@@ -282,13 +286,14 @@ void libaroma_textline_draw(
 		switch (span->type) {
 			case _LIBAROMA_TEXTSPAN_SHAPE: {
 					/* shaped text */
-					prev_res_span = libaroma_text_draw_span(
+					prev_res_span = libaroma_text_draw_span_ex(
 							canvas,
 							(_LIBAROMA_TEXTSHAPED_SPANP) span->data,
 							span->x + draw_x,
 							line->y + ypos + draw_y,
 							prev_res_span,
-							fixed_color,color_force
+							fixed_color,color_force,
+							alpha
 						);
 				}
 				break;
@@ -296,13 +301,14 @@ void libaroma_textline_draw(
 					/* bulleted */
 					_LIBAROMA_TEXTSPAN_BULLETP bullet =
 						(_LIBAROMA_TEXTSPAN_BULLETP) span->data;
-					libaroma_text_draw_bullet(
+					libaroma_text_draw_bullet_ex(
 						canvas,
 						bullet->style,
 						bullet->x + draw_x,
 						line->y + ((line->lineheight >> 1) - (bullet->w >> 2)) + draw_y,
 						bullet->w,
-						fixed_color?color_force:bullet->color
+						fixed_color?color_force:bullet->color,
+						alpha
 					);
 				}
 				break;
@@ -318,7 +324,7 @@ void libaroma_textline_draw(
 						hrwidth,
 						linesize,
 						fixed_color?color_force:hrcolor,
-						0xff
+						alpha
 					);
 				}
 				break;
@@ -346,6 +352,7 @@ void libaroma_textline_draw(
 						img_y = (line->y + ypos + draw_y) -
 							((line->h>>1)+(imgspan->h>>1)-((line->lineheight-line->h)>>2));
 					}
+					/* TODO: use alpha when drawing scaled */
 					libaroma_draw_scale_smooth(
 						canvas, imgspan->canvas,
 						span->x + draw_x + libaroma_dp(left_add),

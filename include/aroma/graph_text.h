@@ -283,11 +283,13 @@ byte libaroma_text_draw_ex(
 );
 /* aliases */
 #define libaroma_text_draw(d,t,x,y) \
-	libaroma_text_draw_ex(d,t,x,y,0,0,0,0,0,0,0,0,0)
+	libaroma_text_draw_ex(d,t,x,y,0,0,0,0,0,0,0xFF,0,0)
 #define libaroma_text_draw_color(d,t,x,y,c) \
-	libaroma_text_draw_ex(d,t,x,y,0,0,0,10,0,c,0,0,0)
+	libaroma_text_draw_ex(d,t,x,y,0,0,0,10,0,c,0xFF,0,0)
 #define libaroma_text_draw_shadow(d,t,x,y,shadow,radius,color,opacity,shx,shy) \
 	libaroma_text_draw_ex(d,t,x,y,0,0,0,shadow,radius,color,opacity,shx,shy)
+#define libaroma_text_draw_opacity(d,t,x,y,opa) \
+	libaroma_text_draw_ex(d,t,x,y,0,0,0,0,0,0,opa,0,0)
 
 /*
  * Function		: libaroma_draw_text_ex

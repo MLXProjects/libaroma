@@ -288,18 +288,20 @@ int libaroma_text_draw_line_ex(
 		_libaroma_pubtext_lock(1);
 		if (line_txt->span) {
 			if (!isshadow) {
-				libaroma_textline_draw(
+				libaroma_textline_draw_ex(
 					dest,
 					line_txt,
 					dx,
-					dy - line_txt->y, 0, 0);
+					dy - line_txt->y, 0, 0,
+					shadow_opacity);
 			}
 			else if (isshadow>=10) {
-				libaroma_textline_draw(
+				libaroma_textline_draw_ex(
 					dest,
 					line_txt,
 					dx,
-					dy - line_txt->y, 1, shadow_color);
+					dy - line_txt->y, 1, shadow_color,
+					shadow_opacity);
 			}
 			else if (radius > 0) {
 				byte light = (isshadow == 2) ? 1 : 0;
@@ -310,6 +312,7 @@ int libaroma_text_draw_line_ex(
 				word trans_color = (light) ? 0xffff : 0x0000;
 				word fore_color = (light) ? 0x0000 : 0xffff;
 				libaroma_canvas_setcolor(cv, trans_color, 0);
+				/* TODO: should use opacity instead of manually setting alpha? */
 				libaroma_textline_draw(
 					cv,
 					line_txt,
@@ -418,18 +421,8 @@ byte libaroma_text_draw_ex(
 	int shadow_x,
 	int shadow_y
 ) {
-	if (isshadow>=10) {
-		return libaroma_text_draw_layer(
-			dest,
-			text,
-			dx,
-			dy,
-			sx,
-			sy,
-			maxh,
-			isshadow,0,shadow_color,0);
-	}
-	else if (isshadow) {
+	if (isshadow>=20){
+		/* draw text and shadow with same opacity */
 		libaroma_text_draw_layer(
 			dest,
 			text,
@@ -450,8 +443,47 @@ byte libaroma_text_draw_ex(
 			sx,
 			sy,
 			maxh,
-			0,0,0,0);
+			0,0,0,shadow_opacity);
 	}
+	if (isshadow>=10) {
+		/* draw text with opacity and override color */
+		return libaroma_text_draw_layer(
+			dest,
+			text,
+			dx,
+			dy,
+			sx,
+			sy,
+			maxh,
+			isshadow,0,
+			shadow_color,
+			shadow_opacity);
+	}
+	else if (isshadow) {
+		/* draw shadow with opacity and opaque text */
+		libaroma_text_draw_layer(
+			dest,
+			text,
+			dx + shadow_x,
+			dy + shadow_y,
+			sx,
+			sy,
+			maxh,
+			isshadow,
+			radius,
+			shadow_color,
+			shadow_opacity);
+		return libaroma_text_draw_layer(
+			dest,
+			text,
+			dx,
+			dy,
+			sx,
+			sy,
+			maxh,
+			0,0,0,0xFF);
+	}
+	/* draw text using shadow opacity (default to 0xFF by macros) */
 	return libaroma_text_draw_layer(
 			dest,
 			text,
@@ -460,7 +492,7 @@ byte libaroma_text_draw_ex(
 			sx,
 			sy,
 			maxh,
-			0,0,0,0);
+			0,0,0,shadow_opacity);
 } /* End of libaroma_text_draw_ex */
 
 /*

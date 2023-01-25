@@ -426,40 +426,49 @@ byte libaroma_textline_free(
 /*
  * Function		: libaroma_text_draw_span
  * Return Value: dword
- * Descriptions: draw text span
+ * Descriptions: draw text span - extended
  */
-dword libaroma_text_draw_span(
+dword libaroma_text_draw_span_ex(
 		LIBAROMA_CANVASP canvas,
 		_LIBAROMA_TEXTSHAPED_SPANP span_shaped,
 		int x,
 		int y,
 		dword prev_res_span,
-		byte fixed_color, word color_force);
+		byte fixed_color, word color_force,
+		byte opacity);
+#define libaroma_text_draw_span(cv, sh, x, y, prev, c, cf) \
+		libaroma_text_draw_span_ex(cv, sh, x, y, prev, c, cf, 0xFF)
 
 /*
  * Function		: libaroma_text_draw_bullet
  * Return Value: void
- * Descriptions: draw bulleted span
+ * Descriptions: draw bulleted span - extended
  */
-void libaroma_text_draw_bullet(
+void libaroma_text_draw_bullet_ex(
 		LIBAROMA_CANVASP canvas,
 		byte style,
 		short x,
 		short y,
 		short sz,
-		word color);
+		word color,
+		byte opacity);
+#define libaroma_text_draw_bullet(cv, st, x, y, sz, c) \
+		libaroma_text_draw_bullet_ex(cv, st, x, y, sz, c, 0xFF)
 
 /*
  * Function		: libaroma_textline_draw
  * Return Value: void
- * Descriptions: draw text line
+ * Descriptions: draw text line - extended
  */
-void libaroma_textline_draw(
+void libaroma_textline_draw_ex(
 		LIBAROMA_CANVASP canvas,
 		_LIBAROMA_TEXTLINEP line,
 		int draw_x,
 		int draw_y,
-		byte fixed_color, word color_force);
+		byte fixed_color, word color_force,
+		byte opacity);
+#define libaroma_textline_draw(cv, ln, dx, dy, c, cf) \
+		libaroma_textline_draw_ex(cv, ln, dx, dy, c, cf, 0xFF)
 
 #ifdef __cplusplus
 }
