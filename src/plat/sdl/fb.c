@@ -205,6 +205,7 @@ byte SDLFBDR_init(LIBAROMA_FBP me) {
 								libaroma_config()->sdl_wm_width, libaroma_config()->sdl_wm_height,
 								0);
 #else
+	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_WM_SetCaption(libaroma_config()->sdl_wm_title, libaroma_config()->sdl_wm_title);
 	mi->window = SDL_SetVideoMode(libaroma_config()->sdl_wm_width, libaroma_config()->sdl_wm_height, 16, SDL_HWSURFACE);
 	if(!mi->window){

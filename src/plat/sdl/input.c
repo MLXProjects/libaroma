@@ -391,7 +391,7 @@ byte SDLHIDRV_translate_keyboard(
 		case SDLK_RCTRL:
 			dest_ev->key = LIBAROMA_HID_KEY_RIGHTCTRL;
 			break;
-		/* now check edition keys section (PrtScr, insert, del...) */
+		/* now check navigation & edition keys section (arrows, insert, PrtScr...) */
 		case SDLK_SYSREQ:
 			dest_ev->key = LIBAROMA_HID_KEY_SYSRQ;
 			break;
@@ -422,6 +422,12 @@ byte SDLHIDRV_translate_keyboard(
 			break;
 		case SDLK_PAGEDOWN:
 			dest_ev->key = LIBAROMA_HID_KEY_PAGEDOWN;
+			break;
+		case SDLK_LEFT:
+			dest_ev->key = LIBAROMA_HID_KEY_LEFT;
+			break;
+		case SDLK_RIGHT:
+			dest_ev->key = LIBAROMA_HID_KEY_RIGHT;
 			break;
 		/* finally, check keypad keys */
 		/* thanks SDL for needlessly renaming some keys in the 2.0 version,
