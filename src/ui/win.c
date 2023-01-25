@@ -1273,26 +1273,44 @@ dword libaroma_window_process_event(LIBAROMA_WINDOWP win, LIBAROMA_MSGP msg){
 			{
 				/* touch handler */
 				if (msg->state==LIBAROMA_HID_EV_STATE_DOWN){
-					win->touched = NULL;
 					int x = msg->x;
 					int y = msg->y;
 					libaroma_window_calculate_pos(win,NULL,&x,&y);
 					int i;
+					/* save new touched control if found */
+					LIBAROMA_CONTROLP touched = NULL;
+					byte send_unfocus = 1;
 					for (i=0;i<win->childn;i++){
+						/* find first control inside touch coords */
 						if (_libaroma_window_is_inside(win->childs[i],x,y)){
-							/* set touched if not already */
-							if (win->touched != win->childs[i]){
-								/* set touched & focused */
-								win->touched = win->childs[i];
-								libaroma_window_setfocus(win, win->touched);
+							/* if touched control is already focused, don't send unfocus */
+							if (win->focused == win->childs[i]){
+								send_unfocus = 0;
+							}
+							else {
+								/* non-focused control touched */
+								touched = win->childs[i];
 							}
 							break;
 						}
 					}
+					/* if there was another (different) control focused, send unfocus */
+					if (win->focused && send_unfocus){
+						if (win->focused->handler->focus){
+								win->focused->handler->focus(win->focused, 0);
+						}
+						/* & unset touched */
+						win->focused = win->touched = NULL;
+					}
+					/* if touched control found, send focus & set touched */
+					if (touched){
+						libaroma_window_setfocus(win, touched);
+						win->touched = touched;
+					}
+					/* if control touched, send touch message */
 					if (win->touched!=NULL){
-						/* send touch message */
-						if (win->touched->handler->message){
-							ret=win->touched->handler->message(win->touched, msg);
+						if (touched->handler->message){
+							ret=touched->handler->message(touched, msg);
 						}
 					}
 				}
