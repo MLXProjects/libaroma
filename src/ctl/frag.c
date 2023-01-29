@@ -84,7 +84,7 @@ struct __LIBAROMA_CTL_FRAGMENT{
 	long transition_duration;
 	float transition_state;
 	byte transition_type;
-	byte transision_delprev;
+	byte transition_delprev;
 	LIBAROMA_TRANSITION_CB transition_cb;
 	LIBAROMA_RECTP transition_rs;
 	LIBAROMA_RECTP transition_re;
@@ -446,48 +446,38 @@ void _libaroma_ctl_fragment_draw(
 	/* draw window canvas */
 	libaroma_mutex_lock(me->dmutex);
 	if (!me->on_direct_canvas){
-		if (me->win_pos_out==-1){
-			LIBAROMA_WINDOWP awin = me->wins[me->win_pos];
+		LIBAROMA_WINDOWP awin = me->wins[me->win_pos];
+		LIBAROMA_WINDOWP owin = NULL;
+		if (me->win_pos_out!=-1) owin = me->wins[me->win_pos_out];
+		if (me->transition_state==1){
 			if (awin->dc){
 				libaroma_draw(c,awin->dc,0,0,0);
 			}
 			else{
 				libaroma_control_erasebg(ctl,c);
 			}
+			me->transition_state=0;
+		}
+		else if ((me->transition_cb)&&(awin->dc)){
+			me->transition_cb(
+				c,
+				(owin)?owin->dc:NULL,
+				awin->dc,
+				me->transition_state,
+				me->transition_rs,
+				me->transition_re
+			);
 		}
 		else{
-			LIBAROMA_WINDOWP awin = me->wins[me->win_pos];
-			LIBAROMA_WINDOWP owin = me->wins[me->win_pos_out];
-			if (me->transition_state==1){
-				if (awin->dc){
-					libaroma_draw(c,awin->dc,0,0,0);
-				}
-				else{
-					libaroma_control_erasebg(ctl,c);
-				}
-				me->transition_state=0;
-			}
-			else if ((me->transition_cb)&&(owin->dc)&&(awin->dc)){
-				me->transition_cb(
-					c,
-					owin->dc,
-					awin->dc,
-					me->transition_state,
-					me->transition_rs,
-					me->transition_re
-				);
+			/* simple alpha transition */
+			if (owin&&owin->dc){
+				libaroma_draw(c,owin->dc,0,0,0);
 			}
 			else{
-				/* simple alpha transition */
-				if (owin->dc){
-					libaroma_draw(c,owin->dc,0,0,0);
-				}
-				else{
-					libaroma_control_erasebg(ctl,c);
-				}
-				if (awin->dc){
-					libaroma_draw_opacity(c,awin->dc,0,0,0,0xff*me->transition_state);
-				}
+				libaroma_control_erasebg(ctl,c);
+			}
+			if (awin->dc){
+				libaroma_draw_opacity(c,awin->dc,0,0,0,0xff*me->transition_state);
 			}
 		}
 	}
@@ -555,7 +545,7 @@ byte _libaroma_ctl_fragment_thread(LIBAROMA_CONTROLP ctl) {
 			}
 		}
 	}
-	if ((me->transition_start!=0)&&(me->win_pos_out!=-1)){
+	if (me->transition_start!=0){
 		float nowstate=libaroma_duration_state(
 			me->transition_start, me->transition_duration
 		);
@@ -564,17 +554,21 @@ byte _libaroma_ctl_fragment_thread(LIBAROMA_CONTROLP ctl) {
 				me->transition_start=0;
 				me->transition_state=1;
 				me->need_direct_canvas=1;
-				if (me->transision_delprev){
-					_LIBAROMA_CTL_FRAGMENT_WINP windd=
-						(_LIBAROMA_CTL_FRAGMENT_WINP)
-							me->wins[me->win_pos_out]->client_data;
-					me->win_next_del_id=windd->id;
+				/* ignore delprev if no previous window */
+				if (me->win_pos_out!=-1){
+					if (me->transition_delprev){
+						_LIBAROMA_CTL_FRAGMENT_WINP windd=
+							(_LIBAROMA_CTL_FRAGMENT_WINP)
+								me->wins[me->win_pos_out]->client_data;
+						me->win_next_del_id=windd->id;
+					}
+					_libaroma_ctl_fragment_activate_win(
+						me->wins[me->win_pos_out], 0
+					);
+					me->win_pos_out=-1;
 				}
-				_libaroma_ctl_fragment_activate_win(
-					me->wins[me->win_pos_out], 0
-				);
-				me->win_pos_out=-1;
-				me->transision_delprev=0;
+				/* reset delprev in case it was set while no previous window */
+				me->transition_delprev=0;
 			}
 			else{
 				me->transition_state=nowstate;
@@ -1018,28 +1012,22 @@ byte libaroma_ctl_fragment_set_active_window(
 		if (me->win_pos!=did){
 			_libaroma_ctl_fragment_activate_win(win,1);
 			libaroma_sleep(120);
-			if (me->win_pos!=-1){
-				me->transition_start=libaroma_tick();
-				me->transition_duration=duration;
-				me->transition_type=anitype;
-				me->transition_state=0;
-				me->transision_delprev=remove_prev;
+			me->transition_start=libaroma_tick();
+			me->transition_duration=duration;
+			me->transition_type=anitype;
+			me->transition_state=0;
+			me->transition_delprev=remove_prev;
 
-				me->transition_cb=transcb;
-				me->transition_rs=rect_start;
-				me->transition_re=rect_end;
+			me->transition_cb=transcb;
+			me->transition_rs=rect_start;
+			me->transition_re=rect_end;
 
-				_LIBAROMA_CTL_FRAGMENT_WINP windid =
-					(_LIBAROMA_CTL_FRAGMENT_WINP) me->wins[did]->client_data;
-				windid->active_state=2;
-				me->win_pos_out=me->win_pos;
-				me->win_pos=did;
-				_libaroma_ctl_fragment_direct_canvas(ctl,0);
-			}
-			else{
-				me->win_pos_out=me->win_pos;
-				me->win_pos=did;
-			}
+			_LIBAROMA_CTL_FRAGMENT_WINP windid =
+				(_LIBAROMA_CTL_FRAGMENT_WINP) me->wins[did]->client_data;
+			windid->active_state=2;
+			me->win_pos_out=me->win_pos;
+			me->win_pos=did;
+			_libaroma_ctl_fragment_direct_canvas(ctl,0);
 
 			ret=1;
 			me->redraw=1;
