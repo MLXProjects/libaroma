@@ -821,16 +821,22 @@ byte libaroma_window_invalidate(LIBAROMA_WINDOWP win, byte sync){
 			win->bg,
 			0, 0, 1);
 
+		/* compose invalidate msg */
+		LIBAROMA_MSG _msg;
+		LIBAROMA_MSGP inval_msg = libaroma_wm_compose(&_msg, LIBAROMA_MSG_WIN_INVALIDATE, NULL, 0, 0);
 		/* draw childs */
 		int i;
 #ifdef LIBAROMA_CONFIG_OPENMP
 	#pragma omp parallel for
 #endif
 		for (i=0;i<win->childn;i++){
+			/* send invalidate msg */
+			if (win->childs[i]->handler->message){
+				win->childs[i]->handler->message(win->childs[i], inval_msg);
+			}
 			/* draw no sync */
 			libaroma_control_draw(win->childs[i], 0);
 		}
-
 		/* sync */
 		if (sync){
 			libaroma_window_sync(win, 0, 0, win->w, win->h);
