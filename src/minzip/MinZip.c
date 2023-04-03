@@ -15,7 +15,7 @@
 #include <unistd.h>
 
 #define LOG_TAG "minzip"
-#include "Zip.h"
+#include "MinZip.h"
 #include "Bits.h"
 #include "Log.h"
 #include "DirUtil.h"

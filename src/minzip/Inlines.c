@@ -22,4 +22,4 @@
 #include "Bits.h"
 #include "Hash.h"
 #include "SysUtil.h"
-#include "Zip.h"
+#include "MinZip.h"

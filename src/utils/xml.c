@@ -968,7 +968,7 @@ ezxml_t ezxml_set_attr(ezxml_t xml, const char *name, const char *value)
         strcpy(xml->attr[l + 3] + c, " "); // set name/value as not malloced
         if (xml->flags & EZXML_DUP) xml->attr[l + 3][c] = EZXML_NAMEM;
     }
-    else if (xml->flags & EZXML_DUP) free((char *)name); // name was strduped
+    else if (xml->flags & EZXML_DUP) free(name); // name was strduped
 
     for (c = l; xml->attr[c]; c += 2); // find end of attribute list
     if (xml->attr[c + 1][l / 2] & EZXML_TXTM) free(xml->attr[l + 1]); //old val

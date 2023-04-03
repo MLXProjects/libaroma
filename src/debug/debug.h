@@ -32,6 +32,8 @@ extern "C" {
 /* Memory Tracking */
 #ifdef LIBAROMA_CONFIG_DEBUG_MEMORY
 #if LIBAROMA_CONFIG_DEBUG_MEMORY >=1
+/* Include malloc.h Before Override */
+#include <malloc.h>
 
 #define ___MEMTRACK_FILE() __FILE__
 #define ___MEMTRACK_LINE() __LINE__
@@ -50,7 +52,7 @@ char * ___mtrack_strdup(const char * str, char * filename, long line);
 #define realloc(x,s) \
   ___mtrack_realloc(x,s, ___MEMTRACK_FILE(),___MEMTRACK_LINE())
 #define free(x) \
-  ___mtrack_free((void **) &x, ___MEMTRACK_FILE(),___MEMTRACK_LINE())
+  ___mtrack_free(x, ___MEMTRACK_FILE(),___MEMTRACK_LINE())
 
 #ifdef strdup
 #undef strdup

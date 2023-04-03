@@ -302,7 +302,7 @@ static hb_bool_t _libaroma_font_hb_glyph_from_name_func(
  * Descriptions: init harfbuzz-ng callbacks
  */
 static hb_font_funcs_t * _LIBAROMA_FONT_HB_FUNCTIONS_CB = NULL;
-static hb_font_funcs_t * _libaroma_font_hb_init_callbacks() {
+hb_font_funcs_t * _libaroma_font_hb_init_callbacks() {
 	if (_LIBAROMA_FONT_HB_FUNCTIONS_CB == NULL) {
 		_LIBAROMA_FONT_HB_FUNCTIONS_CB = hb_font_funcs_create();
 #define _LIBAROMA_FONT_HB_REG_FUNC(name) \
