@@ -39,6 +39,7 @@ extern "C" {
 #include <sys/param.h>		/* MIN,MAX */
 #include <sys/mman.h>		/* mmap, munmap */
 #include <unistd.h>			/* open, close, unlink, usleep */
+#include <fcntl.h>			/* open flags */
 
 /* shmem prefix */
 #ifndef LIBAROMA_CONFIG_SHMEM_PREFIX

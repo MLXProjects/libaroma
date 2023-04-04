@@ -26,7 +26,7 @@
 #include <aroma_internal.h>
 #ifndef LIBAROMA_CONFIG_NOMINZIP
 #include <zlib.h>
-#include <Zip.h>
+#include <MinZip.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #endif
