@@ -426,8 +426,8 @@ int libaroma_dp(
 		ALOGW("libaroma_dp framebuffer uninitialized");
 		return 0;
 	}
-	if (dp==1 && _libaroma_fb->dpi<160) return 1; /* should return 1 px even on ldpi */
-	return ((dp * _libaroma_fb->dpi) / 160);
+	int ret = (dp * _libaroma_fb->dpi) / 160;
+	return (ret>1)?ret:1; /* must return 1 even on ldpi */
 } /* End of libaroma_dp */
 
 /*
