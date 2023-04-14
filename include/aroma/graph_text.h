@@ -314,6 +314,8 @@ int libaroma_draw_text_ex(
 
 /* aliases */
 #define libaroma_draw_text(d,t,x,y,color,width,flags,lh) \
-	libaroma_draw_text_ex(d,t,x,y,color,width,flags,lh,0,0,0,0,0,0)
+	libaroma_draw_text_ex(d,t,x,y,color,width,flags,lh,0,0,0,0xFF,0,0)
+#define libaroma_draw_text_opacity(d,t,x,y,color,width,flags,lh,opa) \
+	libaroma_draw_text_ex(d,t,x,y,color,width,flags,lh,0,0,0,opa,0,0)
 
 #endif /* __libaroma_text_h__ */
