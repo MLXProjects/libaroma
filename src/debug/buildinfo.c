@@ -39,8 +39,8 @@ extern "C" {
 #ifdef __ARM_NEON
   #define __LIBAROMA_CMSG_CPUOPT "ARM NEON"
 #else
-  #ifdef __SSSE3__
-    #define __LIBAROMA_CMSG_CPUOPT "x86 SSE"
+  #ifdef __SSE2__
+    #define __LIBAROMA_CMSG_CPUOPT "x86 SSE2"
   #else
     #define __LIBAROMA_CMSG_CPUOPT "NONE"
   #endif

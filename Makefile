@@ -111,9 +111,9 @@ LIB_HDR += $(wildcard $(LIB_DIR)/plat/$(LIBAROMA_PLATFORM)/*.h)
 ifeq ($(LIBAROMA_FEATURE_CPU),neon)
 LIB_CFLAGS += -mfloat-abi=hard -mfpu=neon -D__ARM_NEON
 else #LIBAROMA_FEATURE_CPU neon
-ifeq ($(LIBAROMA_FEATURE_CPU),ssse3)
-LIB_CFLAGS += -mssse3 -D__i386
-endif #LIBAROMA_FEATURE_CPU ssse3
+ifeq ($(LIBAROMA_FEATURE_CPU),sse2)
+LIB_CFLAGS += -msse2 -D__i386
+endif #LIBAROMA_FEATURE_CPU sse2
 endif #LIBAROMA_FEATURE_CPU neon
 # if debug enabled, check for debug level
 ifeq ($(LIBAROMA_DEBUG_ENABLE),yes)

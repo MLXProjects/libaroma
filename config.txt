@@ -8,8 +8,8 @@
 # target linux platform
 LIBAROMA_PLATFORM=sdl
 #LIBAROMA_TTY_KDSETMODE=0
-# enable SSSE3 optimization
-#LIBAROMA_FEATURE_CPU=ssse3
+# enable SSE2 optimization
+#LIBAROMA_FEATURE_CPU=sse2
 # set extra dependencies
 LIBAROMA_LIBDEPENDS=-lbrotlidec -lbrotlicommon
 # disable debug

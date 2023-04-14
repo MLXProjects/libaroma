@@ -24,20 +24,16 @@
 #ifndef __libaroma_x86_sse_h__
 #define __libaroma_x86_sse_h__
 
-#ifdef __SSE3__
-#ifdef __SSSE3__
+#ifdef __SSE2__
 
 #include <xmmintrin.h>		 /* SSE	  */
 #include <emmintrin.h>		 /* SSE2  */
-#include <pmmintrin.h>		 /* SSE3  */
-#include <tmmintrin.h>		 /* SSSE3 */
 
 #include "sse_dither.h"
 // #include "sse_blt.h" /* TODO: re-test this */
 #include "sse_color.h"
 #include "sse_alpha.h"
 
-#endif
 #endif
 
 #endif /* __libaroma_x86_sse_h__ */
