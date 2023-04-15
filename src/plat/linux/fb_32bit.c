@@ -91,17 +91,17 @@ void LINUXFBDR_init_32bit(LIBAROMA_FBP me) {
 	/* gralloc framebuffer subpixel position style */
 
 	if (libaroma_config()->gfx_override_rgb){
-		ALOGD("LINUXFBR: CUSTOM RGB VALUES IN USE");
+		ALOGD("LINUXFBDR: CUSTOM RGB VALUES IN USE");
 		LINUXFBDR_setrgbpos(me, libaroma_config()->gfx_default_rgb[0],
 								libaroma_config()->gfx_default_rgb[1],
 								libaroma_config()->gfx_default_rgb[2]);
 	}
 	else {
-		if (mi->var.transp.offset){
-			LINUXFBDR_setrgbpos(me,0,8,16);
-		}
-		else{
+		if (mi->var.red.offset==8){
 			LINUXFBDR_setrgbpos(me,16,8,0);
+		}
+		else {
+			LINUXFBDR_setrgbpos(me,0,8,16);
 		}
 	}
 
