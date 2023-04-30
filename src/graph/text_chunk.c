@@ -240,29 +240,22 @@ byte _libaroma_text_parse_next(
 					}
 				}
 				break;
-			case ' ':
 			case '\t':
 			case '\n': {
-					/* whitespace token */
+					/* newline/tab token */
 					if (chr == '\n') {
 						result_flag |= _LIBAROMA_TEXTCHUNK_RETURN_NEWLINE;
 					}
 					else {
-						result_flag |=
-							(
-								(chr == ' ')?
-									_LIBAROMA_TEXTCHUNK_RETURN_SPACE:
-									_LIBAROMA_TEXTCHUNK_RETURN_TAB
-							);
+						result_flag |= _LIBAROMA_TEXTCHUNK_RETURN_TAB;
 					}
 					_libaroma_text_change_current(chunk, cur + 1);
 					buf[bufn] = 0;
-					result_flag |=
-						((bufn > 0)?_LIBAROMA_TEXTCHUNK_RETURN_HAVEBUF:0);
+					result_flag |= ((bufn > 0)?_LIBAROMA_TEXTCHUNK_RETURN_HAVEBUF:0);
 					return result_flag;
 				}
 				break;
-			case '\r': /* ignore this characters */
+			case '\r': /* ignore this character */
 				break;
 			default: {
 					/* save character */

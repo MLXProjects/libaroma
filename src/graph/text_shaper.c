@@ -546,7 +546,6 @@ _LIBAROMA_TEXTSHAPED_GROUPP libaroma_text_group(
 		((_LIBAROMA_TEXTCHUNK_RETURN_HAVEBUF & res) == 0) &&
 		((_LIBAROMA_TEXTCHUNK_RETURN_TAG & res) == 0) &&
 		((_LIBAROMA_TEXTCHUNK_RETURN_NEWLINE & res) == 0) &&
-		((_LIBAROMA_TEXTCHUNK_RETURN_SPACE & res) == 0) &&
 		((_LIBAROMA_TEXTCHUNK_RETURN_TAB & res) == 0)
 	);
 	/* save last chunk result */

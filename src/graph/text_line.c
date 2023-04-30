@@ -673,15 +673,6 @@ _LIBAROMA_TEXTLINEP libaroma_textline(
 		}
 		/* update rtl from chunk state */
 		rtl = chunk->rtl;
-		if (chunk->last_res & _LIBAROMA_TEXTCHUNK_RETURN_SPACE) {
-			/* next is space */
-			if (space_w + x > limit_width) {
-				return libaroma_textline_align(
-					line, chunk, align, x, indent_size, limit_width);
-			}
-			before_span_w = space_w;
-			before_span	 = 1;
-		}
 		if (chunk->last_res & _LIBAROMA_TEXTCHUNK_RETURN_TAB) {
 			int tab_w = space_w;
 			if (align == 0) {

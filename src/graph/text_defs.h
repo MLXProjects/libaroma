@@ -122,8 +122,8 @@ extern "C" {
 #define _LIBAROMA_TEXTSPAN_SPACE	0x02	/* space */
 #define _LIBAROMA_TEXTSPAN_TAB		0x03	/* tab */
 #define _LIBAROMA_TEXTSPAN_IMAGE	0x04	/* img */
-#define _LIBAROMA_TEXTSPAN_HR		 0x05	/* hr */
-#define _LIBAROMA_TEXTSPAN_BULL	 0x06	/* bulleted */
+#define _LIBAROMA_TEXTSPAN_HR		0x05	/* hr */
+#define _LIBAROMA_TEXTSPAN_BULL		0x06	/* bulleted */
 
 /* text chunk state */
 #define _LIBAROMA_TEXTCHUNK_STATE_OK			0x01
