@@ -51,4 +51,34 @@ LIBAROMA_CANVASP libaroma_image_ex(
 #define libaroma_image_file(filepath, hicolor) \
 	libaroma_image_ex(libaroma_stream_file(filepath),1,hicolor)
 
+/*
+ * Function		: libaroma_image_rotate90
+ * Return Value: void
+ * Descriptions: copy & rotate image data (90 degrees)
+ */
+byte libaroma_image_rotate90(
+		bytep dst, bytep src,
+		int dx, int dy, int dw, int dh, int d_maxw, int d_linesz, int d_pixsz,
+		int sx, int sy, int s_linesz, int s_pixsz);
+
+/*
+ * Function		: libaroma_image_rotate180
+ * Return Value: void
+ * Descriptions: copy & rotate image data (180 degrees)
+ */
+byte libaroma_image_rotate180(
+		bytep dst, bytep src,
+		int dx, int dy, int dw, int dh, int d_maxh, int d_linesz, int d_pixsz,
+		int sx, int sy, int s_linesz, int s_pixsz);
+
+/*
+ * Function		: libaroma_image_rotate270
+ * Return Value: void
+ * Descriptions: copy & rotate image data (270 degrees)
+ */
+byte libaroma_image_rotate270(
+		bytep dst, bytep src,
+		int dx, int dy, int dw, int dh, int d_maxh, int d_linesz, int d_pixsz,
+		int sx, int sy, int s_linesz, int s_pixsz);
+
 #endif /* __libaroma_image_h__ */

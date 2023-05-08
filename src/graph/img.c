@@ -102,6 +102,132 @@ errorgo:
 	}
 	return NULL;
 } /* End of libaroma_image_new */
+
+/*
+ * Function		: libaroma_image_rotate90
+ * Return Value: void
+ * Descriptions: copy & rotate image data (90 degrees)
+ */
+byte libaroma_image_rotate90(
+		bytep dst, bytep src,
+		int dx, int dy, int dw, int dh, int d_maxw, int d_linesz, int d_pixsz,
+		int sx, int sy, int s_linesz, int s_pixsz){
+	/* set destination & source to offset x/y */
+	dst += (d_linesz*dx) + ((d_maxw-dy)*d_pixsz) - d_pixsz;
+	src += (s_linesz*sy) + (sx*s_pixsz);
+	/* xmax = dest width * source pixel size */
+	int x, y, xmax=dw*s_pixsz;
+	/* if dest & src pixel size are the same, just use normal copy */
+	if (d_pixsz == s_pixsz){
+		/* loop through source columns */
+		for (y=0; y<dh; y++){
+		#ifdef LIBAROMA_CONFIG_OPENMP
+			#pragma omp parallel for
+		#endif
+			/* loop through current source row */
+			for (x=0; x<xmax; x+=s_pixsz){
+				/* copy 1 pixel each iteration until end of row */
+				memcpy(dst+(d_maxw*x), src+x, s_pixsz);
+			}
+			/* move dest offset one pixel at the left */
+			dst -= d_pixsz;
+			/* move source offset one line below */
+			src += s_linesz;
+		}
+	}
+	/* TODO: convert 32 to 16 bit and vice versa
+	else if (d_pixsz == 4 && s_pixsz == 2){
+	}*/
+	else {
+		ALOGW("image_rotate90 pixel conversion not supported");
+		return 0;
+	}
+	return 1;
+} /* End of libaroma_image_rotate90 */
+
+/*
+ * Function		: libaroma_image_rotate180
+ * Return Value: void
+ * Descriptions: copy & rotate image data (180 degrees)
+ */
+byte libaroma_image_rotate180(
+		bytep dst, bytep src,
+		int dx, int dy, int dw, int dh, int d_maxh, int d_linesz, int d_pixsz,
+		int sx, int sy, int s_linesz, int s_pixsz){
+	/* set destination to last pixel offset */
+	dst +=  (d_linesz*(d_maxh-dy)) - (dx*d_pixsz) - d_pixsz;
+	/* set source to offset x/y */
+	src += (s_linesz*sy) + (sx*s_pixsz);
+	/* xmax = destination width in bytes */
+	int x, y, xmax = dw*d_pixsz;
+	/* if dest & src pixel size are the same, just use normal copy */
+	if (d_pixsz == s_pixsz){
+	/* loop through source/dest columns */
+		for (y=0; y<dh; y++){
+		#ifdef LIBAROMA_CONFIG_OPENMP
+			#pragma omp parallel for
+		#endif
+			/* loop through horizontal pixels in current row */
+			for (x = 0; x < xmax; x+=s_pixsz){
+				/* copy 1 pixel each iteration until end of row */
+				memcpy(dst-x, src+x, s_pixsz);
+			}
+			/* move dest offset one line above */
+			dst -= d_linesz;
+			/* move source offset one line below */
+			src += s_linesz;
+		}
+	}
+	/* TODO: convert 32 to 16 bit and vice versa
+	else if (d_pixsz == 4 && s_pixsz == 2){
+	}*/
+	else {
+		ALOGW("image_rotate180 pixel conversion not supported");
+		return 0;
+	}
+	return 1;
+} /* End of libaroma_image_rotate180 */
+
+/*
+ * Function		: libaroma_image_rotate270
+ * Return Value: void
+ * Descriptions: copy & rotate image data (270 degrees)
+ */
+byte libaroma_image_rotate270(
+		bytep dst, bytep src,
+		int dx, int dy, int dw, int dh, int d_maxh, int d_linesz, int d_pixsz,
+		int sx, int sy, int s_linesz, int s_pixsz){
+	/* set destination & source to offset x/y */
+	dst += (d_linesz*(d_maxh-dx)) + (dy*d_pixsz) - d_linesz;
+	src += (s_linesz*sy) + (sx*s_pixsz);
+	int x, y;
+	/* if dest & src pixel size are the same, just use normal copy */
+	if (d_pixsz == s_pixsz){
+		/* loop through source columns */
+		for (y=0; y<dh; y++){
+		#ifdef LIBAROMA_CONFIG_OPENMP
+			#pragma omp parallel for
+		#endif
+			/* loop through horizontal pixels in current source row */
+			for (x=0; x<dw; x++){
+				/* copy 1 pixel each iteration until end of row */
+				memcpy(dst-(d_linesz*x)+s_pixsz, src+(x*s_pixsz), s_pixsz);
+			}
+			/* move dest offset one pixel at the right */
+			dst += d_pixsz;
+			/* move source offset one line below */
+			src += s_linesz;
+		}
+	}
+	/* TODO: convert 32 to 16 bit and vice versa
+	else if (d_pixsz == 4 && s_pixsz == 2){
+	}*/
+	else {
+		ALOGW("image_rotate270 pixel conversion not supported");
+		return 0;
+	}
+	return 1;
+} /* End of libaroma_image_rotate270 */
 #ifdef __cplusplus
 }
 #endif
