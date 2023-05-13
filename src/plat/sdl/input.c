@@ -170,9 +170,6 @@ byte SDLHIDRV_translate_keyboard(
 			dest_ev->key = LIBAROMA_HID_KEY_KPENTER;
 			return LIBAROMA_HID_EV_RET_SELECT;
 	#ifdef LIBAROMA_PLATFORM_SDL2
-		case SDLK_ENTER:
-			dest_ev->key = LIBAROMA_HID_KEY_ENTER;
-			return LIBAROMA_HID_EV_RET_SELECT;
 		case SDLK_SELECT:
 			dest_ev->key = LIBAROMA_HID_KEY_UNKNOWN;
 			return LIBAROMA_HID_EV_RET_SELECT;
@@ -182,12 +179,10 @@ byte SDLHIDRV_translate_keyboard(
 		case SDLK_VOLUMEUP:
 			dest_ev->key = LIBAROMA_HID_KEY_VOLUMEUP;
 			return LIBAROMA_HID_EV_RET_VOLUP;
-	#else
+	#endif
 		case SDLK_RETURN:
 			dest_ev->key = LIBAROMA_HID_KEY_ENTER;
 			return LIBAROMA_HID_EV_RET_SELECT;
-
-	#endif
 		case SDLK_MENU:
 			dest_ev->key = LIBAROMA_HID_KEY_UNKNOWN;
 			return LIBAROMA_HID_EV_RET_MENU;
