@@ -29,9 +29,13 @@
 
 #include <pthread.h>		/* pthread_* */
 #include <signal.h>			/* pthread_kill */
-#include <time.h>			/* clock_gettime */
 #include <sys/param.h>		/* MIN,MAX */
 #include <unistd.h>			/* open, close, unlink, usleep */
+#ifdef LIBAROMA_PLATFORM_SDL2
+	#include <SDL2/SDL.h>
+#else
+	#include <SDL/SDL.h>
+#endif
 
 /*
  * platform flags
@@ -55,18 +59,18 @@
 /*
  * common platform wrapper
  */
-#define libaroma_unlink(filename) unlink(filename)
-#define libaroma_sleep(ms) usleep(ms*1000)
+static inline int libaroma_unlink(char *filename){
+	return unlink(filename);
+}
+static inline void libaroma_sleep(int ms){
+	SDL_Delay(ms);
+}
 
 /*
  * get tick count
  */
 static inline long libaroma_tick(){
-	struct timespec now;
-	if (clock_gettime(CLOCK_MONOTONIC, &now)) {
-		return 0;
-	}
-	return ((long) (now.tv_sec * 1000 + now.tv_nsec / 1000000));
+	return (long)SDL_GetTicks();
 }
 
 /*

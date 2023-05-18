@@ -67,8 +67,12 @@ extern "C" {
 /*
  * common platform wrapper
  */
-#define libaroma_unlink(filename) unlink(filename)
-#define libaroma_sleep(ms) usleep(ms*1000)
+static inline int libaroma_unlink(char *filename){
+	return unlink(filename);
+}
+static inline void libaroma_sleep(int ms){
+	usleep(ms*1000);
+}
 
 /*
  * get tick count
