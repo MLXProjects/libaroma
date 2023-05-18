@@ -154,7 +154,6 @@ void _libaroma_ctl_button_internal_draw(LIBAROMA_CONTROLP ctl){
 
 	/* raised shadow */
 	if (me->style&LIBAROMA_CTL_BUTTON_RAISED){
-
 		libaroma_draw_zshadow(
 			rest_canvas, btnmask, ix, iy, (me->style&LIBAROMA_CTL_BUTTON_COLORED)?2:1
 		);
@@ -176,7 +175,7 @@ void _libaroma_ctl_button_internal_draw(LIBAROMA_CONTROLP ctl){
 		else{
 			libaroma_draw_rect(btnmask,0,0,btnmask->w,btnmask->h,me->color,0xff);
 		}
-		if (me->style&LIBAROMA_CTL_BUTTON_RAISED){
+		if (me->style&LIBAROMA_CTL_BUTTON_RAISED || me->style&LIBAROMA_CTL_BUTTON_RAISED_NOSHADOW){
 			libaroma_draw(rest_canvas, btnmask, ix, iy, 1);
 		}
 		else{
@@ -188,7 +187,7 @@ void _libaroma_ctl_button_internal_draw(LIBAROMA_CONTROLP ctl){
 		}
 	}
 	else{
-		if (me->style&LIBAROMA_CTL_BUTTON_RAISED){
+		if (me->style&LIBAROMA_CTL_BUTTON_RAISED || me->style&LIBAROMA_CTL_BUTTON_RAISED_NOSHADOW){
 			libaroma_draw_ex(btnmask,bg,0,0,ix,iy,btnmask->w,btnmask->h,0,0xff);
 			if (!is_disabled || (is_disabled && keepcolor_disabled)){
 				libaroma_draw_rect(btnmask,0,0,btnmask->w,btnmask->h,0xffff,
