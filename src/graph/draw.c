@@ -465,19 +465,11 @@ byte libaroma_draw_pixel(
 		word color,
 		byte alpha
 	){
-	if (!dest){
-		dest=libaroma_fb()->canvas;
-	}
-	if ((dx<0)||(dy<0)||(dy>=dest->h)||(dx>=dest->w)){
-		return 0;
-	}
-	wordp d=&dest->data[dest->l * dy + dx];
+	int offset = (dest->l*dy)+dx;
 	if (alpha==0xff){
-		*d = color;
+		dest->data[offset] = color;
 	}
-	else if (alpha>0){
-		*d = libaroma_alpha(*d,color,alpha);
-	}
+	else dest->data[offset] = libaroma_alpha(dest->data[offset], color, alpha);
 	return 1;
 } /* End of libaroma_draw_pixel */
 
@@ -491,15 +483,6 @@ byte libaroma_draw_alphapixel(
 		int dx, int dy,
 		byte alpha
 	){
-	if (!dest){
-		dest=libaroma_fb()->canvas;
-	}
-	if ((dx<0)||(dy<0)||(dy>=dest->h)||(dx>=dest->w)){
-		return 0;
-	}
-	if (dest->alpha==NULL){
-		return 0;
-	}
 	dest->alpha[dest->l * dy + dx] = alpha;
 	return 1;
 } /* End of libaroma_draw_pixel */
@@ -513,15 +496,8 @@ byte libaroma_draw_copypixel(
 		LIBAROMA_CANVASP dest, LIBAROMA_CANVASP src, 
 		int dx, int dy, int sx, int sy
 	){
-	if (!dest || !src) return 0;
-	if ((dx<0)||(dy<0)||(sx<0)||(sy<0)||
-		(dy>=dest->h)||(dx>=dest->w)||(sy>=src->h)||(sx>=src->w)
-	){
-		return 0;
-	}
 	dest->data[(dest->l*dy)+dx] = src->data[(src->l*sy)+sx];
 	dest->data[(dest->l*dy)+dx+1] = src->data[(src->l*sy)+sx+1];
-	dest->data[(dest->l*dy)+dx+2] = src->data[(src->l*sy)+sx+2];
 	return 1;
 } /* End of libaroma_draw_copypixel */
 
@@ -534,15 +510,6 @@ byte libaroma_draw_copyalphapixel(
 		LIBAROMA_CANVASP dest, LIBAROMA_CANVASP src, 
 		int dx, int dy, int sx, int sy
 	){
-	if (!dest || !src) return 0;
-	if (!src->alpha) return 0;
-	if (!dest->alpha) //initialize alpha for target canvas
-		dest->alpha = calloc(dest->s, 1);
-	if ((dx<0)||(dy<0)||(sx<0)||(sy<0)||
-		(dy>=dest->h)||(dx>=dest->w)||(sy>=src->h)||(sx>=src->w)
-	){
-		return 0;
-	}
 	dest->alpha[(dest->l*dy)+dx] = src->alpha[(src->l*sy)+sx];
 	return 1;
 } /* End of libaroma_draw_copyalphapixel */
