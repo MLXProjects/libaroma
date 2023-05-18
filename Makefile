@@ -13,7 +13,8 @@ CC := gcc
 AR := ar
 RANLIB := ranlib
 MKDIR := mkdir -p
-RM := rm -rf
+RM := rm -f
+RMDIR := rm -rf
 
 # paths for library source/objects
 LIB_DIR := src
@@ -291,8 +292,8 @@ $(OBJDIR)/%.o: %.c $(LIB_HDR)
 
 clean:
 	$(info Deleting $(OUTDIR)/*)
-	@$(RM) $(OBJDIR)/*
-	@$(RM) $(OUTDIR)/*
+	@$(RMDIR) $(OBJDIR)
+	@$(RMDIR) $(OUTDIR)
 
 install: $(LIB_SHARED)
 	$(info Installing shared library to $(DESTDIR)$(PREFIX))
@@ -313,6 +314,6 @@ uninstall:
 	$(info $(DESTDIR)$(PREFIX)/lib/$(LIB_SHARED))
 	$(info $(DESTDIR)$(PREFIX)/lib/$(LIB_STATIC))
 	@$(RM) $(DESTDIR)$(PREFIX)/include/aroma.h
-	@$(RM) $(DESTDIR)$(PREFIX)/include/aroma/
+	@$(RMDIR) $(DESTDIR)$(PREFIX)/include/aroma/
 	@$(RM) $(DESTDIR)$(PREFIX)/lib/$(LIB_SHARED)
 	@$(RM) $(DESTDIR)$(PREFIX)/lib/$(LIB_STATIC)
