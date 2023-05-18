@@ -47,11 +47,7 @@ typedef struct {
 #endif
 	int			fb_sz;									/* framebuffer memory size */
 	voidp		buffer;									/* direct buffer */
-	int			stride;									/* stride size */
 	int			line;									/* line size */
-	byte		depth;									/* color depth */
-	byte		pixsz;									/* memory size per pixel */
-	byte		rgb_pos[6];								/* framebuffer 32bit rgb position */
 
 	LIBAROMA_MUTEX	mutex;
 } SDLFBDR_INTERNAL, * SDLFBDR_INTERNALP;
@@ -111,9 +107,9 @@ byte SDLFBDR_post(
 	}
 	SDLFBDR_INTERNALP mi = (SDLFBDR_INTERNALP) me->internal;
 	int sstride = (sw - dw) * 2;
-	int dstride = (mi->line - (dw * mi->pixsz));
+	int dstride = (mi->line - (dw * 2));
 	wordp copy_dst =
-		(wordp) (mi->buffer+(mi->line * dy)+(dx * mi->pixsz));
+		(wordp) (mi->buffer+(mi->line * dy)+(dx * 2));
 	wordp copy_src =
 		(wordp) (src + (sw * sy) + sx);
 	libaroma_blt_align16(
@@ -264,28 +260,35 @@ byte SDLFBDR_init(LIBAROMA_FBP me) {
 	/* use window pixel buffer */
 	mi->buffer		= mi->window->pixels;
 #endif
-	/* on SDL it's always 16bpp, 2 bytes per pixel */
-	mi->depth		= 16;
-	mi->pixsz		= 2;
-	mi->line		= me->w * mi->pixsz;
-	mi->fb_sz		=(me->sz * mi->pixsz);
-	/* no stride/padding on SDL */
-	mi->stride		= 0;
-
+	/* on SDL, dpp it's always 16bpp (2 bytes per pixel) */
+	mi->line		= me->w * 2;
+	mi->fb_sz		= me->sz* 2;
 	/* swap buffer now */
 	SDLFBDR_flush(me);
-
 	/* set driver callbacks */
 	me->start_post	= &SDLFBDR_start_post;
 	me->end_post	= &SDLFBDR_end_post;
 	me->post		= &SDLFBDR_post;
 	me->snapshoot	= NULL;
 
-	ALOGI("SDL BUFFER INFORMATIONS:");
+	SDL_version ver;
+	SDL_GetVersion(&ver);
+	int i, drv_count=SDL_GetNumVideoDrivers();
+	ALOGI("SDL DRIVER INFORMATIONS:");
+#ifdef LIBAROMA_PLATFORM_SDL2
+	ALOGI("LIBRARY");
+	ALOGI(" version             : %u.%u.%u", ver.major, ver.minor, ver.patch);
+	ALOGI(" outputs             :");
+	for (i=0; i<drv_count; i++){
+		ALOGI("  - %s", SDL_GetVideoDriver(i));
+	}
+	ALOGI(" current             : ", SDL_GetCurrentVideoDriver());
+#endif
+	ALOGI("BUFFER");
 	ALOGI(" width               : %i", me->w);
 	ALOGI(" height              : %i", me->h);
-	ALOGI(" bits_per_pixel      : %i", mi->depth);
-	ALOGD(" pixelsize           : %i", mi->pixsz);
+	ALOGI(" bits_per_pixel      : 16");
+	ALOGD(" pixelsize           : 2");
 	ALOGD(" linesize            : %i", mi->line);
 	ALOGD(" fb_size             : %i", mi->fb_sz);
 
@@ -303,8 +306,6 @@ error:
 	if (mi->window!=NULL){
 		SDL_DestroyWindow(mi->window);
 	}
-#else
-
 #endif
 	/* exit SDL */
 	SDL_Quit();
