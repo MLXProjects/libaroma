@@ -115,7 +115,7 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 #ifndef LIBAROMA_CONFIG_NODRM
 	/* try drm device */
 	if (DRMFB_init(me)){
-		/* set callbacks & return */
+		/* set generic drm callbacks & return */
 		me->start_post	= &DRMFB_start_post;
 		me->end_post	= &DRMFB_end_post;
 		me->post		= &DRMFB_post;
@@ -150,7 +150,7 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 	me->sz	= me->w*me->h;	/* width x height */
 
 	if (QCOMFB_init(me)){
-		/* qcom fb */
+		/* set generic qcom callbacks */
 		me->start_post	= &QCOMFB_start_post;
 		me->end_post	= &QCOMFB_end_post;
 		me->post		= &QCOMFB_post;
@@ -160,9 +160,8 @@ byte LINUXFBDR_init(LIBAROMA_FBP me) {
 	else{
 		/* it's not qcom */
 		ALOGI("not using qcom framebuffer driver");
-
 		if ((mi->var.bits_per_pixel != 32) && (mi->var.bits_per_pixel != 16)) {
-			/* non 32/16bit colorspace is not supported */
+			/* TODO: add support for 24bpp displays */
 			ALOGE("LINUXFBDR bits_per_pixel=%i not supported",
 				mi->var.bits_per_pixel);
 			goto error;
@@ -247,10 +246,12 @@ void LINUXFBDR_release(LIBAROMA_FBP me) {
 			/* release qcom overlay driver */
 			QCOMFB_release(me);
 		}
+		#ifndef LIBAROMA_CONFIG_NODRM
 		else if (bi->type == LINUXFBDR_BACKEND_DRM){
 			/* release drm driver */
 			DRMFB_release(me);
 		}
+		#endif /* LIBAROMA_CONFIG_NODRM */
 	}
 
 	/* unmap */
