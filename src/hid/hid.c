@@ -64,7 +64,7 @@ byte libaroma_hid_init() {
 	/* check instance */
 	if (_libaroma_hid != NULL) {
 		ALOGE("hid instance already initialized");
-		goto return_error;
+		goto init_error;
 	}
 
 	/* allocating input instance */
@@ -74,13 +74,13 @@ byte libaroma_hid_init() {
 	/* check allocation */
 	if (!_libaroma_hid) {
 		ALOGE("unable to allocating hid instance");
-		goto return_error_clean;
+		goto init_error_cleanup;
 	}
 
 	/* check framebuffer */
 	if (libaroma_fb() == NULL) {
 		ALOGE("framebuffer instance not initialized yet!");
-		goto return_error_clean;
+		goto init_error_cleanup;
 	}
 
 	/* set screen information */
@@ -96,38 +96,38 @@ byte libaroma_hid_init() {
 		ALOGV("Init hid driver - runtime");
 		if (!_libaroma_hid_initializer(_libaroma_hid)) {
 			ALOGE("init hid driver failed");
-			goto return_error_clean;
+			goto init_error_cleanup;
 		}
 	}
-	else{
+	else {
 		ALOGV("Init hid driver - default");
 		if (!LIBAROMA_HID_INIT_FUNCTION(_libaroma_hid)) {
 			ALOGE("init hid driver failed");
-			goto return_error_clean;
+			goto init_error_cleanup;
 		}
 	}
 	
-	if (_libaroma_hid->has_mice || libaroma_config()->wm_force_cursor){
+	if (_libaroma_hid->has_mice){
 		/* set cursor to screen center at startup */
-		_libaroma_hid->touch_last_x=libaroma_fb()->w>>1;
-		_libaroma_hid->touch_last_y=libaroma_fb()->h>>1;
+		_libaroma_hid->touch_last_x=_libaroma_hid->screen_width>>1;
+		_libaroma_hid->touch_last_y=_libaroma_hid->screen_height>>1;
 	}
 
 	/* Check Callbacks */
 	if ((_libaroma_hid->release == NULL) ||
 			(_libaroma_hid->getinput == NULL)){
 		ALOGE("hid driver callback invalid");
-		goto return_error_clean;
+		goto init_error_cleanup;
 	}
 	/* ok */
 	ALOGV("hid driver initialized");
-	goto return_ok;
-return_error_clean:
+	goto init_ok;
+init_error_cleanup:
 	free(_libaroma_hid);
 	_libaroma_hid = NULL;
-return_error:
+init_error:
 	return 0;
-return_ok:
+init_ok:
 	return 1;
 } /* End of libaroma_hid_init */
 
@@ -251,7 +251,6 @@ byte libaroma_hid_get(
 					/* filter move event to prevent flooding move messages */
 					if (e->state == LIBAROMA_HID_EV_STATE_MOVE) {
 						/* ignore the floods */
-						if (libaroma_wm()!=NULL) libaroma_wm()->cursor_draw=1;
 						if ((_libaroma_hid->touch_last_x!=e->x)||
 							 (_libaroma_hid->touch_last_y!=e->y)){
 							libaroma_hid_set_keypress(LIBAROMA_HID_TOUCH_KEYCODE, e->state);
@@ -273,7 +272,6 @@ byte libaroma_hid_get(
 			case LIBAROMA_HID_EV_RET_MOUSE: {
 					/* filter move event to prevent flooding move messages */
 					if (e->state == LIBAROMA_HID_EV_STATE_MOVE) {
-						if (libaroma_wm()!=NULL) libaroma_wm()->cursor_draw=1;
 						/* ignore the floods */
 						if ((_libaroma_hid->touch_last_x!=e->x)||
 							 (_libaroma_hid->touch_last_y!=e->y)){
