@@ -28,13 +28,13 @@
 #define __libaroma_window_manager_h__
 
 /* defines */
-#define LIBAROMA_WM_MSG_UNHANDLED			 0x0
-#define LIBAROMA_WM_MSG_HANDLED				 0x1
-#define LIBAROMA_WM_MSG_EXIT						0x2
-#define LIBAROMA_WM_FLAG_RESET_COLOR		0x1
-#define LIBAROMA_WM_FLAG_RESET_THEME		0x2
-#define LIBAROMA_WM_FLAG_THEME_PNG9P		0x1
-#define LIBAROMA_WM_FLAG_THEME_WMFREE	 0x2
+#define LIBAROMA_WM_MSG_UNHANDLED		0x0
+#define LIBAROMA_WM_MSG_HANDLED			0x1
+#define LIBAROMA_WM_MSG_EXIT			0x2
+#define LIBAROMA_WM_FLAG_RESET_COLOR	0x1
+#define LIBAROMA_WM_FLAG_RESET_THEME	0x2
+#define LIBAROMA_WM_FLAG_THEME_PNG9P	0x1
+#define LIBAROMA_WM_FLAG_THEME_WMFREE	0x2
 
 /*
  * Structure	 : _LIBAROMA_WM
@@ -89,8 +89,6 @@ struct _LIBAROMA_WM{
 	byte client_started;
 	LIBAROMA_WINDOWP active_window;
 	LIBAROMA_CANVASP workspace_bg;
-	
-	byte cursor_draw;
 };
 
 /*
@@ -325,56 +323,5 @@ byte libaroma_wm_set_active_window(LIBAROMA_WINDOWP win);
  * Descriptions: get current active window
  */
 LIBAROMA_WINDOWP libaroma_wm_get_active_window();
-
-/*
- * Function		: libaroma_wm_cursor_getimg
- * Return Value: LIBAROMA_CANVASP
- * Descriptions: get cursor image
- */
-LIBAROMA_CANVASP libaroma_wm_cursor_getimg();
-
-/*
- * Function		: libaroma_wm_cursor_setimg
- * Return Value: byte
- * Descriptions: set cursor image
- */
-byte libaroma_wm_cursor_setimg(LIBAROMA_CANVASP image);
-
-/*
- * Function		: libaroma_wm_cursor_getshadow
- * Return Value: byte
- * Descriptions: get cursor shadow enabled
- */
-byte libaroma_wm_cursor_getshadow();
-
-/*
- * Function		: libaroma_wm_cursor_getshadow
- * Return Value: word
- * Descriptions: get cursor shadow color
- */
-word libaroma_wm_cursor_getshadow_color();
-
-/*
- * Function		: libaroma_wm_cursor_setshadow_color
- * Return Value: byte
- * Descriptions: set cursor shadow and color
- */
-byte libaroma_wm_cursor_setshadow_color(byte enable, word color);
-/* enable shadow alias - using current-color shadow */
-#define libaroma_wm_cursor_setshadow(on) libaroma_wm_cursor_setshadow_color(on, libaroma_wm_cursor_getshadow_color())
-
-/*
- * Function		: libaroma_wm_cursor_visible
- * Return Value: byte
- * Descriptions: get cursor visible
- */
-byte libaroma_wm_cursor_visible();
-
-/*
- * Function		: libaroma_wm_cursor_setvisible
- * Return Value: byte
- * Descriptions: set cursor visible
- */
-byte libaroma_wm_cursor_setvisible(byte visible);
 
 #endif /* __libaroma_window_manager_h__ */
