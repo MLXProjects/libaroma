@@ -1275,6 +1275,11 @@ dword libaroma_window_process_event(LIBAROMA_WINDOWP win, LIBAROMA_MSGP msg){
 				libaroma_window_invalidate(win, 1);
 			}
 			break;
+		case LIBAROMA_MSG_WIN_REDRAW:
+			{
+				libaroma_window_invalidate(win, 0);
+			}
+			break;
 		case LIBAROMA_MSG_TOUCH:
 			{
 				/* touch handler */

@@ -36,9 +36,9 @@
 #define LIBAROMA_CMD_PARAM(cmd) ((cmd>>16)&0xff)
 
 /* command id */
-#define LIBAROMA_CMD_NONE			 0x0
+#define LIBAROMA_CMD_NONE			0x0
 #define LIBAROMA_CMD_CLICK			0x1
-#define LIBAROMA_CMD_HOLD			 0x2
+#define LIBAROMA_CMD_HOLD			0x2
 
 /*
  * Window Messages Queue
@@ -52,6 +52,7 @@
 #define LIBAROMA_MSG_WIN_FOCUS			LIBAROMA_MSG_SYS(0x7)
 #define LIBAROMA_MSG_WIN_BLUR			LIBAROMA_MSG_SYS(0x8)
 #define LIBAROMA_MSG_WIN_TITLE			LIBAROMA_MSG_SYS(0x9)
+#define LIBAROMA_MSG_WIN_REDRAW			LIBAROMA_MSG_SYS(0x10)
 
 /*
  * Window Show Animation
@@ -82,11 +83,11 @@
 /*
  * Special Size & Position
  */
-#define LIBAROMA_SIZE_FULL		 0
-#define LIBAROMA_SIZE_HALF		-1
-#define LIBAROMA_SIZE_THIRD	 -2
-#define LIBAROMA_SIZE_QUARTER -3
-#define LIBAROMA_POS_HALF		 -4
+#define LIBAROMA_SIZE_FULL			 0
+#define LIBAROMA_SIZE_HALF			-1
+#define LIBAROMA_SIZE_THIRD			-2
+#define LIBAROMA_SIZE_QUARTER		-3
+#define LIBAROMA_POS_HALF			-4
 #define LIBAROMA_POS_1P3			-5
 #define LIBAROMA_POS_2P3			-6
 #define LIBAROMA_POS_1P4			-7
