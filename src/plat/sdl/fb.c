@@ -271,18 +271,27 @@ byte SDLFBDR_init(LIBAROMA_FBP me) {
 	me->post		= &SDLFBDR_post;
 	me->snapshoot	= NULL;
 
+	int i, drv_count;
 	SDL_version ver;
-	SDL_GetVersion(&ver);
-	int i, drv_count=SDL_GetNumVideoDrivers();
-	ALOGI("SDL DRIVER INFORMATIONS:");
 #ifdef LIBAROMA_PLATFORM_SDL2
+	SDL_GetVersion(&ver);
+	drv_count=SDL_GetNumVideoDrivers();
+#else
+	SDL_VERSION(&ver);
+	char drv_name[64];
+	SDL_VideoDriverName(drv_name, 64);
+#endif
+	ALOGI("SDL DRIVER INFORMATIONS:");
 	ALOGI("LIBRARY");
 	ALOGI(" version             : %u.%u.%u", ver.major, ver.minor, ver.patch);
+#ifdef LIBAROMA_PLATFORM_SDL2
 	ALOGI(" outputs             :");
 	for (i=0; i<drv_count; i++){
 		ALOGI("  - %s", SDL_GetVideoDriver(i));
 	}
-	ALOGI(" current             : ", SDL_GetCurrentVideoDriver());
+	ALOGI(" current             : %s", SDL_GetCurrentVideoDriver());
+	#else
+	ALOGI(" driver              : %s", drv_name);
 #endif
 	ALOGI("BUFFER");
 	ALOGI(" width               : %i", me->w);
