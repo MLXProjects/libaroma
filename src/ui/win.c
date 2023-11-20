@@ -352,19 +352,9 @@ byte _libaroma_window_updatebg(LIBAROMA_WINDOWP win){
 	if (win->parent!=NULL){
 		return 0;
 	}
-	int w = win->w;
-	int h = win->h;
-
-	/* draw background */
-	if (win->bg!=NULL){
-		if ((win->bg->w==w)&&(win->bg->h==h)){
-			/* not need recreate background */
-			return 1;
-		}
-		libaroma_canvas_free(win->bg);
-	}
-	win->bg = libaroma_canvas(w,h);
-
+	/* draw background - allocate if not already done */
+	if (win->bg == NULL) win->bg = libaroma_canvas(win->w,win->h);
+	
 	/* default canvas color */
 	libaroma_canvas_setcolor(
 		win->bg,
@@ -376,7 +366,7 @@ byte _libaroma_window_updatebg(LIBAROMA_WINDOWP win){
 	if (win->theme_bg[0]!=0){
 		libaroma_wm_draw_theme(
 			win->bg, win->theme_bg,
-			0, 0, win->bg->w, win->bg->h,
+			0, 0, win->w, win->h,
 			NULL
 		);
 	}
@@ -804,7 +794,6 @@ byte libaroma_window_invalidate(LIBAROMA_WINDOWP win, byte sync){
 	if (win->parent!=NULL){
 		return 0;
 	}
-
 	if (!libaroma_window_isactive(win)){
 		ALOGW("window_invalidate win is not active window");
 		return 0;
@@ -813,9 +802,9 @@ byte libaroma_window_invalidate(LIBAROMA_WINDOWP win, byte sync){
 		ALOGW("window_invalidate dc is null");
 		return 0;
 	}
-
 	if ((!win->lock_sync)||(sync==10)){
-		/* draw bg */
+		/* redraw bg & update main dc */
+		_libaroma_window_updatebg(win);
 		libaroma_draw(
 			win->dc,
 			win->bg,
