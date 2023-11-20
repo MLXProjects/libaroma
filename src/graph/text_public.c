@@ -222,36 +222,29 @@ int libaroma_text_line_info(
 		LIBAROMA_TEXT text,
 		int line,
 		byte info) {
-	if (text) {
-		_LIBAROMA_TEXTP txt = (_LIBAROMA_TEXTP) text;
+	if (!text || line < 0) return 0;
+	_LIBAROMA_TEXTP txt = (_LIBAROMA_TEXTP) text;
 
-		if (line > txt->n - 1) {
-			return 0;
-		}
-		else if (line < 0) {
-			return 0;
-		}
-		_LIBAROMA_TEXTLINEP linep = txt->lines[line];
-		if (info == LIBAROMA_TEXTLINE_INFO_CONTENT_WIDTH) {
-			return linep->maxx - linep->minx;
-		}
-		else if (info == LIBAROMA_TEXTLINE_INFO_RIGHT) {
-			return linep->maxx;
-		}
-		else if (info == LIBAROMA_TEXTLINE_INFO_LEFT) {
-			return linep->minx;
-		}
-		else if (info == LIBAROMA_TEXTLINE_INFO_HEIGHT) {
-			return linep->lineheight;
-		}
-		else if (info == LIBAROMA_TEXTLINE_INFO_WIDTH) {
-			return linep->w;
-		}
-		else if (info == LIBAROMA_TEXTLINE_INFO_BASELINE) {
-			return linep->h;
-		}
+	if (line > txt->n - 1) {
+		return 0;
 	}
-	return 0;
+	_LIBAROMA_TEXTLINEP linep = txt->lines[line];
+	switch (info){
+		case LIBAROMA_TEXTLINE_INFO_CONTENT_WIDTH:
+			return linep->maxx - linep->minx;
+		case LIBAROMA_TEXTLINE_INFO_RIGHT:
+			return linep->maxx;
+		case LIBAROMA_TEXTLINE_INFO_LEFT:
+			return linep->minx;
+		case LIBAROMA_TEXTLINE_INFO_HEIGHT:
+			return linep->lineheight;
+		case LIBAROMA_TEXTLINE_INFO_WIDTH:
+			return linep->w;
+		case LIBAROMA_TEXTLINE_INFO_BASELINE:
+			return linep->h;
+		default:
+			return 0;
+	}
 } /* End of libaroma_text_line_info */
 
 /*
