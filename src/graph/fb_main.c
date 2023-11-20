@@ -427,7 +427,8 @@ int libaroma_dp(
 		return 0;
 	}
 	int ret = (dp * _libaroma_fb->dpi) / 160;
-	return (ret>1)?ret:1; /* must return 1 even on ldpi */
+	if (ret < 1 && _libaroma_fb->dpi < 160) return 1; /* must return 1 even on ldpi */
+	return ret;
 } /* End of libaroma_dp */
 
 /*
