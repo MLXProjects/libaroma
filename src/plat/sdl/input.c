@@ -272,10 +272,18 @@ byte SDLHIDRV_translate_keyboard(
 			dest_ev->key = LIBAROMA_HID_KEY_P;
 			break;
 		case SDLK_LEFTBRACKET:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_LBRACE;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_LEFTBRACE;
+		#endif
 			break;
 		case SDLK_RIGHTBRACKET:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_RBRACE;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_RIGHTBRACE;
+		#endif
 			break;
 		case SDLK_CAPSLOCK:
 			dest_ev->key = LIBAROMA_HID_KEY_CAPSLOCK;
@@ -314,7 +322,11 @@ byte SDLHIDRV_translate_keyboard(
 			dest_ev->key = LIBAROMA_HID_KEY_APOSTROPHE;
 			break;
 		case SDLK_LSHIFT:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_LSHIFT;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_LEFTSHIFT;
+		#endif
 			break;
 		case SDLK_BACKSLASH:
 			dest_ev->key = LIBAROMA_HID_KEY_BACKSLASH;
@@ -350,10 +362,18 @@ byte SDLHIDRV_translate_keyboard(
 			dest_ev->key = LIBAROMA_HID_KEY_SLASH;
 			break;
 		case SDLK_RSHIFT:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_RSHIFT;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_RIGHTSHIFT;
+		#endif
 			break;
 		case SDLK_LCTRL:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_LCTRL;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_LEFTCTRL;
+		#endif
 			break;
 	#ifdef LIBAROMA_PLATFORM_SDL2
 		case SDLK_LGUI:
@@ -361,10 +381,18 @@ byte SDLHIDRV_translate_keyboard(
 		case SDLK_LMETA:
 		case SDLK_LSUPER:
 	#endif
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_LMETA;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_LEFTMETA;
+		#endif
 			break;
 		case SDLK_LALT:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_LALT;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_LEFTALT;
+		#endif
 			break;
 		case SDLK_SPACE:
 			dest_ev->key = LIBAROMA_HID_KEY_SPACE;
@@ -373,18 +401,27 @@ byte SDLHIDRV_translate_keyboard(
 		case SDLK_MODE: /* AltGr key in SDL 1.2 */
 	#endif
 		case SDLK_RALT:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_RALT;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_RIGHTALT;
+		#endif
 			break;
 	#ifdef LIBAROMA_PLATFORM_SDL2
 		case SDLK_RGUI:
+			dest_ev->key = LIBAROMA_HID_KEY_RMETA;
 	#else
 		case SDLK_RMETA:
 		case SDLK_RSUPER:
-	#endif
 			dest_ev->key = LIBAROMA_HID_KEY_RIGHTMETA;
+	#endif
 			break;
 		case SDLK_RCTRL:
+		#ifdef LIBAROMA_PLATFORM_SDL2
+			dest_ev->key = LIBAROMA_HID_KEY_RCTRL;
+		#else
 			dest_ev->key = LIBAROMA_HID_KEY_RIGHTCTRL;
+		#endif
 			break;
 		/* now check navigation & edition keys section (arrows, insert, PrtScr...) */
 		case SDLK_SYSREQ:
