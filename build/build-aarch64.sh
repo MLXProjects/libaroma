@@ -53,13 +53,13 @@ export LIBAROMA_ARCH_FLAGS=""
 
 export LIBAROMA_PLATFORM_SRC="
     ${LIBAROMA_PATH}/src/aroma/arch/arm64/android_memset.S
-    ${LIBAROMA_PATH}/src/contrib/platform/linux/fb_driver.c
-    ${LIBAROMA_PATH}/src/contrib/platform/linux/hid_driver.c
-    ${LIBAROMA_PATH}/src/contrib/platform/linux/platform.c
+    ${LIBAROMA_PATH}/src/contrib/platform/${LIBAROMA_PLATFORM}/fb_driver.c
+    ${LIBAROMA_PATH}/src/contrib/platform/${LIBAROMA_PLATFORM}/hid_driver.c
+    ${LIBAROMA_PATH}/src/contrib/platform/${LIBAROMA_PLATFORM}/platform.c
 "
 
 export LIBAROMA_PLATFORM_INCLUDE="
-    ${LIBAROMA_PATH}/src/contrib/platform/linux/include
+    ${LIBAROMA_PATH}/src/contrib/platform/${LIBAROMA_PLATFORM}/include
 "
 
 ##

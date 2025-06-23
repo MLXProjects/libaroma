@@ -225,8 +225,7 @@ ${CC} -c -Wno-format-truncation \
     -I${LIBAROMA_PATH}/libs/freetype/include \
     -I${LIBAROMA_PATH}/libs/minzip \
     -I${LIBAROMA_PATH}/libs/png \
-    -I${LIBAROMA_PATH}/libs/jpeg-turbo \
-    -I${LIBAROMA_PATH}/libs/harfbuzz-ng/src/hb-ucdn
+    -I${LIBAROMA_PATH}/libs/jpeg-turbo
 echo " "
 echo "      -------------------------"
 echo " "
