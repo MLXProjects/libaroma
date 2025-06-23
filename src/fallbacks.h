@@ -27,12 +27,13 @@
 #ifndef __libaroma_fallbacks_h__
 #define __libaroma_fallbacks_h__
 
-/* min/max fallback*/
+/* min/max fallback */
+/*
 #ifndef MIN
   #define MIN(a, b) ({ \
     __typeof__ (a) _a = (a); \
     __typeof__ (b) _b = (b); \
-    _a > _b ? _a : _b; \
+    _a < _b ? _a : _b; \
   })
 #endif
 #ifndef MAX
@@ -42,6 +43,6 @@
     _a > _b ? _a : _b; \
   })
 #endif
-
+*/
 #endif /* __libaroma_fallbacks_h__ */
 
