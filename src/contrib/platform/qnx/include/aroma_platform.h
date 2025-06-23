@@ -116,13 +116,14 @@ static void * ___realloc_ori(void * addr,size_t sz){
 /*
  * common platform wrapper
  */
-#define libaroma_unlink(filename) unlink(filename)
-#define libaroma_sleep(ms) usleep(ms*1000)
+static inline void _libaroma_platform_sleep(long ms) {
+  usleep(ms * 1000);
+}
 
 /*
  * get tick count
  */
-static inline long libaroma_tick(){
+static inline long _libaroma_platform_tick(){
   struct timespec now;
   if (clock_gettime(CLOCK_MONOTONIC, &now)) {
     return 0;

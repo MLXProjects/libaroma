@@ -53,12 +53,12 @@ byte libaroma_timer_release() {
 } /* End of libaroma_timer_release */
 
 /* alias libaroma_tick for public */
-long libaroma_extern_tick(){
-  return libaroma_tick();
+long libaroma_tick(){
+  return _libaroma_platform_tick();
 }
 /* alias libaroma_sleep for public */
-void libaroma_extern_sleep(long n){
-  libaroma_sleep(n);
+void libaroma_sleep(long ms){
+	_libaroma_platform_sleep(ms);
 }
 
 #endif /* __libaroma_time_c__ */

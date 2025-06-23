@@ -614,9 +614,6 @@ finalize:
 
   if (fp != NULL) {
     fclose(fp);
-    if (!result) {
-      libaroma_unlink(filename);
-    }
   }
   if (info_ptr != NULL) {
     png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
