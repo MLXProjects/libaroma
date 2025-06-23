@@ -6,3 +6,5 @@ install_manifest.txt
 /build/armv7
 /build/aarch64
 /build/x86_64
+cbuild
+.scannerwork
