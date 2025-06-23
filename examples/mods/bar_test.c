@@ -102,7 +102,7 @@ void bar_test(){
   
   libaroma_listitem_image(
     list,1,
-    libaroma_image_uri("file:///sdcard/wall2.jpg"),
+    libaroma_image_uri("file://./res/wall2.jpg"),
     120,
     LIBAROMA_LISTITEM_IMAGE_FREE|LIBAROMA_LISTITEM_WITH_SEPARATOR|
     LIBAROMA_LISTITEM_IMAGE_FILL|LIBAROMA_LISTITEM_IMAGE_PROPORTIONAL|
@@ -111,11 +111,11 @@ void bar_test(){
   
   
   LIBAROMA_CANVASP list_icon =
-    libaroma_image_uri("file:///sdcard/card.png");
+    libaroma_image_uri("file://./res/card.png");
   LIBAROMA_CANVASP list_icon2 =
-    libaroma_image_uri("file:///sdcard/gesture.png");
+    libaroma_image_uri("file://./res/gesture.png");
   LIBAROMA_CANVASP list_icon3 =
-    libaroma_image_uri("file:///sdcard/inbox.png");
+    libaroma_image_uri("file://./res/inbox.png");
   
   /* fill color */
   libaroma_canvas_fillcolor(list_icon,libaroma_colorget(NULL,NULL)->primary);
@@ -130,7 +130,7 @@ void bar_test(){
     if (itm==10){
       libaroma_listitem_image(
         list,1,
-        libaroma_image_uri("file:///sdcard/wall1.jpg"),
+        libaroma_image_uri("file://./res/wall1.jpg"),
         150,
         LIBAROMA_LISTITEM_IMAGE_FREE|LIBAROMA_LISTITEM_WITH_SEPARATOR|
         LIBAROMA_LISTITEM_IMAGE_FILL|LIBAROMA_LISTITEM_IMAGE_PROPORTIONAL|
@@ -218,7 +218,7 @@ void bar_test(){
     
     libaroma_listitem_image(
       sblist,1,
-      libaroma_image_uri("file:///sdcard/wall2.jpg"),
+      libaroma_image_uri("file://./res/wall2.jpg"),
       150,
       LIBAROMA_LISTITEM_IMAGE_FREE|LIBAROMA_LISTITEM_WITH_SEPARATOR|
       LIBAROMA_LISTITEM_IMAGE_FILL|LIBAROMA_LISTITEM_IMAGE_PROPORTIONAL|
@@ -228,7 +228,7 @@ void bar_test(){
     char xtext[256];
     for (r=0;r<20;r++){
       if (r%5==0){
-        snprintf(xtext,256,"SIDEBAR CAPTION %i",itm);
+        snprintf(xtext,256,"SIDEBAR CAPTION %i",r);
         libaroma_listitem_caption_color(
           sblist, 200, xtext, RGB(888888), -1);
       }
@@ -278,7 +278,7 @@ void bar_test(){
   int change_id=0;
   byte onpool=1;
   do{
-    LIBAROMA_MSG msg;
+    LIBAROMA_MSG msg={0};
     dword command=libaroma_window_pool(win,&msg);
     byte cmd  = LIBAROMA_CMD(command);
     word id   = LIBAROMA_CMD_ID(command);
@@ -287,10 +287,15 @@ void bar_test(){
     if (msg.msg==LIBAROMA_MSG_KEY_SELECT){
       if (msg.state==0){
         printf("Screenshoot... and exit\n");
-        libaroma_png_save(libaroma_fb()->canvas,"/sdcard/libaroma_screenshoot.png");
+        libaroma_png_save(libaroma_fb()->canvas,"./libaroma_screenshot.png");
         onpool = 0;
         break;
       }
+    }
+    else if (msg.msg==LIBAROMA_MSG_EXIT){
+      printf("Exit Button Pressed...\n");
+      onpool = 0;
+      break;
     }
     else if (cmd){
       if (cmd==LIBAROMA_CMD_HOLD){
