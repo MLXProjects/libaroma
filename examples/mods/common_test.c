@@ -90,7 +90,7 @@ void common_test(){
   );
   
   LIBAROMA_CANVASP list_icon =
-    libaroma_image_uri("file:///sdcard/ic_settings_data_usage.png");
+    libaroma_image_uri("file://./res/ic_settings_data_usage.png");
   char main_text[256];
   char extra_text[256];
   int itm=0;
@@ -139,12 +139,16 @@ void common_test(){
     word id   = LIBAROMA_CMD_ID(command);
     byte param= LIBAROMA_CMD_PARAM(command);
     
-    if (cmd){
-      
+    if (msg.msg==LIBAROMA_MSG_EXIT){
+      printf("Exit Button Pressed...\n");
+      onpool = 0;
+      break;
+    }
+    else if (cmd){
       if (cmd==LIBAROMA_CMD_CLICK){
         if (id==6){
           if (click_value==0){
-            libaroma_png_save(libaroma_fb()->canvas,"/sdcard/libaroma_screenshoot.png");
+            libaroma_png_save(libaroma_fb()->canvas,"./libaroma_screenshot.png");
           }
           
           click_value++;

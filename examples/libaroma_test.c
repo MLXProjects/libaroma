@@ -29,34 +29,28 @@
 
 /* include test modules */
 #include "mods/bar_test.c"
-#include "mods/tab_test.c"
 #include "mods/common_test.c"
+#include "mods/tab_test.c"
 
 /*
  * Function    : init_libaroma
  * Return Value: void
  * Descriptions: init libaroma
  */
-void init_libaroma(){
+void init_libaroma() {
   /* set libaroma runtime configuration
     snprintf(libaroma_config()->fb_shm_name,64,"recovery-mainfb");
     libaroma_config()->runtime_monitor = LIBAROMA_START_UNSAFE;
   */
-  
-  /*snprintf(libaroma_config()->fb_shm_name,64,"");*/
-  libaroma_config()->fb_shm_name[0]=0;
+  libaroma_config()->runtime_monitor = LIBAROMA_START_SAFE;
   libaroma_start();
-  
+
   /* clean display */
   libaroma_canvas_blank(libaroma_fb()->canvas);
   libaroma_sync();
-  
+
   /* load font - id=0 */
-  libaroma_font(0,
-    libaroma_stream(
-      "file:///sdcard/Roboto-Regular.ttf"
-    )
-  );
+  libaroma_font(0, libaroma_stream("file://./res/Roboto-Regular.ttf"));
 } /* End of init_libaroma */
 
 /*
@@ -64,27 +58,25 @@ void init_libaroma(){
  * Return Value: int
  * Descriptions: main executable function
  */
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
   /* For recovery Apps:
-    pid_t pp = getppid();
-    kill(pp, 19);
+  libaroma_config()->runtime_monitor = LIBAROMA_START_MUTEPARENT;
   */
-  /*libaroma_config()->runtime_monitor = LIBAROMA_START_MUTEPARENT;*/
-  
+
   init_libaroma();
-  
-  // tab_test();
-  
+
+  /* start tab test */
+  tab_test();
+
+  /* start bar test */
   bar_test();
-  
+
   /* start common test */
-  // common_test();
-  
+  common_test();
+
   /* end libaroma process */
   libaroma_end();
-  /* For recovery apps:
-    kill(pp, 18);
-  */
+
   return 0;
 } /* End of main */
 

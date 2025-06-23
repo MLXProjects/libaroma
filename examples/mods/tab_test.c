@@ -87,7 +87,7 @@ void tab_test(){
   );
   
   LIBAROMA_CANVASP list_icon =
-    libaroma_image_uri("file:///sdcard/ic_settings_data_usage.png");
+    libaroma_image_uri("file://./res/ic_settings_data_usage.png");
   char main_text[256];
   char extra_text[256];
   int itm=0;
@@ -126,7 +126,12 @@ void tab_test(){
     /*
     byte param= LIBAROMA_CMD_PARAM(command);
     */
-    if (cmd){
+    if (msg.msg==LIBAROMA_MSG_EXIT){
+      printf("Exit Button Pressed...\n");
+      onpool = 0;
+      break;
+    }
+    else if (cmd){
       if (cmd==LIBAROMA_CMD_HOLD){
         if (id==btn6->id){
           printf("Exit Button Pressed...\n");
