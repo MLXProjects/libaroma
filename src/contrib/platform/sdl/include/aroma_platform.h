@@ -60,21 +60,24 @@
 /*
  * platform flags
  */
-#define LIBAROMA_PLATFORM_HAS_SHMEM  1
-#define LIBAROMA_PLATFORM_HAS_MMAP   1
-#define LIBAROMA_PLATFORM_HAS_FD     1
+#ifndef _WIN32
+  #define LIBAROMA_PLATFORM_HAS_SHMEM  1
+  #define LIBAROMA_PLATFORM_HAS_MMAP   1
+  #define LIBAROMA_PLATFORM_HAS_FD     1
+#endif
 #define LIBAROMA_CONFIG_OS "SDL"
 
 /*
  * common platform wrapper
  */
-#define libaroma_unlink(filename) unlink(filename)
-#define libaroma_sleep(ms) usleep(ms*1000)
+static inline void _libaroma_platform_sleep(long ms) {
+  usleep(ms * 1000);
+}
 
 /*
  * get tick count
  */
-static inline long libaroma_tick(){
+static inline long _libaroma_platform_tick(){
   struct timespec now;
   if (clock_gettime(CLOCK_MONOTONIC, &now)) {
     return 0;
@@ -86,49 +89,91 @@ static inline long libaroma_tick(){
  * MUTEX - NEED MULTICORE THREAD SAFE
  */
 #ifdef LIBAROMA_CONFIG_OPENMP
+  /* OpenMP mutex implementation */
   #include <omp.h>
   #define LIBAROMA_MUTEX omp_nest_lock_t
-  #define libaroma_mutex_init(x) omp_init_nest_lock(&x)
-  #define libaroma_mutex_free(x) omp_destroy_nest_lock(&x)
-  #define libaroma_mutex_lock(x) omp_set_nest_lock(&x)
-  #define libaroma_mutex_unlock(x) omp_unset_nest_lock(&x)
+  #define libaroma_mutex_init(x) omp_init_nest_lock(&(x))
+  #define libaroma_mutex_free(x) omp_destroy_nest_lock(&(x))
+  #define libaroma_mutex_lock(x) omp_set_nest_lock(&(x))
+  #define libaroma_mutex_unlock(x) omp_unset_nest_lock(&(x))
 #else
-  #define LIBAROMA_MUTEX pthread_mutex_t
-  #define libaroma_mutex_init(x) pthread_mutex_init(&x,NULL)
-  #define libaroma_mutex_free(x) pthread_mutex_destroy(&x)
-  #define libaroma_mutex_lock(x) pthread_mutex_lock(&x)
-  #define libaroma_mutex_unlock(x) pthread_mutex_unlock(&x)
+  #ifndef LIBAROMA_CONFIG_NOPTHREAD
+    /* pthread mutex implementation */
+    static inline void libaroma_pthread_mutex_init(pthread_mutex_t * x){
+      pthread_mutexattr_t Attr;
+      pthread_mutexattr_init(&Attr);
+      pthread_mutexattr_settype(&Attr, PTHREAD_MUTEX_RECURSIVE);
+      pthread_mutex_init(x, &Attr);
+    }
+    #define LIBAROMA_MUTEX pthread_mutex_t
+    // #define libaroma_mutex_init(x) pthread_mutex_init(&x,NULL)
+    #define libaroma_mutex_init(x) libaroma_pthread_mutex_init(&(x))
+    #define libaroma_mutex_free(x) pthread_mutex_destroy(&(x))
+    #define libaroma_mutex_lock(x) pthread_mutex_lock(&(x))
+    #define libaroma_mutex_unlock(x) pthread_mutex_unlock(&(x))
+  #else
+    /* dummy - no mutex implementation */
+    #define LIBAROMA_MUTEX voidp
+    #define libaroma_mutex_init(x)
+    #define libaroma_mutex_free(x)
+    #define libaroma_mutex_lock(x)
+    #define libaroma_mutex_unlock(x)
+  #endif
 #endif
 
 /*
  * THREADS
  */
-typedef pthread_t LIBAROMA_THREAD;
-#define libaroma_thread_create(th,cb,cookie) \
-  pthread_create(th,NULL,cb,cookie)
-/* recommended */
-#define libaroma_thread_join(th) pthread_join(th,NULL)
-/* optional */
-#define libaroma_thread_detach(th) pthread_detach(th)
-#define libaroma_thread_kill(th) pthread_kill(th,0)
-static inline void libaroma_thread_set_hiprio(LIBAROMA_THREAD t){
-  struct sched_param params;
-  params.sched_priority = sched_get_priority_max(SCHED_FIFO);
-  pthread_setschedparam(t, SCHED_FIFO, &params);
-}
+#ifndef LIBAROMA_CONFIG_NOPTHREAD
+  /* pthread threading */
+    typedef pthread_t LIBAROMA_THREAD;
+    #define libaroma_thread_create(th,cb,cookie) \
+      pthread_create(th,NULL,cb,cookie)
+    /* recommended */
+    #define libaroma_thread_join(th) pthread_join(th,NULL)
+    /* optional */
+    #define libaroma_thread_detach(th) pthread_detach(th)
+    #define libaroma_thread_kill(th) pthread_kill(th,0)
+    static inline void libaroma_thread_set_hiprio(LIBAROMA_THREAD t){
+      struct sched_param params;
+      params.sched_priority = sched_get_priority_max(SCHED_FIFO);
+      pthread_setschedparam(t, SCHED_FIFO, &params);
+    }
+#else
+ /* dummy - no threading */
+ /* TODO: most things don't work at all without threading */
+  typedef voidp LIBAROMA_THREAD;
+  #define libaroma_thread_create(th,cb,cookie)
+  #define libaroma_thread_join(th)
+  #define libaroma_thread_detach(th)
+  #define libaroma_thread_kill(th)
+  #define libaroma_thread_set_hiprio(t)
+#endif
 
 /*
  * CONDITION & MUTEX CONDITION - NOT NEED MULTICORE THREADSAFE
  */
-#define LIBAROMA_COND_MUTEX pthread_mutex_t
-#define LIBAROMA_COND pthread_cond_t
-#define libaroma_cond_wait(c,m) pthread_cond_wait(c,m)
-#define libaroma_cond_signal(c) pthread_cond_signal(c)
-#define libaroma_cond_lock(m) pthread_mutex_lock(m)
-#define libaroma_cond_unlock(m) pthread_mutex_unlock(m)
-void libaroma_cond_init(LIBAROMA_COND * cond, LIBAROMA_COND_MUTEX * mutex);
-void libaroma_cond_free(LIBAROMA_COND * cond, LIBAROMA_COND_MUTEX * mutex);
-
+#ifndef LIBAROMA_CONFIG_NOPTHREAD
+  /* pthread conditional signal/mutex implementation */
+  #define LIBAROMA_COND_MUTEX pthread_mutex_t
+  #define LIBAROMA_COND pthread_cond_t
+  #define libaroma_cond_wait(c,m) pthread_cond_wait(c,m)
+  #define libaroma_cond_signal(c) pthread_cond_signal(c)
+  #define libaroma_cond_lock(m) pthread_mutex_lock(m)
+  #define libaroma_cond_unlock(m) pthread_mutex_unlock(m)
+  void libaroma_cond_init(LIBAROMA_COND * cond, LIBAROMA_COND_MUTEX * mutex);
+  void libaroma_cond_free(LIBAROMA_COND * cond, LIBAROMA_COND_MUTEX * mutex);
+#else
+  /* dummy - no conditional signal/mutex implementation */
+  #define LIBAROMA_COND_MUTEX voidp
+  #define LIBAROMA_COND voidp
+  #define libaroma_cond_wait(c,m)
+  #define libaroma_cond_signal(c)
+  #define libaroma_cond_lock(m)
+  #define libaroma_cond_unlock(m)
+  #define libaroma_cond_init(c,m)
+  #define libaroma_cond_free(c,m)
+#endif
 
 /*
  * File Management

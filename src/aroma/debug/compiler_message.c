@@ -31,14 +31,16 @@
 #define __LIBAROMA_STR(macro) __LIBAROMA_STRINGFY(macro)
 
 /* arm neon */
-#ifdef __ARM_NEON__
-  #define __LIBAROMA_CMSG_NEON "YES"
-#else
-  #ifdef __SSSE3__
-    #define __LIBAROMA_CMSG_NEON "YES - SSE Emulated"
-  #else
-    #define __LIBAROMA_CMSG_NEON "NO"
+#ifdef LIBAROMA_CONFIG_SIMD
+  #ifdef __ARM_NEON__
+    #define __LIBAROMA_CMSG_SIMD "ARM NEON"
   #endif
+  #ifdef __SSE2__
+    #define __LIBAROMA_CMSG_SIMD "x86 SSE2"
+  #endif
+#endif
+#ifndef __LIBAROMA_CMSG_SIMD
+  #define __LIBAROMA_CMSG_SIMD "NO"
 #endif
 
 /* openmp */
@@ -80,7 +82,7 @@
   #define __LIBAROMA_CMSG_DLEVEL "ENABLED - 6. Verbose With Events\n"\
     "                        "\
     " * WARNING: DONT EVER USE IT ON PRODUCTION"
-#elif LIBAROMA_CONFIG_DEBUG==7
+#elif LIBAROMA_CONFIG_DEBUG>=7
   #define __LIBAROMA_CMSG_DLEVEL "ENABLED - 7. Verbose With Raw Events\n"\
     "                        "\
     " * WARNING: DONT EVER USE IT ON PRODUCTION"
@@ -173,14 +175,14 @@
     "  Shmem FB            : " __LIBAROMA_FBCANVAS_SHMEM "\n"\
     "  Freetype Rendering  : " __LIBAROMA_CMSG_SUBPIXEL "\n"\
     "  32bit highcolor bit : " __LIBAROMA_CMSG_HICOLOR "\n"\
-    "  ARM NEON Optimized  : " __LIBAROMA_CMSG_NEON "\n"\
+    "  SIMD Optimized      : " __LIBAROMA_CMSG_SIMD "\n"\
     "  OpenMP Optimized    : " __LIBAROMA_CMSG_OPENMP "\n"\
   "\n______________________________________________________________________\n"\
   "\n"
 
 #undef __LIBAROMA_CMSG_DTRACE
 #undef __LIBAROMA_CMSG_HICOLOR
-#undef __LIBAROMA_CMSG_NEON
+#undef __LIBAROMA_CMSG_SIMD
 #undef __LIBAROMA_CMSG_DFILENAME
 #undef __LIBAROMA_CMSG_DMEM
 #undef __LIBAROMA_CMSG_DLEVEL
