@@ -1,4 +1,4 @@
-byte dialog_demo(LIBAROMA_WINDOWP parent){
+void dialog_demo(LIBAROMA_WINDOWP parent){
   int res=libaroma_dialog_list(
     "Dialog Demo",
     "OK",
