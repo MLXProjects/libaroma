@@ -84,7 +84,7 @@ static inline void _libaroma_platform_sleep(long ms) {
 /*
  * get tick count
  */
-static inline long libaroma_tick(){
+static inline long _libaroma_platform_tick(){
   struct timespec now;
   if (clock_gettime(CLOCK_MONOTONIC, &now)) {
     return 0;
