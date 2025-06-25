@@ -25,7 +25,7 @@
 #define __libaroma_compiler_message_c__
 #include <aroma_internal.h>
 
-
+#if !defined(LIBAROMA_CONFIG_COMPILER_MESSAGE) || LIBAROMA_CONFIG_COMPILER_MESSAGE == 1
 /* stringfy */
 #define __LIBAROMA_STRINGFY(X) #X
 #define __LIBAROMA_STR(macro) __LIBAROMA_STRINGFY(macro)
@@ -195,5 +195,6 @@
 #undef __LIBAROMA_CMSG_OPENMP
 #undef __LIBAROMA_CMSG_SUBPIXEL
 
+#endif /* LIBAROMA_CONFIG_COMPILER_MESSAGE */
 #endif /* __libaroma_compiler_message_c__ */
 
