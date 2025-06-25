@@ -1,8 +1,4 @@
 {
-  "editor.minimap.enabled": true,
-  "editor.rulers": [
-    80,
-    120
-  ],
-  "C_Cpp.errorSquiggles": "Disabled"
+	"C_Cpp.errorSquiggles": "disabled",
+	"sonarlint.pathToCompileCommands": "${workspaceFolder}/cbuild/compile_commands.json",
 }
