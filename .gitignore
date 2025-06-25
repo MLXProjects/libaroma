@@ -8,3 +8,4 @@ install_manifest.txt
 /build/x86_64
 cbuild
 .scannerwork
+sonar-project.properties
