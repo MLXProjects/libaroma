@@ -61,7 +61,13 @@
  * platform flags
  */
 #ifndef _WIN32
-  #define LIBAROMA_PLATFORM_HAS_SHMEM  1
+  /* shmem prefix */
+  #ifndef LIBAROMA_CONFIG_SHMEM_PREFIX
+    #define LIBAROMA_CONFIG_SHMEM_PREFIX "/libaromashm-"
+  #endif
+  #ifndef LIBAROMA_CONFIG_NOSHMEM
+    #define LIBAROMA_PLATFORM_HAS_SHMEM  1
+  #endif
   #define LIBAROMA_PLATFORM_HAS_MMAP   1
   #define LIBAROMA_PLATFORM_HAS_FD     1
 #endif
