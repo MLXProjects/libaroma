@@ -206,6 +206,9 @@ foreach (target ${LIB_TARGETS})
 	if (LIBAROMA_CONFIG_HICOLOR_BIT)
 		target_compile_definitions(${target} PRIVATE LIBAROMA_CONFIG_HICOLOR_BIT=1)
 	endif()
+	if (LIBAROMA_CONFIG_COMPILER_MESSAGE)
+		target_compile_definitions(${target} PRIVATE LIBAROMA_CONFIG_COMPILER_MESSAGE=1)
+	endif()
    	# add configs with libraries
 	if (LIBAROMA_CONFIG_OPENMP)
 		target_compile_definitions(${target} PRIVATE
