@@ -279,7 +279,7 @@ LIBAROMA_STREAMP libaroma_stream_mem(
   ret->ismmap   = 0;
   ret->ismem    = 1;
   snprintf(ret->uri, LIBAROMA_STREAM_URI_LENGTH,
-      "mem://0x%x-0x%x", (unsigned int)mem, mem_sz);
+      "mem://%p-0x%x", mem, mem_sz);
   return ret;
 } /* End of libaroma_stream_mem */
 
@@ -290,9 +290,9 @@ LIBAROMA_STREAMP libaroma_stream_mem(
  */
 LIBAROMA_STREAMP libaroma_stream(
     char * uri) {
-  int n = strlen(uri);
+  size_t n = strlen(uri);
   char kwd[11];
-  int i;
+  unsigned int i;
   for (i = 0; i < n && i < 10; i++) {
     kwd[i] = uri[i];
     kwd[i + 1] = 0;
@@ -317,32 +317,30 @@ LIBAROMA_STREAMP libaroma_stream(
         zpath[cpos++] = uri[i];
         zpath[cpos] = 0;
       }
+      else if (uri[i] == '#') {
+        cpos     = 0;
+        is_zpath = 1;
+      }
       else {
-        if (uri[i] == '#') {
-          cpos     = 0;
-          is_zpath = 1;
-        }
-        else {
-          zip_path[cpos++] = uri[i];
-          zip_path[cpos] = 0;
-        }
+        zip_path[cpos++] = uri[i];
+        zip_path[cpos] = 0;
       }
     }
     return libaroma_stream_zip(zip_path, zpath);
   }
 #endif
   else if (strcmp(kwd, "mem://") == 0) {
-    unsigned int mem;
+    bytep mem;
     unsigned int mem_sz;
     int rc;
 
-    rc = sscanf(uri+6, "0x%x-0x%x", &mem, &mem_sz);
+    rc = sscanf(uri+6, "%p-0x%x", &mem, &mem_sz);
     if (rc!=2) {
       ALOGW("libaroma_stream_mem range format is invalid");
       return NULL;
     }
 
-    return libaroma_stream_mem((bytep)mem, mem_sz);
+    return libaroma_stream_mem(mem, mem_sz);
   }
   else if (_libaroma_stream_uri_cb != NULL) {
     return _libaroma_stream_uri_cb(uri);
@@ -486,10 +484,8 @@ byte libaroma_shmem_close(
   if (a->data) {
     munmap(a->data, a->size);
   }
-  if (del) {
-    if (shm_unlink(a->name) != 0) {
-      ALOGW("libaroma_shmem_close shm_unlink failed (%s)", a->name);
-    }
+  if (del && shm_unlink(a->name) != 0) {
+    ALOGW("libaroma_shmem_close shm_unlink failed (%s)", a->name);
   }
   free(a);
   return 1;
