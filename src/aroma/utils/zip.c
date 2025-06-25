@@ -25,7 +25,7 @@
 #define __libaroma_zip_c__
 #include <aroma_internal.h>
 
-#ifndef LIBAROMA_CONFIG_NOZIP
+#ifndef LIBAROMA_CONFIG_NOMINZIP
   #include <zlib.h>
   #include <Zip.h>
 #endif
@@ -37,7 +37,7 @@
  */
 LIBAROMA_ZIP libaroma_zip(
     const char * filename) {
-#ifndef LIBAROMA_CONFIG_NOZIP
+#ifndef LIBAROMA_CONFIG_NOMINZIP
   LIBAROMA_ZIP zip = (LIBAROMA_ZIP) malloc(sizeof(ZipArchive));
   if (mzOpenZipArchive(filename, (ZipArchive *) zip) != 0) {
     ALOGW("libaroma_zip mzOpenZipArchive error (%s)", filename);
@@ -57,7 +57,7 @@ LIBAROMA_ZIP libaroma_zip(
  */
 void libaroma_zip_release(
     LIBAROMA_ZIP zip) {
-#ifndef LIBAROMA_CONFIG_NOZIP
+#ifndef LIBAROMA_CONFIG_NOMINZIP
   mzCloseZipArchive((ZipArchive *) zip);
   free(zip);
 #endif
@@ -72,7 +72,7 @@ byte libaroma_zip_extract(
     LIBAROMA_ZIP zip,
     const char * zpath,
     const char * dest) {
-#if !defined(LIBAROMA_CONFIG_NOZIP) && defined(LIBAROMA_PLATFORM_HAS_FD)
+#if !defined(LIBAROMA_CONFIG_NOMINZIP) && defined(LIBAROMA_PLATFORM_HAS_FD)
   const ZipEntry * zdata = mzFindZipEntry((ZipArchive *) zip, zpath);
   if (zdata == NULL) {
     ALOGW("libaroma_zip_extract zdata=NULL (%s)", zpath);
@@ -101,7 +101,7 @@ int libaroma_zip_read(
     bytep * bufp,
     const char * zpath,
     byte bytesafe) {
-#ifndef LIBAROMA_CONFIG_NOZIP
+#ifndef LIBAROMA_CONFIG_NOMINZIP
   const ZipEntry * se = mzFindZipEntry((ZipArchive *) zip, zpath);
   if (se == NULL) {
     ALOGW("libaroma_zip_read mzFindZipEntry error (%s)", zpath);
