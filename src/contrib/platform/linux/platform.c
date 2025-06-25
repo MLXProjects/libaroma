@@ -27,11 +27,6 @@
 
 #include <sys/stat.h>
 
-/* shmem prefix */
-#ifndef LIBAROMA_CONFIG_SHMEM_PREFIX
-  #define LIBAROMA_CONFIG_SHMEM_PREFIX "/libaromashm-"
-#endif
-
 /* event & condition */
 #ifndef LIBAROMA_CONFIG_NOPTHREAD
 void libaroma_cond_init(
