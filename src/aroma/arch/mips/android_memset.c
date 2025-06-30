@@ -28,7 +28,8 @@
 
 /* generic C version for any machine */
 
-#include <cutils/memory.h>
+#include <stdint.h>
+#include <stddef.h>
 
 void android_memset16(uint16_t* dst, uint16_t value, size_t size)
 {
