@@ -24,12 +24,13 @@
 #ifndef __libaroma_jpeg_c__
 #define __libaroma_jpeg_c__
 #include <aroma_internal.h>
+
+#ifndef LIBAROMA_CONFIG_NOJPEG
 // #include <jinclude.h>         /* JPEG */
 #include <jerror.h>
 #include <jpeglib.h>
 #include <setjmp.h>
 
-#ifndef LIBAROMA_CONFIG_NOJPEG
 
 //
 // LIB-JPEG-TURBO RGB565 - Define in build argument
