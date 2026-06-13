@@ -245,13 +245,13 @@ byte LINUXHIDRV_init(LIBAROMA_HIDP me) {
     closedir(dir);
 
     /* input device not found */
-    if (mi->n == 0) {
-      /* free internal data */
-      free(mi);
-      ALOGE("INDR ERROR: Input Device Not Found...");
-      /* error */
-      return 0;
-    }
+    // if (mi->n == 0) {
+    //   /* free internal data */
+    //   free(mi);
+    //   ALOGE("INDR ERROR: Input Device Not Found...");
+    //   /* error */
+    //   return 0;
+    // }
 
     pipe(mi->fdctl);
     mi->fds[mi->n].fd = mi->fdctl[0];
